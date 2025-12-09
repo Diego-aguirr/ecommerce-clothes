@@ -1,5 +1,7 @@
 "use client";
 
+import { titleFont } from "@/config/fonts";
+
 // import { getStockBySlug } from "@/actions"; // Funcionalidad externa
 // import { titleFont } from "@/config/fonts"; // Funcionalidad externa
 // import { useEffect, useState } from "react"; // Funcionalidad externa
@@ -21,7 +23,6 @@ export const StockLabel = ({ slug }: Props) => {
 
   // }, [slug]);
 
-
   return (
     <>
       {/* {isLoading ? ( // Funcionalidad externa
@@ -35,8 +36,10 @@ export const StockLabel = ({ slug }: Props) => {
           Stock: {stock}
         </h1>
       )} */}
-      <h1 className={` /* ${titleFont.className} */ antialiased font-bold text-lg`}>
-        Stock: 7
+      <h1
+        className={` /* ${titleFont.className} */ antialiased font-bold text-lg`}
+      >
+        Stock: 7{slug}
       </h1>
     </>
   );

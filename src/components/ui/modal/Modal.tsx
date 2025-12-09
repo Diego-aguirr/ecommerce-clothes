@@ -1,10 +1,6 @@
-import React from 'react';
+import React from "react";
 
-interface ModalProps {
-  // Define props here
-}
-
-export const Modal = ({}: ModalProps) => {
+export const Modal = () => {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg">

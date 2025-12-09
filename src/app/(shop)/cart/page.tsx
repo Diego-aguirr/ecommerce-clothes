@@ -1,14 +1,8 @@
 import { QuantitySelector } from "@/components";
-import { initialData } from "@/seed/seed";
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  IoTrashOutline,
-  IoArrowBack,
-  IoCard,
-  IoShieldCheckmark,
-} from "react-icons/io5";
+import { IoArrowBack, IoCard, IoShieldCheckmark } from "react-icons/io5";
+import { initialData } from "@/seed  /seed";
 
 // Tomamos productos reales del seed data para el carrito
 const cartItems = [
@@ -76,7 +70,7 @@ export default function CartPage() {
               >
                 <div className="flex flex-col sm:flex-row gap-4">
                   {/* Imagen del producto */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="w-20 h-24 sm:w-24 sm:h-32 bg-gray-100 rounded-lg overflow-hidden">
                       <Image
                         src={item.image}
