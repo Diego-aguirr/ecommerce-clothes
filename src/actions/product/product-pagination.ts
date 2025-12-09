@@ -1,29 +1,64 @@
 "use server";
 
+import { Gender } from "@/generated/prisma/enums";
 import prisma from "@/lib/prisma";
 
-export const getPaginatedProductsWithImages = async () => {
-  try {
-    const products = await prisma.product.findMany({
-      include: {
-        ProductImage: {
-          take: 2,
-          select: { url: true },
-        },
-      },
-    });
+interface PaginationOptions {
+  page?: number;
+  take?: number;
+  gender?: Gender;
+}
 
-    console.log("Fetched products:", products);
+export const getPaginatedProductsWithImages = async ({
+  page = 1,
+  take = 12,
+  gender,
+}: PaginationOptions) => {
+  if (isNaN(Number(page))) page = 1;
+  if (page < 1) page = 1;
+
+  if (isNaN(Number(take))) take = 12;
+  if (take < 1) take = 1;
+  if (take > 100) take = 100; // Prevenir consultas muy grandes
+
+  try {
+    //Obtenemos datos de productos con paginación e imágenes
+
+    const whereCondition = gender ? { gender } : {};
+    const [products, totalProducts] = await Promise.all([
+      prisma.product.findMany({
+        where: whereCondition,
+        take: take,
+        skip: (page - 1) * take,
+        include: {
+          ProductImage: {
+            take: 2,
+            select: { url: true },
+          },
+        },
+      }),
+      // Obtenemos el total de productos
+      prisma.product.count({
+        where: whereCondition,
+      }),
+    ]);
+
+    // Obetenemos el total de paginas
+    //todo:
+    const totalPages = Math.ceil(totalProducts / take);
     return {
-      currentPage: 1,
-      totalPages: 10,
-      products: products.map((product) => ({
+      currentPage: page,
+      totalPages: totalPages,
+      products: products.map(({ ProductImage, ...product }) => ({
         ...product,
-        images: product.ProductImage.map((image) => image.url),
-        ProductImage: undefined,
+        images: ProductImage.map((image) => image.url),
       })),
     };
   } catch (error) {
-    throw new Error("Error fetching paginated products with images: " + error);
+    throw new Error(
+      `Error fetching products: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
   }
 };

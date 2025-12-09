@@ -16,10 +16,10 @@ export default function ProductSlideshow({
 }: Props) {
   const [selectedImage, setSelectedImage] = useState(0);
 
-  if (!images || images.length === 0) return null;
-
   // ⏱️ Cambio automático cada 2 segundos
   useEffect(() => {
+    if (images.length === 0) return;
+
     const interval = setInterval(() => {
       setSelectedImage((prev) => (prev + 1) % images.length);
     }, 5000);

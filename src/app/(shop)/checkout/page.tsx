@@ -1,6 +1,5 @@
-import { Title } from "@/components";
+import { initialData } from "@/seed  /seed";
 import Link from "next/link";
-import { initialData } from "@/seed/seed";
 
 // Simulamos productos del carrito basados en el seed data
 const cartItems = [

@@ -9,11 +9,7 @@ import {
 } from "react-icons/io5";
 import { useUIStore } from "@/store";
 
-interface TopMenuProps {
-  // Define props here if needed
-}
-
-export const TopMenu = ({}: TopMenuProps) => {
+export const TopMenu = () => {
   const openSideMenu = useUIStore((state) => state.openSideMenu);
   return (
     <nav className="bg-brand-primary py-4 px-6 shadow-md">
@@ -29,25 +25,25 @@ export const TopMenu = ({}: TopMenuProps) => {
         {/* Center Navigation - Hidden on small, visible on medium and up */}
         <div className="hidden md:flex items-center space-x-8">
           <Link
-            href="/category/men"
+            href="/gender/men"
             className="hover:text-brand-accent transition-colors"
           >
             Hombre
           </Link>
           <Link
-            href="/category/women/"
+            href="/gender/women/"
             className="hover:text-brand-accent transition-colors"
           >
             Mujer
           </Link>
           <Link
-            href="/category/kid"
+            href="/gender/kid"
             className="hover:text-brand-accent transition-colors"
           >
             Niños
           </Link>
           <Link
-            href="/category/unisex"
+            href="/gender/unisex"
             className="hover:text-brand-accent transition-colors"
           >
             Accesorios

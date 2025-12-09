@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { initialData } from "@/seed/seed";
 import { titleFont } from "@/config/fonts";
 import { QuantitySelector, SizeSelector } from "@/components";
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
-import { Size } from "@/interfaces";
+import { initialData } from "@/seed  /seed";
 /* import {
   ProductMobileSlideshow,
   ProductSlideshow,
@@ -44,7 +43,7 @@ export default async function Page({ params }: Props) {
         <SizeSelector
           selectedSize={product.sizes[0]}
           availableSizes={product.sizes}
-          onSizeChanged={function (size: Size): void {
+          onSizeChanged={function (): void {
             throw new Error("Function not implemented.");
           }}
         />
