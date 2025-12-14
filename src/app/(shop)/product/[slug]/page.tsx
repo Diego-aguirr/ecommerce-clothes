@@ -1,16 +1,11 @@
+export const revalidate = 604800; // Disable caching for this page
 import { notFound } from "next/navigation";
+import { Metadata, ResolvingMetadata } from "next";
 
-import { initialData } from "@/seed/seed";
 import { titleFont } from "@/config/fonts";
-import { QuantitySelector, SizeSelector } from "@/components";
+import { QuantitySelector, SizeSelector, StockLabel } from "@/components";
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
-import { Size } from "@/interfaces";
-/* import {
-  ProductMobileSlideshow,
-  ProductSlideshow,
-  QuantitySelector,
-  SizeSelector,
-} from "@/components"; */
+import { getProductBySlug } from "@/actions";
 
 interface Props {
   params: {
@@ -18,10 +13,36 @@ interface Props {
   };
 }
 
-export default async function Page({ params }: Props) {
-  const { slug } = await params; // 👈 importante
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const slug = params.slug;
 
-  const product = initialData.products.find((p) => p.slug === slug);
+  // fetch post information
+  const product = await getProductBySlug(slug);
+
+  return {
+    title: product?.title ?? "Producto no encontrado",
+    description:
+      product?.description ??
+      "No se pudo encontrar la descripción del producto.",
+    openGraph: {
+      title: product?.title ?? "Producto no encontrado",
+      description:
+        product?.description ??
+        "No se pudo encontrar la descripción del producto.",
+      //aqui debe ir el url Original de produccion
+      images: [`/products/${product?.images[1]}`],
+    },
+  };
+}
+
+export default async function Page({ params }: Props) {
+  const { slug } = params; // 👈 importante
+
+  const product = await getProductBySlug(slug);
+  console.log("Product fetched in page:", product);
 
   if (!product) {
     notFound();
@@ -36,6 +57,8 @@ export default async function Page({ params }: Props) {
 
       {/* Detalles */}
       <div className="col-span-1 px-5">
+        <StockLabel slug={product.slug} />
+
         <h1 className={`${titleFont.className} antialiased font-bold text-xl`}>
           {product.title}
         </h1>
@@ -44,8 +67,8 @@ export default async function Page({ params }: Props) {
         <SizeSelector
           selectedSize={product.sizes[0]}
           availableSizes={product.sizes}
-          onSizeChanged={function (size: Size): void {
-            throw new Error("Function not implemented.");
+          onSizeChanged={function (): void {
+            throw new Error("Function n: ot implemented.");
           }}
         />
         <QuantitySelector quantity={2} />

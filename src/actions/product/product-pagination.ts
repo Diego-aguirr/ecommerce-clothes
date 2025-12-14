@@ -13,7 +13,6 @@ export const getPaginatedProductsWithImages = async () => {
       },
     });
 
-    console.log("Fetched products:", products);
     return {
       currentPage: 1,
       totalPages: 10,

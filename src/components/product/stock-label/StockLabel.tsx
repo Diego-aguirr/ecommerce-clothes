@@ -1,30 +1,29 @@
 "use client";
 
-// import { getStockBySlug } from "@/actions"; // Funcionalidad externa
-// import { titleFont } from "@/config/fonts"; // Funcionalidad externa
-// import { useEffect, useState } from "react"; // Funcionalidad externa
+import { getStockBySlug } from "@/actions";
+import { titleFont } from "@/config/fonts";
+import { useEffect, useState } from "react";
 
 interface Props {
   slug: string;
 }
 
 export const StockLabel = ({ slug }: Props) => {
-  // const [stock, setStock] = useState(0); // Funcionalidad externa
-  // const [isLoading, setIsLoading] = useState(true); // Funcionalidad externa
-
-  // useEffect(() => { // Funcionalidad externa
-  //   const getStock = async () => {
-  //     const inStock = await getStockBySlug(slug);
-  //     setStock(inStock);
-  //     setIsLoading(false);
-  //   };
-
-  // }, [slug]);
-
+  const [stock, setStock] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  /// recordar que puedo aplicar conceptos nuevos de reat 19
+  useEffect(() => {
+    const getStock = async () => {
+      const inStock = await getStockBySlug(slug);
+      setStock(inStock);
+      setIsLoading(false);
+    };
+    getStock();
+  }, [slug]);
 
   return (
     <>
-      {/* {isLoading ? ( // Funcionalidad externa
+      {isLoading ? (
         <h1
           className={` ${titleFont.className} antialiased font-bold text-lg bg-gray-200 animate-pulse `}
         >
@@ -34,10 +33,7 @@ export const StockLabel = ({ slug }: Props) => {
         <h1 className={` ${titleFont.className} antialiased font-bold text-lg`}>
           Stock: {stock}
         </h1>
-      )} */}
-      <h1 className={` /* ${titleFont.className} */ antialiased font-bold text-lg`}>
-        Stock: 7
-      </h1>
+      )}
     </>
   );
 };
