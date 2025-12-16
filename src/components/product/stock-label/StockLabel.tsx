@@ -1,31 +1,30 @@
 "use client";
 
+import { getStockBySlug } from "@/actions";
 import { titleFont } from "@/config/fonts";
-
-// import { getStockBySlug } from "@/actions"; // Funcionalidad externa
-// import { titleFont } from "@/config/fonts"; // Funcionalidad externa
-// import { useEffect, useState } from "react"; // Funcionalidad externa
+import { useEffect, useState } from "react";
 
 interface Props {
   slug: string;
 }
 
 export const StockLabel = ({ slug }: Props) => {
-  // const [stock, setStock] = useState(0); // Funcionalidad externa
-  // const [isLoading, setIsLoading] = useState(true); // Funcionalidad externa
+  const [stock, setStock] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect(() => { // Funcionalidad externa
-  //   const getStock = async () => {
-  //     const inStock = await getStockBySlug(slug);
-  //     setStock(inStock);
-  //     setIsLoading(false);
-  //   };
+  useEffect(() => {
+    getStock();
+  }, []);
 
-  // }, [slug]);
+  const getStock = async () => {
+    const inStock = await getStockBySlug(slug);
+    setStock(inStock);
+    setIsLoading(false);
+  };
 
   return (
     <>
-      {/* {isLoading ? ( // Funcionalidad externa
+      {isLoading ? (
         <h1
           className={` ${titleFont.className} antialiased font-bold text-lg bg-gray-200 animate-pulse `}
         >
@@ -35,12 +34,7 @@ export const StockLabel = ({ slug }: Props) => {
         <h1 className={` ${titleFont.className} antialiased font-bold text-lg`}>
           Stock: {stock}
         </h1>
-      )} */}
-      <h1
-        className={` /* ${titleFont.className} */ antialiased font-bold text-lg`}
-      >
-        Stock: 7{slug}
-      </h1>
+      )}
     </>
   );
 };

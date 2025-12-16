@@ -4,7 +4,10 @@ import { inter } from "@/config/fonts";
 import "./globals.css"; // Re-adding the missing import
 
 export const metadata: Metadata = {
-  title: "JAVA CREW - Tienda Oficial",
+  title: {
+    default: "JAVA CREW - Tienda Oficial",
+    template: "%s - JAVA CREW",
+  },
   description:
     "La mejor tienda de ropa con diseños únicos. Explora la colección de JAVA CREW.",
 };
