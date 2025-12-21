@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   IoSearch,
@@ -7,10 +7,19 @@ import {
   IoPersonOutline,
   IoMenu,
 } from "react-icons/io5";
-import { useUIStore } from "@/store";
+import { useCartStore, useUIStore } from "@/store";
 
 export const TopMenu = () => {
   const openSideMenu = useUIStore((state) => state.openSideMenu);
+  const cart = useCartStore((state) => state.cart);
+
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(true);
+  }, []);
+
+  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
   return (
     <nav className="bg-brand-primary py-4 px-6 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
@@ -57,9 +66,23 @@ export const TopMenu = () => {
           </button>
 
           <Link
-            href="/cart"
-            className="p-2 rounded-full hover:bg-brand-secondary/20 transition-colors"
+            href={totalItems === 0 && loaded ? "/empty" : "/cart"}
+            className="relative p-2 rounded-full hover:bg-brand-secondary/20 transition-colors"
           >
+            {loaded && totalItems > 0 && (
+              <span
+                className={`fade-in
+      absolute -top-2 -right-1 
+      bg-black text-white text-xs 
+      px-1.5 min-w-5 h-5 
+      rounded-full flex items-center justify-center 
+      font-bold
+      ${totalItems > 99 ? "text-[10px] px-1" : ""}
+    `}
+              >
+                {totalItems > 99 ? "99+" : totalItems}
+              </span>
+            )}
             <IoCartOutline size={24} />
           </Link>
 
