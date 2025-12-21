@@ -6,18 +6,24 @@ import { Gender } from "@/generated/prisma/enums";
 import { redirect } from "next/navigation";
 
 interface Props {
-  params: {
+  params: Promise<{
     gender: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     page?: string;
-  };
+  }>;
 }
 
 export default async function Page({ params, searchParams }: Props) {
-  const { gender } = await params;
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const { gender } = resolvedParams;
 
-  const page = searchParams.page ? parseInt(searchParams.page) : 1;
+  const page = resolvedSearchParams.page
+    ? parseInt(resolvedSearchParams.page)
+    : 1;
 
   const { products, currentPage, totalPages } =
     await getPaginatedProductsWithImages({
@@ -25,8 +31,6 @@ export default async function Page({ params, searchParams }: Props) {
 
       gender: gender as Gender,
     });
-
-  console.log({ currentPage, totalPages });
 
   if (products.length === 0) {
     redirect(`/gender/${gender}`);
@@ -39,13 +43,11 @@ export default async function Page({ params, searchParams }: Props) {
     unisex: "para todos",
   };
 
+  const subtitle = labels[gender] ? `Artículos ${labels[gender]}` : "Artículos";
+
   return (
     <>
-      <Title
-        title={`Artículos de ${labels[gender]}`}
-        subtitle="Todos los productos"
-        className="mb-2"
-      />
+      <Title title={subtitle} subtitle="Todos los productos" className="mb-2" />
 
       <ProductGrid products={products} />
       <Pagination totalPages={totalPages} />

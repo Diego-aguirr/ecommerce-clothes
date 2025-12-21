@@ -7,11 +7,12 @@ import { QuantitySelector, SizeSelector, StockLabel } from "@/components";
 import { getProductBySlug } from "@/actions";
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
 import { Metadata, ResolvingMetadata } from "next";
+import { AddToCart } from "./ui/AddToCart";
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata(
@@ -19,8 +20,8 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   // read route params
-  const slug = params.slug;
-
+  const resolvedParams = await params; // 👈 Esperar a que params se resuelva
+  const slug = resolvedParams.slug;
   // fetch data
   const product = await getProductBySlug(slug);
 
@@ -40,10 +41,10 @@ export async function generateMetadata(
 }
 
 export default async function Page({ params }: Props) {
-  const { slug } = params; // 👈 importante
+  const resolvedParams = await params; // 👈 Esperar a que params se resuelva
+  const { slug } = resolvedParams;
 
   const product = await getProductBySlug(slug);
-  console.log("Product slug page:", product);
   if (!product) {
     notFound();
   }
@@ -62,18 +63,8 @@ export default async function Page({ params }: Props) {
           {product.title}
         </h1>
         <p className="text-lg mb-5">${product.price}</p>
-
-        <SizeSelector
-          selectedSize={product.sizes[0]}
-          availableSizes={product.sizes}
-          onSizeChanged={function (): void {
-            throw new Error("Function not implemented.");
-          }}
-        />
-        <QuantitySelector quantity={2} />
-
-        <button className="btn-primary my-5">Agregar al carrito</button>
-
+        <AddToCart product={product} />
+        {/*description*/}
         <h3 className="font-bold text-sm">Descripción</h3>
         <p className="font-light">{product.description}</p>
       </div>
