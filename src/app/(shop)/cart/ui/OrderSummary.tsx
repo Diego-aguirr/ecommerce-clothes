@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/store";
 import { IoArrowBack, IoCard, IoShieldCheckmark } from "react-icons/io5";
+import { currencyFormat } from "@/utils";
 
 const OrderSummary = () => {
   const [loaded, setLoaded] = useState(false);
@@ -26,8 +27,8 @@ const OrderSummary = () => {
   const tax = subTotal * taxRate;
 
   // 👇 Envío: gratis si subTotal > 500.000
-  const shippingThreshold = 500.0;
-  const shipping = subTotal > shippingThreshold ? 0 : 9.99;
+  const shippingThreshold = 8000.0;
+  const shipping = subTotal > shippingThreshold ? 0 : 8000.0;
   const missingForFreeShipping = Math.max(0, shippingThreshold - subTotal);
 
   // 👇 Total final
@@ -45,13 +46,13 @@ const OrderSummary = () => {
           <span>
             Subtotal ({itemsInCart} producto{itemsInCart !== 1 ? "s" : ""})
           </span>
-          <span className="font-medium">${subTotal.toFixed(2)}</span>
+          <span className="font-medium">{currencyFormat(subTotal)}</span>
         </div>
 
         {/* Impuestos (21% IVA) */}
         <div className="flex justify-between text-gray-600">
           <span>Impuestos (21%)</span>
-          <span className="font-medium">${tax.toFixed(2)}</span>
+          <span className="font-medium">{currencyFormat(tax)}</span>
         </div>
 
         {/* Envío - CONDICIONAL */}
@@ -60,7 +61,7 @@ const OrderSummary = () => {
           <span
             className={`font-medium ${shipping === 0 ? "text-green-600" : ""}`}
           >
-            {shipping === 0 ? "Gratis" : `$${shipping.toFixed(2)}`}
+            {shipping === 0 ? "Gratis" : `${currencyFormat(shipping)}`}
           </span>
         </div>
 
@@ -70,7 +71,7 @@ const OrderSummary = () => {
             <p className="text-sm text-blue-700 text-center">
               ¡Faltan{" "}
               <span className="font-semibold">
-                ${missingForFreeShipping.toFixed(2)}
+                {currencyFormat(missingForFreeShipping)}
               </span>{" "}
               para envío gratis!
             </p>
@@ -81,7 +82,7 @@ const OrderSummary = () => {
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between text-lg font-bold text-gray-900">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>{currencyFormat(total)}</span>
           </div>
           <p className="text-sm text-gray-500 mt-1">IVA incluido</p>
         </div>
@@ -111,7 +112,9 @@ const OrderSummary = () => {
         <div className="space-y-2 text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
-            <span>Envío gratis en pedidos +${shippingThreshold}</span>
+            <span>
+              Envío gratis en pedidos +{currencyFormat(shippingThreshold)}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
