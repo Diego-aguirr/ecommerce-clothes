@@ -2,7 +2,7 @@
 CREATE TYPE "Size" AS ENUM ('XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Único', 'Ajustable');
 
 -- CreateEnum
-CREATE TYPE "Gender" AS ENUM ('men', 'woman', 'kid', 'unisex');
+CREATE TYPE "Gender" AS ENUM ('men', 'women', 'kid', 'unisex');
 
 -- CreateTable
 CREATE TABLE "Category" (
@@ -19,7 +19,7 @@ CREATE TABLE "Product" (
     "description" TEXT NOT NULL,
     "inStock" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "Size" "Size"[] DEFAULT ARRAY[]::"Size"[],
+    "sizes" "Size"[] DEFAULT ARRAY[]::"Size"[],
     "slug" TEXT NOT NULL,
     "tags" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "gender" "Gender" NOT NULL,

@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
   },
   turbopack: {
-    root: "/home/macaco/Documentos/agentes/Frontend Developer/new-ecommerce/",
+    root: "/home/clyde/Documentos/work/new-ecommerce-java",
   },
 };
 

@@ -69,7 +69,7 @@ export const initialData: SeedData = {
       images: ["remeras.avif", "remeras1.avif"],
       inStock: 28,
       price: 45,
-      sizes: ["Único"],
+      sizes: ["XS", "S", "M", "XXL"],
       slug: "silk_tie",
       type: "accessories",
       tags: ["tie", "silk"],
