@@ -1,7 +1,33 @@
 import { Title } from "@/components";
 import Link from "next/link";
+import { auth } from "../../../../../auth";
+import { redirect } from "next/dist/client/components/navigation";
+import { getEmailVerificationStatus } from "@/lib/email-verification";
+import prisma from "@/lib/prisma";
 
-export default function AddressPage() {
+export default async function AddressPage() {
+  const session = await auth();
+
+  // 🔒 1. No logueado → login
+  if (!session?.user?.id) {
+    redirect("/login?redirect=/checkout");
+  }
+
+  // 🔒 2. Usuario real
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // 🔒 3. Email bloqueado
+  const verification = getEmailVerificationStatus(user);
+
+  if (!verification.allowed) {
+    redirect("/shop"); // o página informativa
+  }
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">

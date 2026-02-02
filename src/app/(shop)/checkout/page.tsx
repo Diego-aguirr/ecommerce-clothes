@@ -1,5 +1,9 @@
 import { initialData } from "@/seed  /seed";
 import Link from "next/link";
+import { auth } from "../../../../auth";
+import { redirect } from "next/dist/client/components/navigation";
+import prisma from "@/lib/prisma";
+import { getEmailVerificationStatus } from "@/lib/email-verification";
 
 // Simulamos productos del carrito basados en el seed data
 const cartItems = [
@@ -23,11 +27,33 @@ const cartItems = [
   },
 ];
 
-export default function PaymentPage() {
+export default async function PaymentPage() {
+  const session = await auth();
+  // 🔒 1. No logueado → login
+  if (!session?.user?.id) {
+    redirect("/login?redirect=/checkout");
+  }
+
+  // 🔒 2. Usuario real
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // 🔒 3. Email bloqueado
+  const verification = getEmailVerificationStatus(user);
+
+  if (!verification.allowed) {
+    redirect("/shop"); // o página informativa
+  }
+
   // Calcular totales
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
-    0
+    0,
   );
   const shipping = subtotal > 50000 ? 0 : 2500; // Envío gratis sobre $50.000
   const total = subtotal + shipping;

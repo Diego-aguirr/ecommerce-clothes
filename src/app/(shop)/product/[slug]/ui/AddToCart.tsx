@@ -18,22 +18,35 @@ export const AddToCart = ({ product }: Props) => {
 
   const addToCart = () => {
     setposted(true);
-    if (!Size) return;
-    // Lógica para agregar el producto al carrito
-    const cartProduct: CartProduct = {
-      id: product.id,
-      slug: product.slug,
-      title: product.title,
-      price: product.price,
-      quantity: quantity,
-      size: Size,
-      image: product.images[0],
-    };
 
-    addProductToCart(cartProduct);
-    setposted(false);
-    setQuantity(1);
-    setSize(undefined);
+    if (!Size) return; // Si no hay talla, paramos
+
+    try {
+      // Crear producto
+      const cartProduct: CartProduct = {
+        id: product.id,
+        slug: product.slug,
+        title: product.title,
+        price: product.price,
+        quantity: quantity,
+        size: Size,
+        image: product.images[0],
+      };
+
+      // INTENTAR agregar (si falla, va al catch)
+      addProductToCart(cartProduct);
+
+      // ⭐⭐ SOLO SI TODO SALE BIEN ⭐⭐
+      setQuantity(1); // Reseteo cantidad
+      setSize(undefined); // Reseteo talla
+    } catch (error) {
+      // ⚠️ SI HAY ERROR: NO RESETEO NADA
+      // El usuario mantiene talla y cantidad elegida
+      console.log("No se pudo agregar al carrito");
+    }
+
+    // Esto siempre se ejecuta (éxito o error)
+    setposted(false); // Dejamos de mostrar validación
   };
 
   return (
@@ -44,7 +57,6 @@ export const AddToCart = ({ product }: Props) => {
         </span>
       )}
 
-      <p className="text-lg mb-5">${product.price}</p>
       <SizeSelector
         selectedSize={Size}
         availableSizes={product.sizes}
