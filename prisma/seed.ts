@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@/generated/prisma/client";
+import { PrismaClient } from "@/generated/prisma/client";
 import { initialData } from "@/seed  /seed";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -12,11 +12,15 @@ const prisma = new PrismaClient({
 
 export async function seed() {
   await Promise.all([
+    prisma.user.deleteMany(),
     prisma.product.deleteMany(),
     prisma.category.deleteMany(),
     prisma.productImage.deleteMany(),
   ]);
-  const { categories, products } = initialData;
+  const { categories, products, users } = initialData;
+
+  //USUARIOS
+  await prisma.user.createMany({ data: users });
 
   //CATEGORIAS
   const categoriesData = categories.map((name) => ({ name }));
