@@ -1,0 +1,79 @@
++ set -e
++++ dirname ./setup.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/home/clyde/Documentos/work/skills
+++ dirname /home/clyde/Documentos/work/skills
++ REPO_ROOT=/home/clyde/Documentos/work
++ SKILLS_SOURCE=/home/clyde/Documentos/work/skills
++ RED='\033[0;31m'
++ GREEN='\033[0;32m'
++ YELLOW='\033[1;33m'
++ BLUE='\033[0;34m'
++ CYAN='\033[0;36m'
++ BOLD='\033[1m'
++ NC='\033[0m'
++ SETUP_CLAUDE=false
++ SETUP_GEMINI=false
++ SETUP_CODEX=false
++ SETUP_COPILOT=false
++ [[ 1 -gt 0 ]]
++ case $1 in
++ SETUP_CLAUDE=true
++ SETUP_GEMINI=true
++ SETUP_CODEX=true
++ SETUP_COPILOT=true
++ shift
++ [[ 0 -gt 0 ]]
++ echo '🤖 Prowler AI Skills Setup'
+🤖 Prowler AI Skills Setup
++ echo ==========================
+==========================
++ echo ''
+
+++ find /home/clyde/Documentos/work/skills -maxdepth 2 -name SKILL.md
+++ wc -l
+++ tr -d ' '
++ SKILL_COUNT=30
++ '[' 30 -eq 0 ']'
++ echo -e '\033[0;34mFound 30 skills to configure\033[0m'
+[0;34mFound 30 skills to configure[0m
++ echo ''
+
++ '[' true = false ']'
++ '[' true = false ']'
++ STEP=1
++ TOTAL=0
++ '[' true = true ']'
++ TOTAL=1
++ '[' true = true ']'
++ TOTAL=2
++ '[' true = true ']'
++ TOTAL=3
++ '[' true = true ']'
++ TOTAL=4
++ '[' true = true ']'
++ echo -e '\033[1;33m[1/4] Setting up Claude Code...\033[0m'
+[1;33m[1/4] Setting up Claude Code...[0m
++ setup_claude
++ local target=/home/clyde/Documentos/work/.claude/skills
++ '[' '!' -d /home/clyde/Documentos/work/.claude ']'
++ '[' -L /home/clyde/Documentos/work/.claude/skills ']'
++ rm /home/clyde/Documentos/work/.claude/skills
++ ln -s /home/clyde/Documentos/work/skills /home/clyde/Documentos/work/.claude/skills
++ echo -e '\033[0;32m  ✓ .claude/skills -> skills/\033[0m'
+[0;32m  ✓ .claude/skills -> skills/[0m
++ copy_agents_md CLAUDE.md
++ local target_name=CLAUDE.md
++ local agents_files
++ local count=0
+++ find /home/clyde/Documentos/work -name AGENTS.md -not -path '*/node_modules/*' -not -path '*/.git/*'
++ agents_files='/home/clyde/Documentos/work/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/actions/product/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/app/api/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/app/(auth)/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/app/(shop)/payments/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/app/(shop)/orders/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/app/(shop)/checkout/AGENTS.md
+/home/clyde/Documentos/work/new-ecommerce-java/src/store/cart/AGENTS.md'
