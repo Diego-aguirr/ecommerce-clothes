@@ -1,5 +1,6 @@
 import { PrismaClient } from "@/generated/prisma/client";
 import { initialData } from "@/seed  /seed";
+import { provinces } from "@/seed  /seed-province";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
@@ -16,8 +17,12 @@ export async function seed() {
     prisma.product.deleteMany(),
     prisma.category.deleteMany(),
     prisma.productImage.deleteMany(),
+    prisma.province.deleteMany(),
   ]);
   const { categories, products, users } = initialData;
+
+  // Provincias
+  await prisma.province.createMany({ data: provinces });
 
   //USUARIOS
   await prisma.user.createMany({ data: users });
@@ -28,10 +33,13 @@ export async function seed() {
   await prisma.category.createMany({ data: categoriesData });
   const categoriesDB = await prisma.category.findMany();
 
-  const categoriesMap = categoriesDB.reduce((map, category) => {
-    map[category.name.toLowerCase()] = category.id;
-    return map;
-  }, {} as Record<string, string>);
+  const categoriesMap = categoriesDB.reduce(
+    (map, category) => {
+      map[category.name.toLowerCase()] = category.id;
+      return map;
+    },
+    {} as Record<string, string>,
+  );
 
   // Productos
   products.forEach(async (product) => {

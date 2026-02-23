@@ -1,10 +1,12 @@
-export interface Address {
-  firstName: string;
-  lastName: string;
-  address: string;
-  address2?: string;
-  postalCode: string;
+export interface AddressFormValues {
+  fullname: string;
+  street: string;
+  apartment?: string;
+  zip: string;
   city: string;
-  country: string;
+  province: string;
   phone: string;
+  dni: string;
+  description?: string;
+  rememberAddress?: boolean;
 }
