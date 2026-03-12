@@ -4,7 +4,7 @@ export interface AddressFormValues {
   apartment?: string;
   zip: string;
   city: string;
-  province: string;
+  provinceId: string;
   phone: string;
   dni: string;
   description?: string;

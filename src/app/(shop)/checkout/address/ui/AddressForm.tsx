@@ -4,9 +4,12 @@ import { AddressFormValues, Province } from "@/interfaces";
 import { useAddressStore } from "@/store";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { deleteUserAddress, setUserAddress } from "@/actions";
+import { useSession } from "next-auth/react";
 
 interface AddressFormProps {
   provinces: Province[];
+  userId: string;
 }
 
 export default function AddressForm({ provinces }: AddressFormProps) {
@@ -19,6 +22,10 @@ export default function AddressForm({ provinces }: AddressFormProps) {
     defaultValues: {},
   }); // Use useForm hook to manage form state and validation
 
+  const { data: session } = useSession({
+    required: true,
+  });
+
   const setAddress = useAddressStore((state) => state.setAddress);
   const address = useAddressStore((state) => state.address);
 
@@ -30,9 +37,15 @@ export default function AddressForm({ provinces }: AddressFormProps) {
   }, [address, reset]);
 
   const onSubmit = (data: AddressFormValues) => {
-    console.log("Dirección enviada:", data);
     setAddress(data);
+
     // Aquí puedes agregar lógica para guardar la dirección o avanzar al siguiente paso
+    const { rememberAddress, ...rest } = data;
+    if (rememberAddress) {
+      setUserAddress(rest);
+    } else {
+      deleteUserAddress();
+    }
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
@@ -138,7 +151,7 @@ export default function AddressForm({ provinces }: AddressFormProps) {
           id="province"
           required
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
-          {...register("province", { required: true })}
+          {...register("provinceId", { required: true })}
         >
           <option value="">Selecciona una provincia</option>
           {provinces.map((province) => (
