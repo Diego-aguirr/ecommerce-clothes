@@ -5,11 +5,13 @@ import { auth } from "../../../../../auth";
 import { redirect } from "next/dist/client/components/navigation";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
-import { getProvincies } from "@/actions";
+import { getProvincies, getUserAddress } from "@/actions";
 
 export default async function AddressPage() {
   const session = await auth();
   const provinces = await getProvincies(); // Obtener provincias para el formulario de dirección
+  const userAddressResponse = await getUserAddress();
+  const userAddress = userAddressResponse.ok ? userAddressResponse.data : null;
 
   // 🔒 1. No logueado → login
   if (!session?.user?.id) {
@@ -74,7 +76,7 @@ export default async function AddressPage() {
                 title="Dirección de Envío"
                 subtitle="Completa tus datos para recibir tu pedido"
               />
-              <AddressForm provinces={provinces} />
+              <AddressForm provinces={provinces} userAddress={userAddress ?? undefined} />
             </div>
           </div>
         </div>

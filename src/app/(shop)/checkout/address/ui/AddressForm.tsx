@@ -9,17 +9,20 @@ import { useSession } from "next-auth/react";
 
 interface AddressFormProps {
   provinces: Province[];
-  userId: string;
+  userId?: string;
+  userAddress?: Partial<AddressFormValues>;
 }
 
-export default function AddressForm({ provinces }: AddressFormProps) {
+export default function AddressForm({ provinces, userAddress, ...restProps }: AddressFormProps) {
   const {
     register,
     handleSubmit,
     formState: { isValid },
     reset,
   } = useForm<AddressFormValues>({
-    defaultValues: {},
+    defaultValues: {
+      ...(userAddress as any)
+    },
   }); // Use useForm hook to manage form state and validation
 
   const { data: session } = useSession({
@@ -30,9 +33,10 @@ export default function AddressForm({ provinces }: AddressFormProps) {
   const address = useAddressStore((state) => state.address);
 
   useEffect(() => {
-    // Si hay una dirección guardada en el store, precargar el formulario con esos datos
+    // Si hay una dirección guardada en el store (del usuario local), precargar el formulario con esos datos.
+    // O si hay un address desde la bd del servidor (este ya vino en los defaultValues, pero si queremos sobreescribir con zustand lo manejamos acá)
     if (address && address.fullname) {
-      reset(address); // Preload form with saved address
+      reset(address); // Preload form with saved address (local Zustand store takes precedence over BD fallback if they continued)
     }
   }, [address, reset]);
 

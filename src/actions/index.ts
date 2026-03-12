@@ -7,3 +7,4 @@ export * from "./product/product-pagination";
 export * from "./provincies/get-provincies";
 export * from "./address/set-user-address";
 export * from "./address/delete-user-address";
+export * from "./address/get-user-address";
