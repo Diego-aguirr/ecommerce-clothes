@@ -13,6 +13,7 @@ const prisma = new PrismaClient({
 
 export async function seed() {
   await Promise.all([
+    prisma.userAddress.deleteMany(),
     prisma.user.deleteMany(),
     prisma.product.deleteMany(),
     prisma.category.deleteMany(),
@@ -24,7 +25,7 @@ export async function seed() {
   // Provincias
   await prisma.province.createMany({ data: provinces });
 
-  //USUARIOS
+  // USUARIOS
   await prisma.user.createMany({ data: users });
 
   //CATEGORIAS
