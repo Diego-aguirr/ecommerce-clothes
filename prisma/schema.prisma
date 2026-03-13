@@ -89,6 +89,7 @@ model Product {
   image                String?
   role                 Role                  @default(user)
 
+  addresses            UserAddress[]
   accounts             Account[]
   sessions             Session[]
   passwordResetTokens  PasswordResetToken[]
@@ -141,4 +142,34 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 }
+
+model Province {
+  id          String         @id
+  name        String
+  UserAddress UserAddress[]
+}
   
+
+  model UserAddress {
+  id          String   @id @default(cuid())
+  fullname    String
+  street      String
+  apartment   String?
+  zip         String
+  city        String
+  phone       String
+  dni         String
+  description String?
+  isDefault   Boolean  @default(false)
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  sessionId   String?
+
+  provinceId  String
+  province    Province @relation(fields: [provinceId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
