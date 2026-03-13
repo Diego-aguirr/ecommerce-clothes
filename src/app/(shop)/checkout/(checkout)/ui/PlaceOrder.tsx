@@ -2,15 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useCartStore, useAddressStore } from "@/store";
+import { placeOrder } from "@/actions";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 export const PlaceOrder = () => {
+  const router = useRouter();
   const [loaded, setLoaded] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const address = useAddressStore((state) => state.address);
 
   const productsInCart = useCartStore((state) => state.cart);
+  const clearCart = useCartStore((state) => state.removeProduct);
   const getSummaryInformation = useCartStore(
     (state) =>
       state.getSummaryInformation ||
@@ -29,15 +34,25 @@ export const PlaceOrder = () => {
 
   const onPlaceOrder = async () => {
     setIsPlacingOrder(true);
-    // TODO: Connect with Server Action `placeOrder`
-    // const productsToOrder = productsInCart.map( p => ({
-    //   productId: p.id,
-    //   quantity: p.quantity,
-    //   size: p.size
-    // }))
+    setErrorMessage("");
 
-    // await placeOrder(productsToOrder, address.id!);
-    setIsPlacingOrder(false);
+    // Solo enviamos IDs, cantidades y tallas (nunca precios)
+    const productsToOrder = productsInCart.map((p) => ({
+      productId: p.id,
+      quantity: p.quantity,
+      size: p.size,
+    }));
+
+    const resp = await placeOrder(productsToOrder, address);
+
+    if (!resp.ok) {
+      setIsPlacingOrder(false);
+      setErrorMessage(resp.message ?? "Error al crear la orden");
+      return;
+    }
+
+    // Redirigir a la página de la orden creada
+    router.replace(`/orders/${resp.order!.id}`);
   };
 
   return (
@@ -82,6 +97,12 @@ export const PlaceOrder = () => {
         >
           {isPlacingOrder ? "Procesando..." : "Finalizar Compra"}
         </button>
+
+        {errorMessage && (
+          <p className="text-red-500 text-sm text-center mt-2">
+            {errorMessage}
+          </p>
+        )}
       </div>
 
       <div className="mt-6 pt-6 border-t border-gray-100">
