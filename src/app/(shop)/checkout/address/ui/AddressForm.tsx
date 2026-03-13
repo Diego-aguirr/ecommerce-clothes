@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { deleteUserAddress, setUserAddress } from "@/actions";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface AddressFormProps {
   provinces: Province[];
@@ -24,6 +25,8 @@ export default function AddressForm({ provinces, userAddress, ...restProps }: Ad
       ...(userAddress as any)
     },
   }); // Use useForm hook to manage form state and validation
+
+  const router = useRouter();
 
   const { data: session } = useSession({
     required: true,
@@ -50,6 +53,8 @@ export default function AddressForm({ provinces, userAddress, ...restProps }: Ad
     } else {
       deleteUserAddress();
     }
+
+    router.push('/checkout');
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
