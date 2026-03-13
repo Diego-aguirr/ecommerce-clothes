@@ -14,7 +14,11 @@ interface AddressFormProps {
   userAddress?: Partial<AddressFormValues>;
 }
 
-export default function AddressForm({ provinces, userAddress, ...restProps }: AddressFormProps) {
+export default function AddressForm({
+  provinces,
+  userAddress,
+  ...restProps
+}: AddressFormProps) {
   const {
     register,
     handleSubmit,
@@ -22,7 +26,7 @@ export default function AddressForm({ provinces, userAddress, ...restProps }: Ad
     reset,
   } = useForm<AddressFormValues>({
     defaultValues: {
-      ...(userAddress as any)
+      ...(userAddress as any),
     },
   }); // Use useForm hook to manage form state and validation
 
@@ -43,18 +47,18 @@ export default function AddressForm({ provinces, userAddress, ...restProps }: Ad
     }
   }, [address, reset]);
 
-  const onSubmit = (data: AddressFormValues) => {
-    setAddress(data);
-
+  const onSubmit = async (data: AddressFormValues) => {
     // Aquí puedes agregar lógica para guardar la dirección o avanzar al siguiente paso
     const { rememberAddress, ...rest } = data;
+    setAddress(data);
+
     if (rememberAddress) {
-      setUserAddress(rest);
+      await setUserAddress(rest);
     } else {
-      deleteUserAddress();
+      await deleteUserAddress();
     }
 
-    router.push('/checkout');
+    router.push("/checkout");
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">

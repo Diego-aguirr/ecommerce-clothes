@@ -17,7 +17,7 @@ interface Props {
 
 export async function generateMetadata(
   { params }: Props,
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   // read route params
   const resolvedParams = await params; // 👈 Esperar a que params se resuelva
