@@ -13,7 +13,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum Size {
   XS
   S
@@ -27,10 +26,10 @@ enum Size {
 }
 
 enum Gender {
-   men
-   women
-   kid
-   unisex
+  men
+  women
+  kid
+  unisex
 }
 
 enum Role {
@@ -38,68 +37,64 @@ enum Role {
   admin
 }
 
-
-
-model Category{
-  id      String     @id @default(uuid())
-  name    String     @unique
+model Category {
+  id      String    @id @default(uuid())
+  name    String    @unique
   Product Product[]
 }
 
 model Product {
-  id                   String                @id @default(uuid())
-  title                String
-  description          String
-  inStock              Int
-  price                Float                 @default(0)
-  sizes                Size[]                @default([])
-  slug                 String                @unique
-  tags                 String[]              @default([])
-  gender               Gender
-
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  inStock     Int
+  price       Float    @default(0)
+  sizes       Size[]   @default([])
+  slug        String   @unique
+  tags        String[] @default([])
+  gender      Gender
 
   //Relaciones
-  category             Category             @relation(fields: [categoryId], references: [id])
-  categoryId           String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
 
-  ProductImage         ProductImage[]
+  ProductImage ProductImage[]
+
+  orderItems OrderItem[] // Relación inversa: productos que aparecen en órdenes
 
   @@index([gender])
+}
 
-
-  }
-
-
-  model ProductImage {
-  id                   Int                   @id @default(autoincrement())
-  url                  String
-  product              Product              @relation(fields: [productId], references: [id])
-  productId            String
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 
   @@index([productId])
-  }
+}
 
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(user)
 
-  model User {
-  id                   String                @id @default(cuid())
-  name                 String
-  email                String                @unique
-  emailVerified        DateTime?
-  password             String?
-  image                String?
-  role                 Role                  @default(user)
+  addresses           UserAddress[]
+  accounts            Account[]
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
 
-  addresses            UserAddress[]
-  accounts             Account[]
-  sessions             Session[]
-  passwordResetTokens  PasswordResetToken[]
-
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[] // Relación inversa: órdenes realizadas por el usuario
 }
 
 model Account {
-  id                String   @id @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -112,46 +107,45 @@ model Account {
   id_token          String?
   session_state     String?
 
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String    @id @default(cuid())
-  sessionToken String    @unique
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
   userId       String
   expires      DateTime
 
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
   identifier String
-  token      String    @unique
+  token      String   @unique
   expires    DateTime
 
   @@unique([identifier, token])
 }
 
 model PasswordResetToken {
-  id        String    @id @default(cuid())
-  token     String    @unique
+  id        String   @id @default(cuid())
+  token     String   @unique
   userId    String
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
 }
 
 model Province {
-  id          String         @id
-  name        String
-  UserAddress UserAddress[]
+  id             String         @id
+  name           String
+  UserAddress    UserAddress[]
+  orderAddresses OrderAddress[] // Relación inversa: direcciones de envío en órdenes
 }
-  
 
-  model UserAddress {
-  id          String   @id @default(cuid())
+model UserAddress {
+  id          String  @id @default(cuid())
   fullname    String
   street      String
   apartment   String?
@@ -160,16 +154,100 @@ model Province {
   phone       String
   dni         String
   description String?
-  isDefault   Boolean  @default(false)
+  isDefault   Boolean @default(false)
 
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
-  sessionId   String?
+  sessionId String?
 
-  provinceId  String
-  province    Province @relation(fields: [provinceId], references: [id])
+  provinceId String
+  province   Province @relation(fields: [provinceId], references: [id])
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Estado del ciclo de vida de una orden
+enum OrderStatus {
+  pending   // Orden creada, esperando pago
+  paid      // Pago confirmado
+  cancelled // Orden cancelada por el usuario o el sistema
+}
+
+// Orden de compra: snapshot financiero del pedido al momento de crearse
+model Order {
+  id String @id @default(uuid())
+
+  // Relación: usuario que realizó la orden
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Totales calculados en el servidor (nunca del frontend)
+  itemsInOrder Int
+  subTotal     Float
+  tax          Float
+  shipping     Float
+  total        Float
+
+  // Estado de pago
+  isPaid Boolean   @default(false)
+  paidAt DateTime?
+
+  status OrderStatus @default(pending)
+
+  // Relaciones: items de la orden y dirección de envío
+  OrderItem    OrderItem[]
+  OrderAddress OrderAddress?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Línea de producto dentro de una orden: guarda precio al momento de la compra
+model OrderItem {
+  id String @id @default(uuid())
+
+  // Relación: orden a la que pertenece (cascade delete)
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Relación: producto comprado
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  size     Size
+
+  price Float // Precio unitario snapshot (no cambia si el producto sube de precio)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// Dirección de envío snapshot: copia de la dirección al momento de crear la orden
+// (si el usuario cambia su dirección después, la orden conserva la original)
+model OrderAddress {
+  id String @id @default(uuid())
+
+  // Relación 1:1 con la orden
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  fullname    String
+  street      String
+  apartment   String?
+  zip         String
+  city        String
+  phone       String
+  dni         String
+  description String?
+
+  // Relación: provincia de envío
+  provinceId String
+  province   Province @relation(fields: [provinceId], references: [id])
+
+  createdAt DateTime @default(now())
 }
