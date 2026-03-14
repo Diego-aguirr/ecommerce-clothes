@@ -38,6 +38,11 @@ export const placeOrder = async (
 
     const userId = session.user.id;
     // 🔒 2. Obtener precios reales de la BD (nunca confiar en el frontend)
+
+    // 🔍 DEBUG: Ver qué IDs llegan del frontend
+    console.log("📦 Productos recibidos del frontend:", productsToOrder);
+    console.log("📍 Dirección recibida:", address);
+
     const products = await prisma.product.findMany({
       where: {
         id: {
@@ -46,8 +51,15 @@ export const placeOrder = async (
       },
     });
 
-    // Verificar que todos los productos existen
-    if (products.length !== productsToOrder.length) {
+    // 🔍 DEBUG: Ver qué encontró Prisma
+    console.log("🔎 Productos encontrados en BD:", products.map(p => ({ id: p.id, title: p.title, price: p.price })));
+
+    // Verificar que todos los productos únicos existen
+    // (un mismo producto puede estar varias veces con diferentes tallas)
+    const uniqueProductIds = [...new Set(productsToOrder.map((p) => p.productId))];
+    console.log(`📊 IDs únicos enviados: ${uniqueProductIds.length} | Encontrados: ${products.length}`);
+
+    if (products.length !== uniqueProductIds.length) {
       return { ok: false, message: "Algunos productos no fueron encontrados" };
     }
 
