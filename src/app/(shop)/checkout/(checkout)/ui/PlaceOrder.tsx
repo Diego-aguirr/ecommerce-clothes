@@ -11,6 +11,7 @@ export const PlaceOrder = () => {
   const [loaded, setLoaded] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [idempotencyToken, setIdempotencyToken] = useState("");
 
   const address = useAddressStore((state) => state.address);
 
@@ -26,6 +27,8 @@ export const PlaceOrder = () => {
 
   useEffect(() => {
     setLoaded(true);
+    // Generar un token de idempotencia único para esta sesión de confirmación
+    setIdempotencyToken(crypto.randomUUID());
   }, []);
 
   if (!loaded) {
@@ -43,13 +46,14 @@ export const PlaceOrder = () => {
       size: p.size,
     }));
 
-    const resp = await placeOrder(productsToOrder, address);
+    const resp = await placeOrder(productsToOrder, address, idempotencyToken);
 
     if (!resp.ok) {
       setIsPlacingOrder(false);
       setErrorMessage(resp.message ?? "Error al crear la orden");
       return;
     }
+
 
     // Redirigir a la página de la orden creada
     router.replace(`/orders/${resp.order!.id}`);

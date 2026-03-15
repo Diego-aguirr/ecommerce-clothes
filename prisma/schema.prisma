@@ -196,6 +196,9 @@ model Order {
 
   status OrderStatus @default(pending)
 
+  // Token de idempotencia para evitar duplicados por doble click
+  idempotencyToken String? @unique
+
   // Relaciones: items de la orden y dirección de envío
   OrderItem    OrderItem[]
   OrderAddress OrderAddress?

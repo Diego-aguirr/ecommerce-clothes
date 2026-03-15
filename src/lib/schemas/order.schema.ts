@@ -19,5 +19,7 @@ export const orderSchema = z.object({
     dni: z.string().min(1, "El DNI es obligatorio"),
     description: z.string().optional().nullable(),
     provinceId: z.string().min(1, "La provincia es obligatoria"),
-  })
+  }),
+
+  idempotencyToken: z.string().uuid("Token de idempotencia inválido").optional(),
 });

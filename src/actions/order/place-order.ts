@@ -11,6 +11,7 @@ import { orderSchema } from "@/lib/schemas/order.schema";
 export const placeOrder = async (
   productsToOrderInput: any,
   addressInput: any,
+  idempotencyTokenInput?: string,
 ) => {
   try {
     // 🔒 1. Verificar sesión
@@ -26,6 +27,7 @@ export const placeOrder = async (
     const parsed = orderSchema.safeParse({
       productsToOrder: productsToOrderInput,
       address: addressInput,
+      idempotencyToken: idempotencyTokenInput,
     });
 
     if (!parsed.success) {
@@ -35,7 +37,7 @@ export const placeOrder = async (
       };
     }
 
-    const { productsToOrder, address } = parsed.data;
+    const { productsToOrder, address, idempotencyToken } = parsed.data;
 
     // 🔒 3. Obtener precios reales de la BD
     const products = await prisma.product.findMany({
@@ -97,6 +99,7 @@ export const placeOrder = async (
           shipping,
           total,
           status: "pending",
+          idempotencyToken,
 
           // 4b. Crear los items de la orden con precios snapshot
           OrderItem: {
@@ -153,7 +156,14 @@ export const placeOrder = async (
         status: order.status,
       },
     };
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return {
+        ok: false,
+        message: "Esta orden ya está siendo procesada",
+      };
+    }
+
     console.error("❌ Error al colocar orden:", error);
     return {
       ok: false,
@@ -161,3 +171,4 @@ export const placeOrder = async (
     };
   }
 };
+
