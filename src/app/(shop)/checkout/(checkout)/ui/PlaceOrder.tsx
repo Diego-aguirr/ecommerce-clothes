@@ -16,7 +16,7 @@ export const PlaceOrder = () => {
   const address = useAddressStore((state) => state.address);
 
   const productsInCart = useCartStore((state) => state.cart);
-  const clearCart = useCartStore((state) => state.removeProduct);
+  const clearCart = useCartStore((state) => state.clearCart);
   const getSummaryInformation = useCartStore(
     (state) =>
       state.getSummaryInformation ||
@@ -54,6 +54,9 @@ export const PlaceOrder = () => {
       return;
     }
 
+
+    // 🧹 Limpiar Carrito
+    clearCart();
 
     // Redirigir a la página de la orden creada
     router.replace(`/orders/${resp.order!.id}`);
