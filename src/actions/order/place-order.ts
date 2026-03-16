@@ -4,29 +4,14 @@ import prisma from "@/lib/prisma";
 import type { Size } from "@/interfaces";
 import { auth } from "../../../auth";
 
-// Tipo que recibimos del frontend (solo IDs, cantidades y tallas)
-type ProductToOrder = {
-  productId: string;
-  quantity: number;
-  size: Size;
-};
+import { orderSchema } from "@/lib/schemas/order.schema";
 
-// Tipo de la dirección que recibimos del frontend
-type OrderAddressInput = {
-  fullname: string;
-  street: string;
-  apartment?: string;
-  zip: string;
-  city: string;
-  phone: string;
-  dni: string;
-  description?: string;
-  provinceId: string;
-};
+
 
 export const placeOrder = async (
-  productsToOrder: ProductToOrder[],
-  address: OrderAddressInput,
+  productsToOrderInput: any,
+  addressInput: any,
+  idempotencyTokenInput?: string,
 ) => {
   try {
     // 🔒 1. Verificar sesión
@@ -37,12 +22,24 @@ export const placeOrder = async (
     }
 
     const userId = session.user.id;
-    // 🔒 2. Obtener precios reales de la BD (nunca confiar en el frontend)
 
-    // 🔍 DEBUG: Ver qué IDs llegan del frontend
-    console.log("📦 Productos recibidos del frontend:", productsToOrder);
-    console.log("📍 Dirección recibida:", address);
+    // 🔒 2. Validar entrada con Zod
+    const parsed = orderSchema.safeParse({
+      productsToOrder: productsToOrderInput,
+      address: addressInput,
+      idempotencyToken: idempotencyTokenInput,
+    });
 
+    if (!parsed.success) {
+      return {
+        ok: false,
+        message: parsed.error.issues[0].message,
+      };
+    }
+
+    const { productsToOrder, address, idempotencyToken } = parsed.data;
+
+    // 🔒 3. Obtener precios reales de la BD
     const products = await prisma.product.findMany({
       where: {
         id: {
@@ -51,19 +48,18 @@ export const placeOrder = async (
       },
     });
 
-    // 🔍 DEBUG: Ver qué encontró Prisma
-    console.log("🔎 Productos encontrados en BD:", products.map(p => ({ id: p.id, title: p.title, price: p.price })));
-
     // Verificar que todos los productos únicos existen
-    // (un mismo producto puede estar varias veces con diferentes tallas)
-    const uniqueProductIds = [...new Set(productsToOrder.map((p) => p.productId))];
-    console.log(`📊 IDs únicos enviados: ${uniqueProductIds.length} | Encontrados: ${products.length}`);
+    const uniqueProductIds = [
+      ...new Set(productsToOrder.map((p) => p.productId)),
+    ];
 
     if (products.length !== uniqueProductIds.length) {
       return { ok: false, message: "Algunos productos no fueron encontrados" };
     }
 
-    // 3. Calcular totales con precios reales del servidor
+
+
+    // 4. Calcular totales con precios reales del servidor
     const itemsInOrder = productsToOrder.reduce(
       (count, p) => count + p.quantity,
       0,
@@ -92,6 +88,7 @@ export const placeOrder = async (
           shipping,
           total,
           status: "pending",
+          idempotencyToken,
 
           // 4b. Crear los items de la orden con precios snapshot
           OrderItem: {
@@ -101,7 +98,7 @@ export const placeOrder = async (
                 return {
                   productId: item.productId,
                   quantity: item.quantity,
-                  size: item.size,
+                  size: item.size as Size,
                   price: product.price, // Precio real de la BD
                 };
               }),
@@ -125,9 +122,11 @@ export const placeOrder = async (
         },
       });
 
-      // 4d. Actualizar stock de los productos
-      for (const item of productsToOrder) {
-        await tx.product.update({
+      // 4d. Actualizar stock de los productos y verificar que no sea negativo
+      const stockUpdatePromises = productsToOrder.map(async (item) => {
+        const product = products.find((p) => p.id === item.productId)!;
+
+        const updatedProduct = await tx.product.update({
           where: { id: item.productId },
           data: {
             inStock: {
@@ -135,23 +134,17 @@ export const placeOrder = async (
             },
           },
         });
-      }
+
+        if (updatedProduct.inStock < 0) {
+          throw new Error(`Stock insuficiente para: ${product.title}`);
+        }
+
+        return updatedProduct;
+      });
+
+      await Promise.all(stockUpdatePromises);
 
       return newOrder;
-    });
-
-    // ✅ Console.log para verificar la orden creada
-    console.log("✅ Orden creada exitosamente:", {
-      orderId: order.id,
-      userId: order.userId,
-      itemsInOrder: order.itemsInOrder,
-      subTotal: order.subTotal,
-      tax: order.tax,
-      shipping: order.shipping,
-      total: order.total,
-      status: order.status,
-      address: address,
-      products: productsToOrder,
     });
 
     return {
@@ -162,11 +155,18 @@ export const placeOrder = async (
         status: order.status,
       },
     };
-  } catch (error) {
-    console.error("❌ Error al colocar orden:", error);
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return {
+        ok: false,
+        message: "Esta orden ya está siendo procesada",
+      };
+    }
+
     return {
       ok: false,
-      message: "Error procesando la orden",
+      message: error.message || "Error procesando la orden",
     };
   }
 };
+
