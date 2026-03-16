@@ -36,6 +36,19 @@ export const PlaceOrder = () => {
   }
 
   const onPlaceOrder = async () => {
+    if (isPlacingOrder) return;
+
+    // 🛡️ Seguridad cliente: Validar datos mínimos antes de ir al server
+    if (productsInCart.length === 0) {
+      setErrorMessage("No hay productos en el carrito");
+      return;
+    }
+
+    if (!address.fullname || !address.street || !address.zip || !address.phone) {
+      setErrorMessage("La dirección de entrega es incompleta");
+      return;
+    }
+
     setIsPlacingOrder(true);
     setErrorMessage("");
 
@@ -46,20 +59,28 @@ export const PlaceOrder = () => {
       size: p.size,
     }));
 
-    const resp = await placeOrder(productsToOrder, address, idempotencyToken);
+    try {
+      const resp = await placeOrder(productsToOrder, address, idempotencyToken);
 
-    if (!resp.ok) {
+      if (!resp.ok) {
+        setIsPlacingOrder(false);
+        setErrorMessage(resp.message ?? "Error al crear la orden");
+        
+        // Si es un error de duplicado (idempotencia), podrías generar un nuevo token 
+        // o invitar al usuario a revisar su historial.
+        return;
+      }
+
+      // 🧹 Limpiar Carrito
+      clearCart();
+
+      // Redirigir a la página de la orden creada
+      router.replace(`/orders/${resp.order!.id}`);
+    } catch (error) {
       setIsPlacingOrder(false);
-      setErrorMessage(resp.message ?? "Error al crear la orden");
-      return;
+      setErrorMessage("Ocurrió un error inesperado. Intente de nuevo.");
+      console.error(error);
     }
-
-
-    // 🧹 Limpiar Carrito
-    clearCart();
-
-    // Redirigir a la página de la orden creada
-    router.replace(`/orders/${resp.order!.id}`);
   };
 
   return (

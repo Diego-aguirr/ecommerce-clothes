@@ -16,10 +16,29 @@ export const getOrderById = async (id: string) => {
   try {
     const order = await prisma.order.findUnique({
       where: { id },
-
-      include: {
+      select: {
+        id: true,
+        subTotal: true,
+        tax: true,
+        shipping: true,
+        total: true,
+        itemsInOrder: true,
+        isPaid: true,
+        paidAt: true,
+        status: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
         OrderAddress: {
-          include: {
+          select: {
+            fullname: true,
+            street: true,
+            apartment: true,
+            zip: true,
+            city: true,
+            phone: true,
+            dni: true,
+            description: true,
             province: {
               select: {
                 name: true,
@@ -27,18 +46,15 @@ export const getOrderById = async (id: string) => {
             },
           },
         },
-
         OrderItem: {
           select: {
             price: true,
             quantity: true,
             size: true,
-
             product: {
               select: {
                 title: true,
                 slug: true,
-
                 ProductImage: {
                   select: { url: true },
                   orderBy: { id: "asc" },
@@ -55,6 +71,7 @@ export const getOrderById = async (id: string) => {
       return { ok: true, order: null };
     }
 
+    // Autorización: solo dueño o admin
     if (session.user.role !== "admin" && session.user.id !== order.userId) {
       return {
         ok: false,
@@ -67,10 +84,10 @@ export const getOrderById = async (id: string) => {
       order,
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error getOrderById:", error);
     return {
       ok: false,
-      message: "Error al obtener la orden",
+      message: "Error interno al obtener la orden",
     };
   }
 };

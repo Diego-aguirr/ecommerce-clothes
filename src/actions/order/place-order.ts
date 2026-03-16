@@ -57,18 +57,7 @@ export const placeOrder = async (
       return { ok: false, message: "Algunos productos no fueron encontrados" };
     }
 
-    // 🔒 4. Verificar disponibilidad de stock
-    for (const item of productsToOrder) {
-      const product = products.find((p) => p.id === item.productId);
-      if (!product) continue;
 
-      if (product.inStock < item.quantity) {
-        return {
-          ok: false,
-          message: `Stock insuficiente para: ${product.title}`,
-        };
-      }
-    }
 
     // 4. Calcular totales con precios reales del servidor
     const itemsInOrder = productsToOrder.reduce(
@@ -133,9 +122,11 @@ export const placeOrder = async (
         },
       });
 
-      // 4d. Actualizar stock de los productos
-      for (const item of productsToOrder) {
-        await tx.product.update({
+      // 4d. Actualizar stock de los productos y verificar que no sea negativo
+      const stockUpdatePromises = productsToOrder.map(async (item) => {
+        const product = products.find((p) => p.id === item.productId)!;
+
+        const updatedProduct = await tx.product.update({
           where: { id: item.productId },
           data: {
             inStock: {
@@ -143,7 +134,15 @@ export const placeOrder = async (
             },
           },
         });
-      }
+
+        if (updatedProduct.inStock < 0) {
+          throw new Error(`Stock insuficiente para: ${product.title}`);
+        }
+
+        return updatedProduct;
+      });
+
+      await Promise.all(stockUpdatePromises);
 
       return newOrder;
     });
@@ -164,10 +163,9 @@ export const placeOrder = async (
       };
     }
 
-    console.error("❌ Error al colocar orden:", error);
     return {
       ok: false,
-      message: "Error procesando la orden",
+      message: error.message || "Error procesando la orden",
     };
   }
 };
