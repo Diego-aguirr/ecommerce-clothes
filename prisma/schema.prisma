@@ -21,8 +21,8 @@ enum Size {
   XL
   XXL
   XXXL
-  Único
-  Ajustable
+  UNICO
+  AJUSTABLE
 }
 
 enum Gender {
