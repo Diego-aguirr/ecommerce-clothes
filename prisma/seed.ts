@@ -1,6 +1,6 @@
 import { PrismaClient } from "@/generated/prisma/client";
-import { initialData } from "@/seed  /seed";
-import { provinces } from "@/seed  /seed-province";
+import { initialData } from "@/seed/seed";
+import { provinces } from "@/seed/seed-province";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
@@ -13,17 +13,18 @@ const prisma = new PrismaClient({
 
 export async function seed() {
   // Limpiar tablas en orden correcto (respetar foreign keys)
-  await Promise.all([
-    prisma.orderAddress.deleteMany(),
-    prisma.orderItem.deleteMany(),
-    prisma.order.deleteMany(),
-    prisma.userAddress.deleteMany(),
-    prisma.user.deleteMany(),
-    prisma.product.deleteMany(),
-    prisma.category.deleteMany(),
-    prisma.productImage.deleteMany(),
-    prisma.province.deleteMany(),
-  ]);
+  await prisma.orderItem.deleteMany();
+  await prisma.orderAddress.deleteMany();
+  await prisma.order.deleteMany();
+
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+
+  await prisma.userAddress.deleteMany();
+  await prisma.user.deleteMany();
+
+  await prisma.category.deleteMany();
+  await prisma.province.deleteMany();
   const { categories, products, users } = initialData;
 
   // Provincias
@@ -47,17 +48,20 @@ export async function seed() {
   );
 
   // Productos
-  products.forEach(async (product) => {
-    const { type, images, ...rest } = product;
+  for (const product of products) {
+    const { type, images, sizes, ...rest } = product;
 
     const dbProduct = await prisma.product.create({
       data: {
         ...rest,
         categoryId: categoriesMap[type],
+
+        // 🔥 FIX IMPORTANTE (Prisma arrays)
+        sizes: {
+          set: sizes,
+        },
       },
     });
-
-    //images
 
     const imagesData = images.map((image) => ({
       url: image,
@@ -65,7 +69,7 @@ export async function seed() {
     }));
 
     await prisma.productImage.createMany({ data: imagesData });
-  });
+  }
 
   console.log("Ejecutado Correctamente ");
 
