@@ -37,6 +37,6 @@ export type Size =
   | "XL"
   | "XXL"
   | "XXXL"
-  | "Único"
-  | "Ajustable";
+  | "UNICO"
+  | "AJUSTABLE";
 export type Type = "shirts" | "pants" | "hoodies" | "hats";

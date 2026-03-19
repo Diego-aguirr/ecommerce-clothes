@@ -1,0 +1,203 @@
+// src/app/api/webhooks/mercadopago/route.ts
+"use server";
+
+import { NextResponse, type NextRequest } from "next/server";
+import prisma from "@/lib/prisma";
+import { MercadoPagoConfig, Payment } from "mercadopago";
+import { PaymentStatus } from "@/generated/prisma/enums";
+import { z } from "zod";
+
+// ---------------------------------------------------------------------------
+// 1️⃣ Configure Mercado Pago SDK (access token from env)
+// ---------------------------------------------------------------------------
+if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+  throw new Error(
+    "MERCADOPAGO_ACCESS_TOKEN is not set in environment variables",
+  );
+}
+const mpClient = new MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
+});
+
+// ---------------------------------------------------------------------------
+// 2️⃣ Zod schema for Mercado Pago webhook payload (simplified)
+// ---------------------------------------------------------------------------
+const webhookSchema = z.object({
+  action: z.string(), // e.g., "payment.created", "payment.updated"
+  data: z.object({
+    id: z.string(), // payment id in Mercado Pago
+  }),
+  type: z.string(), // should be "payment"
+});
+
+type WebhookPayload = z.infer<typeof webhookSchema>;
+
+// ---------------------------------------------------------------------------
+// 3️⃣ Helper: verify MP signature (HMAC SHA256) using secret from env
+// ---------------------------------------------------------------------------
+function verifySignature(request: NextRequest, body: string): boolean {
+  const signature = request.headers.get("x-signature") ?? "";
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "";
+  if (!secret) return false;
+  const crypto = require("crypto");
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(body)
+    .digest("hex");
+  // Ensure buffers have same length before timingSafeEqual
+  const sigBuf = Buffer.from(signature, "hex");
+  const expBuf = Buffer.from(expected, "hex");
+  if (sigBuf.length !== expBuf.length) return false;
+  return crypto.timingSafeEqual(sigBuf, expBuf);
+}
+
+// ---------------------------------------------------------------------------
+// 4️⃣ Helper: confirm payment and decrement stock atomically
+// ---------------------------------------------------------------------------
+async function confirmPaymentAndUpdateStock(orderId: string) {
+  return await prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { OrderItem: true },
+    });
+    if (!order) throw new Error("Order not found");
+    if (order.isPaid) return order; // idempotent
+
+    // Validate stock before decrement
+    for (const item of order.OrderItem) {
+      const product = await tx.product.findUnique({
+        where: { id: item.productId },
+      });
+      if (!product) throw new Error(`Product not found: ${item.productId}`);
+      if (product.inStock < item.quantity) {
+        throw new Error(`Insufficient stock for product ${product.title}`);
+      }
+    }
+
+    // Decrement stock
+    for (const item of order.OrderItem) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { inStock: { decrement: item.quantity } },
+      });
+    }
+
+    // Mark order as paid
+    const updatedOrder = await tx.order.update({
+      where: { id: orderId },
+      data: { isPaid: true, paidAt: new Date(), status: "paid" },
+    });
+    return updatedOrder;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 5️⃣ Main webhook handler – only POST is used by Mercado Pago
+// ---------------------------------------------------------------------------
+export async function POST(req: NextRequest) {
+  const rawBody = await req.text();
+
+  // ---- Signature validation ----
+  if (!verifySignature(req, rawBody)) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  // ---- Payload validation ----
+  let payload: WebhookPayload;
+  try {
+    payload = webhookSchema.parse(JSON.parse(rawBody));
+  } catch {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+
+  // ---- Process only payment events ----
+  if (payload.type !== "payment") {
+    return NextResponse.json({ ok: true }, { status: 200 });
+  }
+
+  // ---------------------------------------------------------------------
+  // 6️⃣ Transaction: find Payment, verify amount/currency, update status, log
+  // ---------------------------------------------------------------------
+  const result = await prisma.$transaction(async (tx) => {
+    const payment = await tx.payment.findUnique({
+      where: { providerPaymentId: payload.data.id },
+      include: { order: true },
+    });
+
+    if (!payment) {
+      await tx.paymentLog.create({
+        data: {
+          provider: "mercadopago",
+          event: payload.action,
+          rawData: payload as any,
+        },
+      });
+      return { ok: false, message: "Payment not found" };
+    }
+
+    // Idempotency – ignore if already finalised
+    if (payment.status === "confirmed" || payment.status === "failed") {
+      return { ok: true, message: "Idempotent – already processed" };
+    }
+
+    // Fetch payment details from Mercado Pago to verify amount & currency
+    const paymentClient = new Payment(mpClient);
+    const mpResponse = await paymentClient.get({ id: payload.data.id });
+    const { transaction_amount, currency_id, status: mpStatus } = mpResponse;
+
+    // ---- Amount integrity & currency lock ----
+    if (
+      transaction_amount !== payment.amount ||
+      currency_id !== payment.currency
+    ) {
+      await tx.paymentLog.create({
+        data: {
+          paymentId: payment.id,
+          provider: "mercadopago",
+          event: "amount_mismatch",
+          rawData: { mpPayment: mpResponse, stored: payment } as any,
+        },
+      });
+      throw new Error("Amount or currency mismatch");
+    }
+
+    // Map MP status to our domain status
+    let newStatus: PaymentStatus;
+    switch (mpStatus) {
+      case "approved":
+        newStatus = PaymentStatus.confirmed;
+        break;
+      case "pending":
+        newStatus = PaymentStatus.pending;
+        break;
+      case "rejected":
+      case "cancelled":
+        newStatus = PaymentStatus.failed;
+        break;
+      default:
+        newStatus = PaymentStatus.pending;
+    }
+
+    const updatedPayment = await tx.payment.update({
+      where: { id: payment.id },
+      data: { status: newStatus },
+    });
+
+    if (newStatus === PaymentStatus.confirmed) {
+      await confirmPaymentAndUpdateStock(payment.orderId);
+    }
+
+    await tx.paymentLog.create({
+      data: {
+        paymentId: payment.id,
+        provider: "mercadopago",
+        event: payload.action,
+        rawData: payload as any,
+      },
+    });
+
+    return { ok: true, payment: updatedPayment };
+  });
+
+  return NextResponse.json(result, { status: 200 });
+}

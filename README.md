@@ -7,3 +7,6 @@
 5.  Correr las migraciones de prisma 'npx prisma migrate dev'
 6.  Ejecutar npx prisma db seed
 7.  Correr el proyecto pnpm run dev
+    npx ngrok config add-authtoken TU_TOKEN
+    pnpm dev
+    npx ngrok http 3000

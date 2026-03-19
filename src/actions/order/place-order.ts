@@ -3,10 +3,7 @@
 import prisma from "@/lib/prisma";
 import type { Size } from "@/interfaces";
 import { auth } from "../../../auth";
-
 import { orderSchema } from "@/lib/schemas/order.schema";
-
-
 
 export const placeOrder = async (
   productsToOrderInput: any,
@@ -23,7 +20,7 @@ export const placeOrder = async (
 
     const userId = session.user.id;
 
-    // 🔒 2. Validar entrada con Zod
+    // 🔒 2. Validar entrada
     const parsed = orderSchema.safeParse({
       productsToOrder: productsToOrderInput,
       address: addressInput,
@@ -39,7 +36,7 @@ export const placeOrder = async (
 
     const { productsToOrder, address, idempotencyToken } = parsed.data;
 
-    // 🔒 3. Obtener precios reales de la BD
+    // 🔒 3. Obtener productos reales
     const products = await prisma.product.findMany({
       where: {
         id: {
@@ -48,7 +45,6 @@ export const placeOrder = async (
       },
     });
 
-    // Verificar que todos los productos únicos existen
     const uniqueProductIds = [
       ...new Set(productsToOrder.map((p) => p.productId)),
     ];
@@ -57,28 +53,36 @@ export const placeOrder = async (
       return { ok: false, message: "Algunos productos no fueron encontrados" };
     }
 
+    // 🔴 4. VALIDAR STOCK (SIN MODIFICAR)
+    for (const item of productsToOrder) {
+      const product = products.find((p) => p.id === item.productId)!;
 
+      if (product.inStock < item.quantity) {
+        return {
+          ok: false,
+          message: `Stock insuficiente para ${product.title}`,
+        };
+      }
+    }
 
-    // 4. Calcular totales con precios reales del servidor
+    // 💰 5. Calcular totales
     const itemsInOrder = productsToOrder.reduce(
       (count, p) => count + p.quantity,
       0,
     );
 
     const subTotal = productsToOrder.reduce((total, item) => {
-      const product = products.find((p) => p.id === item.productId);
-      if (!product) throw new Error(`Producto ${item.productId} no encontrado`);
-
+      const product = products.find((p) => p.id === item.productId)!;
       return total + product.price * item.quantity;
     }, 0);
 
-    const tax = subTotal * 0.21; // 21% IVA
+    const tax = subTotal * 0.21;
     const shipping = subTotal > 50000 ? 0 : 2500;
     const total = subTotal + tax + shipping;
 
-    // 4. Crear la orden dentro de una transacción de Prisma
-    const order = await prisma.$transaction(async (tx) => {
-      // 4a. Crear la orden
+    // 🧱 6. TRANSACCIÓN
+    const result = await prisma.$transaction(async (tx) => {
+      // 🧾 6a. Crear orden
       const newOrder = await tx.order.create({
         data: {
           userId,
@@ -90,7 +94,6 @@ export const placeOrder = async (
           status: "pending",
           idempotencyToken,
 
-          // 4b. Crear los items de la orden con precios snapshot
           OrderItem: {
             createMany: {
               data: productsToOrder.map((item) => {
@@ -99,13 +102,12 @@ export const placeOrder = async (
                   productId: item.productId,
                   quantity: item.quantity,
                   size: item.size as Size,
-                  price: product.price, // Precio real de la BD
+                  price: product.price,
                 };
               }),
             },
           },
 
-          // 4c. Crear la dirección snapshot de la orden
           OrderAddress: {
             create: {
               fullname: address.fullname,
@@ -122,37 +124,30 @@ export const placeOrder = async (
         },
       });
 
-      // 4d. Actualizar stock de los productos y verificar que no sea negativo
-      const stockUpdatePromises = productsToOrder.map(async (item) => {
-        const product = products.find((p) => p.id === item.productId)!;
-
-        const updatedProduct = await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            inStock: {
-              decrement: item.quantity,
-            },
-          },
-        });
-
-        if (updatedProduct.inStock < 0) {
-          throw new Error(`Stock insuficiente para: ${product.title}`);
-        }
-
-        return updatedProduct;
+      // 🟡 6b. Crear registro de Payment (IMPORTANTE)
+      const payment = await tx.payment.create({
+        data: {
+          orderId: newOrder.id,
+          amount: total,
+          currency: "ARS",
+          status: "created",
+          provider: "mercadopago",
+        },
       });
 
-      await Promise.all(stockUpdatePromises);
-
-      return newOrder;
+      return { newOrder, payment };
     });
 
     return {
       ok: true,
       order: {
-        id: order.id,
-        total: order.total,
-        status: order.status,
+        id: result.newOrder.id,
+        total: result.newOrder.total,
+        status: result.newOrder.status,
+      },
+      payment: {
+        id: result.payment.id,
+        status: result.payment.status,
       },
     };
   } catch (error: any) {
@@ -169,4 +164,3 @@ export const placeOrder = async (
     };
   }
 };
-

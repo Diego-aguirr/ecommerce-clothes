@@ -37,6 +37,19 @@ enum Role {
   admin
 }
 
+enum PaymentStatus {
+  created
+  pending
+  confirmed
+  failed
+  cancelled
+}
+
+enum PaymentProvider {
+  mercadopago
+  cash
+}
+
 model Category {
   id      String    @id @default(uuid())
   name    String    @unique
@@ -202,6 +215,8 @@ model Order {
   // Relaciones: items de la orden y dirección de envío
   OrderItem    OrderItem[]
   OrderAddress OrderAddress?
+ // ✅ FIX: relación bien nombrada
+  payments Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -252,5 +267,35 @@ model OrderAddress {
   provinceId String
   province   Province @relation(fields: [provinceId], references: [id])
 
+  createdAt DateTime @default(now())
+}
+
+// Payment model – almacena la información del pago asociado a una orden
+model Payment {
+  id                 String          @id @default(uuid())
+  orderId            String
+  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount             Float
+  currency           String  @default("ARS")
+  status             PaymentStatus   @default(created)
+  provider           PaymentProvider @default(mercadopago)
+  providerPaymentId  String?         @unique
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  // Relación a logs de webhook
+  logs               PaymentLog[]
+   @@index([orderId])
+  @@index([providerPaymentId]) // 🔥 performance webhook
+}
+
+// PaymentLog – registro de eventos webhook para auditoría y debugging
+model PaymentLog {
+  id        String   @id @default(uuid())
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  provider  PaymentProvider
+  event     String
+  rawData   Json
   createdAt DateTime @default(now())
 }
