@@ -3,34 +3,15 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import { MercadoPagoConfig, Payment } from "mercadopago";
+import { Payment } from "mercadopago";
+import { mpClient } from "@/lib/mercadopago";
 import { PaymentStatus } from "@/generated/prisma/enums";
-import { z } from "zod";
+import { webhookSchema } from "@/lib/zod";
+import type { WebhookPayload } from "@/interfaces";
 
 // ---------------------------------------------------------------------------
-// 1️⃣ Configure Mercado Pago SDK (access token from env)
-// ---------------------------------------------------------------------------
-if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
-  throw new Error(
-    "MERCADOPAGO_ACCESS_TOKEN is not set in environment variables",
-  );
-}
-const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
-});
 
-// ---------------------------------------------------------------------------
-// 2️⃣ Zod schema for Mercado Pago webhook payload (simplified)
-// ---------------------------------------------------------------------------
-const webhookSchema = z.object({
-  action: z.string(), // e.g., "payment.created", "payment.updated"
-  data: z.object({
-    id: z.string(), // payment id in Mercado Pago
-  }),
-  type: z.string(), // should be "payment"
-});
 
-type WebhookPayload = z.infer<typeof webhookSchema>;
 
 // ---------------------------------------------------------------------------
 // 3️⃣ Helper: verify MP signature (HMAC SHA256) using secret from env
@@ -96,6 +77,7 @@ async function confirmPaymentAndUpdateStock(orderId: string) {
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
+  console.log("🔔 [Webhook MercadoPago] Payload recibido:", rawBody);
 
   // ---- Signature validation ----
   if (!verifySignature(req, rawBody)) {
@@ -119,8 +101,18 @@ export async function POST(req: NextRequest) {
   // 6️⃣ Transaction: find Payment, verify amount/currency, update status, log
   // ---------------------------------------------------------------------
   const result = await prisma.$transaction(async (tx) => {
+    // Fetch payment details from Mercado Pago first to get our standard ID
+    const paymentClient = new Payment(mpClient);
+    const mpResponse = await paymentClient.get({ id: payload.data.id });
+    const { transaction_amount, currency_id, status: mpStatus, external_reference } = mpResponse;
+
+    if (!external_reference) {
+       return { ok: false, message: "Missing external_reference in Mercado Pago payment" };
+    }
+
+    // 🔗 Find payment record using external_reference (our DB Payment ID)
     const payment = await tx.payment.findUnique({
-      where: { providerPaymentId: payload.data.id },
+      where: { id: external_reference },
       include: { order: true },
     });
 
@@ -136,14 +128,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Idempotency – ignore if already finalised
-    if (payment.status === "confirmed" || payment.status === "failed") {
+    if (payment.status === PaymentStatus.confirmed || payment.status === PaymentStatus.failed) {
       return { ok: true, message: "Idempotent – already processed" };
     }
-
-    // Fetch payment details from Mercado Pago to verify amount & currency
-    const paymentClient = new Payment(mpClient);
-    const mpResponse = await paymentClient.get({ id: payload.data.id });
-    const { transaction_amount, currency_id, status: mpStatus } = mpResponse;
 
     // ---- Amount integrity & currency lock ----
     if (
@@ -180,7 +167,7 @@ export async function POST(req: NextRequest) {
 
     const updatedPayment = await tx.payment.update({
       where: { id: payment.id },
-      data: { status: newStatus },
+      data: { status: newStatus, providerPaymentId: payload.data.id },
     });
 
     if (newStatus === PaymentStatus.confirmed) {
