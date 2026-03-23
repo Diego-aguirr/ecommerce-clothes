@@ -4,3 +4,4 @@ export * from "./paypal.interface";
 export * from "./product.interface";
 export * from "./province.interface";
 export * from "./user.interface";
+export * from "./mercadopago.interface";

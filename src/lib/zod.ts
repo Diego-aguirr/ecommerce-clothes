@@ -24,3 +24,14 @@ export const registerSchema = z.object({
     .min(1, "Name is required")
     .max(32, "Name must be less than 32 characters"),
 });
+
+// ---------------------------------------------------------------------------
+// 📦 Mercado Pago Webhook Schema
+// ---------------------------------------------------------------------------
+export const webhookSchema = z.object({
+  action: z.string(), // e.g., "payment.created", "payment.updated"
+  data: z.object({
+    id: z.string(), // payment id in Mercado Pago
+  }),
+  type: z.string(), // should be "payment"
+});
