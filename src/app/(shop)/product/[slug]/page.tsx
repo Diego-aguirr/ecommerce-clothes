@@ -6,6 +6,7 @@ import { titleFont } from "@/config/fonts";
 import { QuantitySelector, SizeSelector, StockLabel } from "@/components";
 import { getProductBySlug } from "@/actions";
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
+import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
 import { Metadata, ResolvingMetadata } from "next";
 import { AddToCart } from "./ui/AddToCart";
 
@@ -53,7 +54,19 @@ export default async function Page({ params }: Props) {
     <div className="mt-5 mb-20 grid grid-cols-1 md:grid-cols-3 gap-3">
       {/* Slideshow */}
       <div className="col-span-1 md:col-span-2">
-        <ProductSlideshow title={product.title} images={product.images} />
+        {/* Desktop Slideshow */}
+        <ProductSlideshow
+          title={product.title}
+          images={product.images}
+          className="hidden md:block"
+        />
+
+        {/* Mobile Slideshow */}
+        <ProductMobileSlideshow
+          title={product.title}
+          images={product.images}
+          className="block md:hidden pb-4"
+        />
       </div>
 
       {/* Detalles */}

@@ -36,7 +36,7 @@ export default function ProductSlideshow({
       className={`relative w-full max-w-5xl mx-auto ${className} flex flex-col items-center`}
     >
       {/* Imagen principal */}
-      <div className="relative w-full h-[800px] rounded-2xl overflow-hidden group shadow-lg">
+      <div className="relative w-full aspect-square md:aspect-auto md:h-[600px] lg:h-[800px] rounded-2xl overflow-hidden group shadow-lg">
         {images.map((image, index) => (
           <div
             key={index}
