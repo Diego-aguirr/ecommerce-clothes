@@ -47,7 +47,6 @@ export async function createPreference(orderId: string) {
       };
     }
 
-
     const preference = new Preference(mpClient);
 
     // 💳 4. Construir cuerpo de la preferencia
@@ -60,20 +59,27 @@ export async function createPreference(orderId: string) {
     }));
 
     // URL dinámica (ngrok o localhost según .env)
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+    if (!baseUrl) {
+      throw new Error("BASE URL not defined");
+    }
 
     const body = {
       items,
-      // 👉 CRÍTICO: Aquí unimos el Webhook con tu Base de Datos
       external_reference: unconfirmedPayment.id,
-      
+
       back_urls: {
         success: `${baseUrl}/orders/${orderId}?status=success`,
         pending: `${baseUrl}/orders/${orderId}?status=pending`,
         failure: `${baseUrl}/orders/${orderId}?status=failure`,
       },
-      auto_return: "approved",
+
+      notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+
+      //   auto_return: "approved",
     };
+    console.log("SUCCESS FINAL:", `${baseUrl}/orders/${orderId}`);
 
     // 📡  5. Crear preferencia en Mercado Pago
     const result = await preference.create({ body });

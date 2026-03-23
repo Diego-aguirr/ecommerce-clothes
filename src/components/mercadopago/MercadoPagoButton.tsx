@@ -19,13 +19,14 @@ export const MercadoPagoButton = ({ orderId, amount }: Props) => {
     try {
       // Llamar al action del servidor
       const result = await createPreference(orderId);
+      console.log("Respuesta de createPreference:", result);
 
       if (!result.ok || !result.init_point) {
         setError(result.message || "No se pudo generar el enlace de pago");
         return;
       }
 
-      // Redirigir al usuario al checkout de Mercado Pago
+      // 🚀 Redirigir al usuario al checkout oficial de Mercado Pago
       window.location.href = result.init_point;
     } catch (err) {
       console.error(err);
@@ -44,14 +45,14 @@ export const MercadoPagoButton = ({ orderId, amount }: Props) => {
         onClick={handlePayment}
         disabled={loading}
         className={`w-full py-3 px-4 rounded-md text-white font-bold transition-all flex justify-center items-center ${
-          loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 shadow-md"
+          loading
+            ? "bg-blue-300 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 shadow-md"
         }`}
       >
-        {loading ? (
-          "Conectando..."
-        ) : (
-          `Pagar $${amount.toLocaleString()} con Mercado Pago`
-        )}
+        {loading
+          ? "Conectando con Mercado Pago..."
+          : `Pagar $${amount.toLocaleString()} con Mercado Pago`}
       </button>
     </div>
   );
