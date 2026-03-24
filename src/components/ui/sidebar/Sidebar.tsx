@@ -12,6 +12,7 @@ import {
   IoSearchOutline,
   IoShirtOutline,
   IoTicketOutline,
+  IoLocationOutline,
 } from "react-icons/io5";
 import { useUIStore } from "@/store";
 import { logout } from "@/actions";
@@ -44,7 +45,7 @@ export const Sidebar = () => {
       {/* Sidemenu */}
       <nav
         className={clsx(
-          "fixed p-5 right-0 top-0 w-125 h-screen bg-white z-20 shadow-2xl transform transition-all duration-300",
+          "fixed p-5 right-0 top-0 w-[85vw] sm:w-[400px] h-screen bg-white z-20 shadow-2xl transform transition-all duration-300 overflow-y-auto",
           {
             "translate-x-full": !isSideMenuOpen,
           }
@@ -62,25 +63,68 @@ export const Sidebar = () => {
           />
         </div>
 
-        {/* Menú */}
+        {/* Categorías Principales (Mobile Only) */}
+        <div className="md:hidden mt-10">
+          <Link
+            href="/gender/men"
+            onClick={() => closeMenu()}
+            className="flex items-center p-2 hover:bg-gray-100 rounded transition-all"
+          >
+            <span className="ml-3 text-xl font-medium">Hombre</span>
+          </Link>
+          <Link
+            href="/gender/women"
+            onClick={() => closeMenu()}
+            className="flex items-center mt-2 p-2 hover:bg-gray-100 rounded transition-all"
+          >
+            <span className="ml-3 text-xl font-medium">Mujer</span>
+          </Link>
+          <Link
+            href="/gender/kid"
+            onClick={() => closeMenu()}
+            className="flex items-center mt-2 p-2 hover:bg-gray-100 rounded transition-all"
+          >
+            <span className="ml-3 text-xl font-medium">Niños</span>
+          </Link>
+          <Link
+            href="/gender/unisex"
+            onClick={() => closeMenu()}
+            className="flex items-center mt-2 p-2 hover:bg-gray-100 rounded transition-all"
+          >
+            <span className="ml-3 text-xl font-medium">Accesorios</span>
+          </Link>
+
+          <div className="w-full h-px bg-gray-200 my-8" />
+        </div>
+
+        {/* Menú Privado de Usuario */}
         {isAuthenticated && (
           <>
             <Link
               href="/profile"
               onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+              className="flex items-center mt-5 md:mt-10 p-2 hover:bg-gray-100 rounded transition-all"
             >
-              <IoPersonOutline size={30} />
+              <IoPersonOutline size={30} color="black"/>
               <span className="ml-3 text-xl">Perfil</span>
             </Link>
 
             <Link
               href="/orders"
               onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+              className="flex items-center mt-5 p-2 hover:bg-gray-100 rounded transition-all"
             >
-              <IoTicketOutline size={30} />
-              <span className="ml-3 text-xl">Ordenes</span>
+              <IoTicketOutline size={30} color="black"/>
+              <span className="ml-3 text-xl">Órdenes</span>
+            </Link>
+            
+            <Link
+              href="/profile/addresses"
+              onClick={() => closeMenu()}
+              className="flex items-center mt-5 p-2 hover:bg-gray-100 rounded transition-all"
+            >
+              <IoLocationOutline size={30} color="black"/>
+              <span className="ml-3 text-xl">Direcciones</span>
             </Link>
           </>
         )}
