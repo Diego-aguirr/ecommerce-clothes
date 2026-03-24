@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
-  IoSearch,
   IoCartOutline,
   IoPersonOutline,
   IoMenu,
@@ -91,15 +90,8 @@ export const TopMenu = () => {
           </Link>
         </div>
 
-        {/* Search, Cart, Profile Icons */}
+        {/* Cart, Profile Icons */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          <button 
-            className="p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
-            aria-label="Buscar"
-          >
-            <IoSearch size={22} color="black" />
-          </button>
-
           <Link
             href={totalItems === 0 && loaded ? "/empty" : "/cart"}
             className="relative p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
@@ -116,40 +108,44 @@ export const TopMenu = () => {
           </Link>
 
           {/* Desktop User Menu */}
-          <div className="hidden md:inline-block relative text-left" ref={userMenuRef}>
-            {isAuthenticated ? (
-              <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                onKeyDown={handleKeyDown}
-                className="flex items-center space-x-2 p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent group"
-                aria-expanded={isUserMenuOpen}
-                aria-haspopup="true"
-                aria-label="Menú de usuario"
-              >
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-medium hidden lg:block text-black">
-                    Hola, {session?.user?.name?.split(' ')[0] || "Usuario"}
-                  </span>
-                  <IoPersonOutline size={22} color="black" />
-                  <IoChevronDownOutline 
-                    size={16} 
-                    className={`transition-transform duration-200 text-black ${isUserMenuOpen ? "rotate-180" : ""}`} 
-                  />
-                </div>
-              </button>
+          <div className="hidden md:inline-block relative text-left min-w-[40px] h-[40px]" ref={userMenuRef}>
+            {loaded ? (
+              isAuthenticated ? (
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  onKeyDown={handleKeyDown}
+                  className="flex items-center space-x-2 p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent group"
+                  aria-expanded={isUserMenuOpen}
+                  aria-haspopup="true"
+                  aria-label="Menú de usuario"
+                >
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-medium hidden lg:block text-black">
+                      Hola, {session?.user?.name?.split(' ')[0] || "Usuario"}
+                    </span>
+                    <IoPersonOutline size={22} color="black" />
+                    <IoChevronDownOutline 
+                      size={16} 
+                      className={`transition-transform duration-200 text-black ${isUserMenuOpen ? "rotate-180" : ""}`} 
+                    />
+                  </div>
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex items-center p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  aria-label="Ingresar a mi cuenta"
+                  title="Ingresar"
+                >
+                  <IoPersonOutline size={22} color="black"/>
+                </Link>
+              )
             ) : (
-              <Link
-                href="/login"
-                className="flex items-center p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                aria-label="Ingresar a mi cuenta"
-                title="Ingresar"
-              >
-                <IoPersonOutline size={22} color="black"/>
-              </Link>
+              <div className="w-10 h-10 rounded-full animate-pulse bg-gray-200/60" />
             )}
 
             {/* Dropdown User Menu */}
-            {isUserMenuOpen && isAuthenticated && (
+            {loaded && isUserMenuOpen && isAuthenticated && (
               <div 
                 className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 fade-in"
                 role="menu"
