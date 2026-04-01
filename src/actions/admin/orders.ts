@@ -4,34 +4,22 @@ import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import { logAdminAction } from "@/lib/admin/audit-logger";
 import { revalidatePath } from "next/cache";
-import { OrderStatus, DeliveryStatus } from "@/generated/prisma/client";
+import { OrderStatus, DeliveryStatus, Order } from "@/generated/prisma/client";
 import { z } from "zod";
+import { UpdateDeliveryStatusSchema, UpdateOrderStatusSchema, UpdateOrderNotesSchema } from "@/lib/validations";
 
-const DeliveryStatusSchema = z.enum(["pending", "shipped", "delivered"]);
-const OrderStatusSchema = z.enum(["pending", "paid", "cancelled"]);
+export type OrderActionResponse = {
+  ok: boolean;
+  order?: Order;
+  error?: string;
+  issues?: z.ZodIssue[];
+};
 
-// Input schemas for validation
-const UpdateDeliveryStatusInput = z.object({
-  orderId: z.string().uuid({ message: "Invalid order ID" }),
-  deliveryStatus: DeliveryStatusSchema,
-  trackingCode: z.string().optional()
-});
-
-const UpdateOrderStatusInput = z.object({
-  orderId: z.string().uuid({ message: "Invalid order ID" }),
-  status: OrderStatusSchema,
-});
-
-const UpdateOrderNotesInput = z.object({
-  orderId: z.string().uuid({ message: "Invalid order ID" }),
-  notes: z.string()
-});
-
-export async function updateDeliveryStatus(orderId: string, deliveryStatus: DeliveryStatus, trackingCode?: string) {
+export async function updateDeliveryStatus(orderId: string, deliveryStatus: DeliveryStatus, trackingCode?: string): Promise<OrderActionResponse> {
   const admin = await requireAdmin();
 
   // Validate inputs
-  const parsed = UpdateDeliveryStatusInput.safeParse({ orderId, deliveryStatus, trackingCode });
+  const parsed = UpdateDeliveryStatusSchema.safeParse({ orderId, deliveryStatus, trackingCode });
   if (!parsed.success) {
     return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
   }
@@ -43,7 +31,13 @@ export async function updateDeliveryStatus(orderId: string, deliveryStatus: Deli
     return { ok: false, error: "Order not found" };
   }
 
-  const updateData: any = { deliveryStatus: data.deliveryStatus };
+  type UpdateOrderData = {
+    deliveryStatus: DeliveryStatus;
+    shippedAt?: Date;
+    trackingCode?: string;
+  };
+
+  const updateData: UpdateOrderData = { deliveryStatus: data.deliveryStatus };
   
   if (data.deliveryStatus === "shipped" && !oldOrder.shippedAt) {
     updateData.shippedAt = new Date();
@@ -74,10 +68,10 @@ export async function updateDeliveryStatus(orderId: string, deliveryStatus: Deli
   return { ok: true, order };
 }
 
-export async function updateOrderStatus(orderId: string, status: OrderStatus) {
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<OrderActionResponse> {
   const admin = await requireAdmin();
 
-  const parsed = UpdateOrderStatusInput.safeParse({ orderId, status });
+  const parsed = UpdateOrderStatusSchema.safeParse({ orderId, status });
   if (!parsed.success) {
     return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
   }
@@ -106,11 +100,11 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   return { ok: true, order };
 }
 
-export async function updateOrderNotes(orderId: string, notes: string) {
+export async function updateOrderNotes(orderId: string, notes: string): Promise<OrderActionResponse> {
   const admin = await requireAdmin();
 
   // Validate inputs
-  const parsed = UpdateOrderNotesInput.safeParse({ orderId, notes });
+  const parsed = UpdateOrderNotesSchema.safeParse({ orderId, notes });
   if (!parsed.success) {
     return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
   }

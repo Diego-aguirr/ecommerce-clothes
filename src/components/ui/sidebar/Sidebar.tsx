@@ -156,6 +156,16 @@ export const Sidebar = () => {
         {isAdmin && (
           <>
             <div className="w-full h-px bg-gray-200 my-10" />
+            
+            <Link
+              href="/admin"
+              onClick={() => closeMenu()}
+              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all font-semibold"
+            >
+              <IoPeopleOutline size={30} />
+              <span className="ml-3 text-xl">Dashboard Admin</span>
+            </Link>
+
             <Link
               href="/admin/products"
               onClick={() => closeMenu()}
