@@ -1,12 +1,12 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import { logAdminAction } from "@/lib/admin/audit-logger";
 import { revalidatePath } from "next/cache";
 import { Product, StockMovement } from "@/generated/prisma/client";
 import { z } from "zod";
 import { ToggleProductStatusSchema, UpdateProductDetailsSchema, AdjustStockSchema } from "@/lib/validations";
+import { toggleProductStatusService, updateProductDetailsService, adjustProductStockService } from "@/lib/services/product.service";
 
 export type ProductActionResponse = {
   ok: boolean;
@@ -20,25 +20,25 @@ export async function toggleProductStatus(productId: string, isActive: boolean):
   const admin = await requireAdmin();
 
   const parsed = ToggleProductStatusSchema.safeParse({ productId, isActive });
-  if (!parsed.success) {
-    return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
-  }
+  if (!parsed.success) return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
+  
   const { productId: validId, isActive: validIsActive } = parsed.data;
 
-  const product = await prisma.product.update({
-    where: { id: validId },
-    data: { isActive: validIsActive },
-  });
+  try {
+    const product = await toggleProductStatusService(validId, validIsActive);
 
-  await logAdminAction({
-    adminId: admin.id,
-    action: "TOGGLE_PRODUCT_STATUS",
-    targetId: validId,
-    metadata: { isActive: validIsActive }
-  });
+    await logAdminAction({
+      adminId: admin.id,
+      action: "TOGGLE_PRODUCT_STATUS",
+      targetId: validId,
+      metadata: { isActive: validIsActive }
+    });
 
-  revalidatePath("/admin/products");
-  return { ok: true, product };
+    revalidatePath("/admin/products");
+    return { ok: true, product };
+  } catch (error: any) {
+    return { ok: false, error: error.message };
+  }
 }
 
 export async function updateProductDetails(
@@ -48,70 +48,51 @@ export async function updateProductDetails(
   const admin = await requireAdmin();
 
   const parsed = UpdateProductDetailsSchema.safeParse({ productId, data });
-  if (!parsed.success) {
-    return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
-  }
+  if (!parsed.success) return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
+  
   const { productId: validId, data: validData } = parsed.data;
 
-  const oldProduct = await prisma.product.findUnique({ where: { id: validId } });
-  
-  const product = await prisma.product.update({
-    where: { id: validId },
-    data: validData,
-  });
+  try {
+    const { product, oldProduct } = await updateProductDetailsService(validId, validData);
 
-  await logAdminAction({
-    adminId: admin.id,
-    action: "UPDATE_PRODUCT_DETAILS",
-    targetId: validId,
-    metadata: { 
-      old: { price: oldProduct?.price, title: oldProduct?.title },
-      new: validData 
-    }
-  });
+    await logAdminAction({
+      adminId: admin.id,
+      action: "UPDATE_PRODUCT_DETAILS",
+      targetId: validId,
+      metadata: { 
+        old: { price: oldProduct?.price, title: oldProduct?.title },
+        new: validData 
+      }
+    });
 
-  revalidatePath("/admin/products");
-  return { ok: true, product };
+    revalidatePath("/admin/products");
+    return { ok: true, product };
+  } catch (error: any) {
+    return { ok: false, error: error.message };
+  }
 }
 
 export async function adjustStock(productId: string, adjustment: number, type: string, note?: string): Promise<ProductActionResponse> {
   const admin = await requireAdmin();
 
   const parsed = AdjustStockSchema.safeParse({ productId, adjustment, type, note });
-  if (!parsed.success) {
-    return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
-  }
+  if (!parsed.success) return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
+  
   const { productId: validId, adjustment: validAdj, type: validType, note: validNote } = parsed.data;
 
-  const product = await prisma.product.findUnique({ where: { id: validId } });
-  if (!product) return { ok: false, error: "Producto no encontrado" };
+  try {
+    const { updatedProduct, movement, previousStock } = await adjustProductStockService(validId, validAdj, validType, validNote);
 
-  const newStock = product.inStock + validAdj;
-  if (newStock < 0) return { ok: false, error: "El stock no puede ser negativo" };
+    await logAdminAction({
+      adminId: admin.id,
+      action: "ADJUST_STOCK",
+      targetId: validId,
+      metadata: { previousStock, newStock: updatedProduct.inStock, type: validType, note: validNote }
+    });
 
-  // Utilizamos una transacción para asegurar la integridad
-  const [updatedProduct, movement] = await prisma.$transaction([
-    prisma.product.update({
-      where: { id: validId },
-      data: { inStock: newStock }
-    }),
-    prisma.stockMovement.create({
-      data: {
-        productId: validId,
-        type: validType,
-        quantity: validAdj,
-        note: validNote
-      }
-    })
-  ]);
-
-  await logAdminAction({
-    adminId: admin.id,
-    action: "ADJUST_STOCK",
-    targetId: validId,
-    metadata: { previousStock: product.inStock, newStock: updatedProduct.inStock, type: validType, note: validNote }
-  });
-
-  revalidatePath("/admin/products");
-  return { ok: true, product: updatedProduct, movement };
+    revalidatePath("/admin/products");
+    return { ok: true, product: updatedProduct, movement };
+  } catch (error: any) {
+    return { ok: false, error: error.message };
+  }
 }

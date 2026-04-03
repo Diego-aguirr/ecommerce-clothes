@@ -1,6 +1,5 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/admin/auth-utils";
 import { logAdminAction } from "@/lib/admin/audit-logger";
 import { revalidatePath } from "next/cache";
@@ -8,6 +7,7 @@ import { UserStatus, Role } from "@/generated/prisma/enums";
 import { User } from "@/generated/prisma/client";
 import { z } from "zod";
 import { ToggleUserBlockSchema, UpdateUserRoleSchema } from "@/lib/validations";
+import { toggleUserBlockService, updateUserRoleService } from "@/lib/services/user.service";
 
 export type UserActionResponse = {
   ok: boolean;
@@ -20,51 +20,48 @@ export async function toggleUserBlock(userId: string, isBlocked: boolean): Promi
   const admin = await requireSuperAdmin();
 
   const parsed = ToggleUserBlockSchema.safeParse({ userId, isBlocked });
-  if (!parsed.success) {
-    return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
-  }
-
+  if (!parsed.success) return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
+  
   const { userId: validUserId, isBlocked: validIsBlocked } = parsed.data;
-  const status = validIsBlocked ? UserStatus.BLOCKED : UserStatus.ACTIVE;
 
-  const user = await prisma.user.update({
-    where: { id: validUserId },
-    data: { status },
-  });
+  try {
+    const user = await toggleUserBlockService(validUserId, validIsBlocked);
 
-  await logAdminAction({
-    adminId: admin.id,
-    action: "TOGGLE_USER_BLOCK",
-    targetId: validUserId,
-    metadata: { status },
-  });
+    await logAdminAction({
+      adminId: admin.id,
+      action: "TOGGLE_USER_BLOCK",
+      targetId: validUserId,
+      metadata: { status: user.status },
+    });
 
-  revalidatePath("/admin/users");
-  return { ok: true, user };
+    revalidatePath("/admin/users");
+    return { ok: true, user };
+  } catch (error: any) {
+    return { ok: false, error: error.message };
+  }
 }
 
 export async function updateUserRole(userId: string, role: Role): Promise<UserActionResponse> {
   const admin = await requireSuperAdmin();
 
   const parsed = UpdateUserRoleSchema.safeParse({ userId, role });
-  if (!parsed.success) {
-    return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
-  }
-
+  if (!parsed.success) return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
+  
   const { userId: validUserId, role: validRole } = parsed.data;
 
-  const user = await prisma.user.update({
-    where: { id: validUserId },
-    data: { role: validRole },
-  });
+  try {
+    const user = await updateUserRoleService(validUserId, validRole);
 
-  await logAdminAction({
-    adminId: admin.id,
-    action: "UPDATE_USER_ROLE",
-    targetId: validUserId,
-    metadata: { role: validRole },
-  });
+    await logAdminAction({
+      adminId: admin.id,
+      action: "UPDATE_USER_ROLE",
+      targetId: validUserId,
+      metadata: { role: validRole },
+    });
 
-  revalidatePath("/admin/users");
-  return { ok: true, user };
+    revalidatePath("/admin/users");
+    return { ok: true, user };
+  } catch (error: any) {
+    return { ok: false, error: error.message };
+  }
 }
