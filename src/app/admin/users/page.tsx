@@ -8,7 +8,10 @@ export default async function AdminUsersPage() {
   await requireSuperAdmin();
   
   const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: [
+      { createdAt: 'desc' },
+      { id: 'asc' }
+    ]
   });
 
   return (
@@ -46,22 +49,20 @@ export default async function AdminUsersPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {!user.isSuperAdmin && (
-                     <form action={toggleUserBlock.bind(null, user.id, user.status !== 'BLOCKED')}>
-                        <button type="submit" className={`focus:outline-none ${user.status === 'ACTIVE' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}`}>
-                          {user.status === 'ACTIVE' ? 'Bloquear' : 'Desbloquear'}
-                        </button>
-                     </form>
-                  )}
+                  {/* @ts-expect-error React form action typings clash with our custom Return object */}
+                  <form action={toggleUserBlock.bind(null, user.id, user.status !== 'BLOCKED')}>
+                    <button type="submit" className={`focus:outline-none cursor-pointer ${user.status === 'ACTIVE' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}`}>
+                      {user.status === 'ACTIVE' ? 'Bloquear' : 'Desbloquear'}
+                    </button>
+                  </form>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {!user.isSuperAdmin && (
-                    <form action={updateUserRole.bind(null, user.id, user.role === 'admin' ? 'user' : 'admin')}>
-                      <button type="submit" className="text-indigo-600 hover:text-indigo-900 focus:outline-none">
-                        {user.role === 'admin' ? 'Quitar Admin' : 'Hacer Admin'}
-                      </button>
-                    </form>
-                  )}
+                  {/* @ts-expect-error React form action typings clash with our custom Return object */}
+                  <form action={updateUserRole.bind(null, user.id, user.role === 'admin' ? 'user' : 'admin')}>
+                    <button type="submit" className="text-indigo-600 hover:text-indigo-900 focus:outline-none cursor-pointer">
+                      {user.role === 'admin' ? 'Quitar Admin' : 'Hacer Admin'}
+                    </button>
+                  </form>
                 </td>
               </tr>
             ))}

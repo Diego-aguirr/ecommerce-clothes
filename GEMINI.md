@@ -353,8 +353,6 @@ STOP.
 Analyze project structure.
 Never guess.
 
-
-
 ## PROJECT STRUCTURE
 
 ```

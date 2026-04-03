@@ -24,6 +24,11 @@ export async function toggleUserBlock(userId: string, isBlocked: boolean): Promi
   
   const { userId: validUserId, isBlocked: validIsBlocked } = parsed.data;
 
+  // Security layer: Prevent self-destruction
+  if (validUserId === admin.id) {
+    return { ok: false, error: "Crítico: No puedes bloquear ni alterar tu propio usuario." };
+  }
+
   try {
     const user = await toggleUserBlockService(validUserId, validIsBlocked);
 
@@ -48,6 +53,11 @@ export async function updateUserRole(userId: string, role: Role): Promise<UserAc
   if (!parsed.success) return { ok: false, error: "Datos inválidos", issues: parsed.error.issues };
   
   const { userId: validUserId, role: validRole } = parsed.data;
+
+  // Security layer: Prevent self-destruction
+  if (validUserId === admin.id) {
+    return { ok: false, error: "Crítico: No puedes cambiar tu propio rol de administrador." };
+  }
 
   try {
     const user = await updateUserRoleService(validUserId, validRole);
