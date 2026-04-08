@@ -352,3 +352,36 @@ If unsure where code belongs:
 STOP.
 Analyze project structure.
 Never guess.
+
+## PROJECT STRUCTURE
+
+```
+src/
+    2 ├── actions/              - [Lógica de Servidor (Server Actions)]
+    3 │   ├── auth/             - [Lógica de Servidor]
+    4 │   └── product/          - [Lógica de Servidor]
+    5 ├── app/                  - [Páginas y Rutas]
+    6 │   ├── (auth)/           - [Grupo de Rutas]
+    7 │   ├── (shop)/           - [Grupo de Rutas]
+    8 │   └── api/              - [API Endpoints (Server)]
+    9 ├── components/           - [Componentes de UI (React)]
+   10 │   ├── product/          - [Componentes Específicos]
+   11 │   ├── products/         - [Componentes Específicos]
+   12 │   ├── provider/         - [Componentes de Contexto (cc)]
+   13 │   └── ui/               - [Componentes Genéricos]
+   14 ├── config/               - [Configuración]
+   15 ├── generated/            - [Código Autogenerado por Herramientas]
+   16 │   └── prisma/           - [Generado por Prisma]
+   17 ├── interfaces/           - [Utilidades (Tipos y Contratos de Datos)]
+   18 ├── lib/                  - [Servicios y Lógica Compartida (Server)]
+   19 │   └── api/              - [Utilidades de API (Server)]
+   20 ├── seed /                - [Utilidades (Scripts de Base de Datos)]
+   21 ├── store/                - [Manejo de Estado (Client-Side / cc)]
+   22 │   ├── cart/             - [Estado del Carrito (cc)]
+   23 │   └── ui/               - [Estado de la UI (cc)]
+   24 ├── types/                - [Utilidades (Tipos de Datos Globales)]
+   25 └── utils/                - [Utilidades (Funciones Generales)]
+       # Global CSS
+```
+
+---

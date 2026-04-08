@@ -103,6 +103,8 @@ export const placeOrder = async (
                   quantity: item.quantity,
                   size: item.size as Size,
                   price: product.price,
+                  productName: product.title,
+                  productDescription: product.description,
                 };
               }),
             },
@@ -130,7 +132,7 @@ export const placeOrder = async (
           orderId: newOrder.id,
           amount: total,
           currency: "ARS",
-          status: "created",
+          status: "CREATED",
           provider: "mercadopago",
         },
       });
@@ -151,16 +153,20 @@ export const placeOrder = async (
       },
     };
   } catch (error: any) {
+    // 🕵️ Registrar el error crudo sólo internamente en el backend (logs)
+    console.error("Error crítico procesando la orden:", error);
+
     if (error.code === "P2002") {
       return {
         ok: false,
-        message: "Esta orden ya está siendo procesada",
+        message: "Ya existe un intento de orden en proceso. Verifica tu sesión.",
       };
     }
 
+    // 🛡️ Regla de Seguridad: NUNCA regresar error.message al cliente si el error viene de DB
     return {
       ok: false,
-      message: error.message || "Error procesando la orden",
+      message: "Ocurrió un inconveniente procesando los datos. Por favor, intenta nuevamente más tarde.",
     };
   }
 };

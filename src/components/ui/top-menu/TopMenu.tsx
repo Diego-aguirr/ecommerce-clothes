@@ -40,6 +40,7 @@ export const TopMenu = () => {
 
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
   const isAuthenticated = !!session?.user;
+  const isAdmin = session?.user?.role === "admin";
 
   // Cierra el menú al apretar Escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -181,6 +182,20 @@ export const TopMenu = () => {
                     Direcciones
                   </Link>
                   
+                  {isAdmin && (
+                    <>
+                      <div className="border-t border-gray-100"></div>
+                      <Link
+                        href="/admin"
+                        className="block px-4 py-2 text-sm text-brand-accent hover:bg-gray-100 font-semibold focus:bg-gray-100 focus:outline-none transition-colors"
+                        role="menuitem"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        Panel de Administración
+                      </Link>
+                    </>
+                  )}
+
                   <div className="border-t border-gray-100"></div>
                   
                   <button
