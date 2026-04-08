@@ -21,7 +21,7 @@ export async function createPreference(orderId: string) {
           include: { product: true },
         },
         payments: {
-          where: { provider: "mercadopago", status: "created" },
+          where: { provider: "mercadopago", status: "CREATED" },
           take: 1,
         },
       },
