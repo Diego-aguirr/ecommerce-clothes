@@ -3,9 +3,9 @@ import { z } from "zod";
 export const orderSchema = z.object({
   productsToOrder: z.array(
     z.object({
-      productId: z.string().uuid("ID de producto inválido"),
-      quantity: z.number().min(1, "La cantidad debe ser al menos 1"),
-      size: z.enum(["XS", "S", "M", "L", "XL", "XXL", "XXXL", "Único", "Ajustable"]),
+      productId: z.string().uuid({ message: "ID de producto inválido" }),
+      quantity: z.number().min(1, { message: "La cantidad debe ser al menos 1" }),
+      size: z.enum(["XS", "S", "M", "L", "XL", "XXL", "XXXL", "UNICO", "AJUSTABLE"]),
     })
   ).min(1, "Debe haber al menos un producto en la orden"),
   
