@@ -6,10 +6,31 @@ export const metadata = { title: "SuperAdmin | Auditoría" };
 export default async function AdminAuditPage() {
   await requireSuperAdmin();
   
-  const logs = await prisma.auditLog.findMany({
+  const rawLogs = await prisma.auditLog.findMany({
     orderBy: { createdAt: 'desc' },
     take: 100 // Límite de las últimas 100 por rendimiento
   });
+
+  // Extraer los IDs únicos de los administradores que causaron las acciones
+  const adminIds = [...new Set(rawLogs.map(l => l.adminId))];
+
+  // Traer los nombres/emails de esos usuarios para mostrarlos bonito
+  const users = await prisma.user.findMany({
+    where: { id: { in: adminIds } },
+    select: { id: true, name: true, email: true },
+  });
+
+  // Crear un diccionario ID -> Nombre
+  const userMap = users.reduce((acc, user) => {
+    acc[user.id] = user.name || user.email || user.id;
+    return acc;
+  }, {} as Record<string, string>);
+
+  // Combinar los logs con el nombre resuelto
+  const logs = rawLogs.map(log => ({
+    ...log,
+    adminName: userMap[log.adminId] || "Usuario Eliminado/Desconocido",
+  }));
 
   return (
     <div>
@@ -22,7 +43,7 @@ export default async function AdminAuditPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-              <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Admin ID</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Administrador</th>
               <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Acción</th>
               <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Entidad</th>
               <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Target ID</th>
@@ -35,8 +56,8 @@ export default async function AdminAuditPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                   {new Date(log.createdAt).toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-800">
-                  {log.adminId}
+                <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900 border-l-[3px] border-transparent hover:border-blue-500 transition-colors">
+                  {log.adminName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -46,7 +67,7 @@ export default async function AdminAuditPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-gray-500 font-medium">
                   {log.entity}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-400 text-xs">
                   {log.targetId || '-'}
                 </td>
                 <td className="px-6 py-4 text-xs font-mono text-gray-500 max-w-xs truncate overflow-hidden" title={log.metadata ? JSON.stringify(log.metadata) : ""}>
