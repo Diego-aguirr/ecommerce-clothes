@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import prisma from "@/lib/prisma";
 import { FiDollarSign, FiShoppingCart, FiBox, FiClock } from "react-icons/fi";
-import { StatCard } from "./components/dashboard/stat-card";
+import { StatCard } from "@/components/admin/dashboard/stat-card";
 
 export default async function AdminDashboardPage() {
   await requireAdmin();

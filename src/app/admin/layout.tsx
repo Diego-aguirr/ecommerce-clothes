@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import { ReactNode } from "react";
-import { AdminSidebar } from "./components/ui/admin-sidebar";
+import { AdminSidebar } from "@/components/admin/ui/admin-sidebar";
 
 export const metadata = {
   title: "Admin Panel | E-Commerce",
