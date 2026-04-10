@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateProductSchema } from "@/lib/validations/product.schema";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { uploadProductImage, removeProductImage } from "@/actions/admin/upload";
 import { createProduct, updateProduct } from "@/actions/admin/products";
 import { useRouter } from "next/navigation";
@@ -51,6 +51,19 @@ export function ProductForm({ categories, product }: Props) {
   );
   const [newImages, setNewImages] = useState<ImageEntry[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+
+  // Sincronizar estado cuando el producto cambia (ej: después de guardar)
+  useEffect(() => {
+    if (product) {
+      setExistingImages(product.ProductImage);
+      setNewImages([]);
+      setImagesToDelete([]);
+    }
+  }, [product, product?.id]);
+
+  // Se omite reset() acá porque el formulario ya debe respetar defaultValues, 
+  // Opcionalmente podrías llamar setValue("images", product.ProductImage)
+
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(CreateProductSchema),
@@ -242,17 +255,17 @@ export function ProductForm({ categories, product }: Props) {
 
             {/* Grid de previsualizaciones */}
             <div className="grid grid-cols-3 gap-3 mb-4">
-              {existingImages.map((img) => (
+              {existingImages.map((img, idx) => (
                 <ImagePreview
-                  key={img.publicId}
+                  key={`existing-${img.publicId}-${idx}`}
                   url={img.url}
                   onRemove={() => removeExistingImage(img.publicId)}
                   badge="Guardada"
                 />
               ))}
-              {newImages.map((img) => (
+              {newImages.map((img, idx) => (
                 <ImagePreview
-                  key={img.publicId}
+                  key={`new-${img.publicId}-${idx}`}
                   url={img.url}
                   onRemove={() => removeNewImage(img.publicId)}
                   badge="Nueva"
@@ -347,9 +360,21 @@ function ImagePreview({
   badge: string;
   badgeColor?: string;
 }) {
+  // Asegurar que las imágenes "semilla" locales se resuelvan correctamente en el admin
+  const isCloudinary = url.startsWith("http");
+  const resolvedUrl = isCloudinary ? url : `/products/${url}`;
+
   return (
     <div className="relative group rounded-xl border border-gray-200 overflow-hidden aspect-square bg-gray-50">
-      <img src={url} alt="Vista previa" className="w-full h-full object-cover" />
+      <img
+        src={resolvedUrl}
+        alt="Vista previa"
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.currentTarget.src = "/imgs/placeholder.jpg";
+          e.currentTarget.onerror = null;
+        }}
+      />
       <span
         className={`absolute bottom-1 left-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md ${badgeColor}`}
       >

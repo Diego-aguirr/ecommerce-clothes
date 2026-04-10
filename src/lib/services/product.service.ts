@@ -107,13 +107,25 @@ export async function updateProductService(
     });
   }
 
-  // 2. Actualizar datos centrales y crear sólo las imágenes nuevas
+  // 2. Traer las imágenes que el producto YA tiene actualmente en DB
+  const existingRecords = await prisma.productImage.findMany({
+    where: { productId }
+  });
+  const existingPublicIds = existingRecords.map(img => img.publicId);
+
+  // 3. Filtrar para mandar a CREAR exclusivamente las nuevas
+  // (Aquellas cuyo publicId no esté ya grabado en DB)
+  const newImagesToCreate = images.filter(
+    (img) => !existingPublicIds.includes(img.publicId)
+  );
+
+  // 4. Actualizar datos centrales y añadir sólo las fotos nuevas
   return prisma.product.update({
     where: { id: productId },
     data: {
       ...productData,
       ProductImage: {
-        create: images.map((img) => ({ url: img.url, publicId: img.publicId })),
+        create: newImagesToCreate.map((img) => ({ url: img.url, publicId: img.publicId })),
       },
     },
     include: {
