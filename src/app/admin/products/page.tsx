@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { toggleProductStatus } from "@/actions/admin/products";
 import { Pagination } from "@/components/admin/ui/pagination";
+import { ProductThumbnail } from "@/components/admin/products/product-thumbnail";
 
 export const metadata = { title: "Admin | Productos" };
 
@@ -61,15 +62,11 @@ export default async function AdminProductsPage({ searchParams }: Props) {
               <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    {p.ProductImage[0] ? (
-                      <img
-                        src={p.ProductImage[0].url}
-                        alt={p.title}
-                        className="w-10 h-10 rounded-lg object-cover border border-gray-100 shrink-0"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 shrink-0" />
-                    )}
+                    <ProductThumbnail
+                      src={p.ProductImage[0]?.url}
+                      alt={p.title}
+                      className="w-10 h-10 rounded-lg object-cover border border-gray-100 shrink-0"
+                    />
                     <span className="font-semibold text-gray-900 text-sm">{p.title}</span>
                   </div>
                 </td>
