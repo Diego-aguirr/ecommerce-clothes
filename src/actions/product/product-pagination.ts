@@ -24,7 +24,11 @@ export const getPaginatedProductsWithImages = async ({
   try {
     //Obtenemos datos de productos con paginación e imágenes
 
-    const whereCondition = gender ? { gender } : {};
+    // isActive: true → solo mostramos productos activos en la tienda pública
+    const whereCondition = gender
+      ? { gender, isActive: true }
+      : { isActive: true };
+
     const [products, totalProducts] = await Promise.all([
       prisma.product.findMany({
         where: whereCondition,
@@ -37,7 +41,7 @@ export const getPaginatedProductsWithImages = async ({
           },
         },
       }),
-      // Obtenemos el total de productos
+      // Total de productos activos (para calcular páginas correctamente)
       prisma.product.count({
         where: whereCondition,
       }),
