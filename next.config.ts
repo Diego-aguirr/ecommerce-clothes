@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.unsplash.com", // Para todos los subdominios de Unsplash
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com", // Imágenes subidas via Cloudinary
+      },
     ],
     formats: ["image/webp", "image/avif"], // Formatos modernos
   },

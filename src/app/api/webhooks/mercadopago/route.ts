@@ -7,6 +7,7 @@ import { mpClient } from "@/lib/mercadopago";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
+import type { Prisma } from "@/generated/prisma/client";
 
 // ---------------------------------------------------------------------------
 // 🔐 Verify MP signature (HMAC SHA256)
@@ -31,44 +32,52 @@ function verifySignature(request: NextRequest, body: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// 🧱 Confirm payment + decrement stock (ATÓMICO)
+// 🧱 Confirm payment + decrement stock (ATÓMICO sin anidar tx)
 // ---------------------------------------------------------------------------
-async function confirmPaymentAndUpdateStock(orderId: string) {
-  return await prisma.$transaction(async (tx) => {
-    const order = await tx.order.findUnique({
-      where: { id: orderId },
-      include: { OrderItem: true },
-    });
+async function confirmPaymentAndUpdateStock(tx: Prisma.TransactionClient, orderId: string) {
+  const order = await tx.order.findUnique({
+    where: { id: orderId },
+    include: { OrderItem: true },
+  });
 
-    if (!order) throw new Error("Order not found");
-    if (order.isPaid) return order; // idempotencia
+  if (!order) throw new Error("Order not found");
+  if (order.isPaid) return order; // idempotencia
 
-    // 🔥 decremento atómico seguro
-    for (const item of order.OrderItem) {
-      const updated = await tx.product.updateMany({
-        where: {
-          id: item.productId,
-          inStock: { gte: item.quantity },
-        },
-        data: {
-          inStock: { decrement: item.quantity },
-        },
-      });
-
-      if (updated.count === 0) {
-        throw new Error(`Insufficient stock for product ${item.productId}`);
-      }
-    }
-
-    // marcar orden como pagada
-    return await tx.order.update({
-      where: { id: orderId },
+  // 🔥 decremento atómico seguro usando la transacción PADRE (inyectada)
+  for (const item of order.OrderItem) {
+    const updated = await tx.product.updateMany({
+      where: {
+        id: item.productId,
+        inStock: { gte: item.quantity },
+      },
       data: {
-        isPaid: true,
-        paidAt: new Date(),
-        status: "paid",
+        inStock: { decrement: item.quantity },
       },
     });
+
+    if (updated.count === 0) {
+      throw new Error(`Insufficient stock for product ${item.productId}`);
+    }
+
+    // 🔴 FIJO OBLIGATORIO: Mover stock dejando rastro (auditoría/debugging)
+    await tx.stockMovement.create({
+      data: {
+        productId: item.productId,
+        quantity: -item.quantity, // Número negativo por despacho/venta
+        type: "sale",
+        note: `Venta por Orden ${orderId}`,
+      },
+    });
+  }
+
+  // marcar orden como pagada
+  return await tx.order.update({
+    where: { id: orderId },
+    data: {
+      isPaid: true,
+      paidAt: new Date(),
+      status: "paid", // Status de order
+    },
   });
 }
 
@@ -97,7 +106,7 @@ export async function POST(req: NextRequest) {
   }
 
   // -----------------------------------------------------------------------
-  // 💳 TRANSACCIÓN PRINCIPAL
+  // 💳 TRANSACCIÓN PRINCIPAL (ÚNICA)
   // -----------------------------------------------------------------------
   const result = await prisma.$transaction(async (tx) => {
     const paymentClient = new Payment(mpClient);
@@ -176,33 +185,36 @@ export async function POST(req: NextRequest) {
       throw new Error("Amount mismatch");
     }
 
-    // 🎯 map status
+    // 🎯 map status (🔴 FIJO OBLIGATORIO: Usar nombres estrictos del enum de Prisma)
     let newStatus: PaymentStatus;
 
     switch (mpStatus) {
       case "approved":
-        newStatus = PaymentStatus.confirmed;
+        newStatus = PaymentStatus.APPROVED;
         break;
       case "pending":
-        newStatus = PaymentStatus.pending;
+        newStatus = PaymentStatus.PENDING;
         break;
       case "rejected":
+        newStatus = PaymentStatus.REJECTED;
+        break;
       case "cancelled":
-        newStatus = PaymentStatus.failed;
+        newStatus = PaymentStatus.CANCELLED;
         break;
       default:
-        newStatus = PaymentStatus.pending;
+        newStatus = PaymentStatus.PENDING;
     }
 
     // 🔥 idempotencia REAL (race safe)
+    // Se compara contra PENDING o CREATED (los estados iniciales válidos de PaymentStatus)
     const updated = await tx.payment.updateMany({
       where: {
         id: payment.id,
-        status: PaymentStatus.created,
+        status: { in: [PaymentStatus.CREATED, PaymentStatus.PENDING] },
       },
       data: {
         status: newStatus,
-        providerPaymentId: payload.data.id,
+        providerPaymentId: String(payload.data.id),
       },
     });
 
@@ -211,8 +223,9 @@ export async function POST(req: NextRequest) {
     }
 
     // 📦 confirmar orden
-    if (newStatus === PaymentStatus.confirmed) {
-      await confirmPaymentAndUpdateStock(payment.orderId);
+    if (newStatus === PaymentStatus.APPROVED) {
+      // Pasamos tx explícitamente para mantener una sola transacción real
+      await confirmPaymentAndUpdateStock(tx, payment.orderId);
     }
 
     // 🧾 log completo

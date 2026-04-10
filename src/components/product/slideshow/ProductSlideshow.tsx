@@ -9,6 +9,44 @@ interface Props {
   className?: string;
 }
 
+const PLACEHOLDER = "/imgs/placeholder.jpg";
+
+function resolveImageSrc(image: string | undefined): string {
+  if (!image) return PLACEHOLDER;
+  if (image.startsWith("http")) return image;
+  return `/products/${image}`;
+}
+
+// Función auxiliar para renderizar con manejo de error local
+function FallbackImage({
+  image,
+  alt,
+  priority = false,
+  sizes,
+  className
+}: {
+  image: string;
+  alt: string;
+  priority?: boolean;
+  sizes: string;
+  className: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const src = hasError ? PLACEHOLDER : resolveImageSrc(image);
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      className={className}
+      sizes={sizes}
+      priority={priority}
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
 export default function ProductSlideshow({
   images,
   title,
@@ -16,20 +54,23 @@ export default function ProductSlideshow({
 }: Props) {
   const [selectedImage, setSelectedImage] = useState(0);
 
+  // Garantizar que haya al menos 1 elemento para que renderice el placeholder si la DB lo manda vacío
+  const safeImages = images.length === 0 ? [""] : images;
+
   // ⏱️ Cambio automático cada 2 segundos
   useEffect(() => {
-    if (images.length === 0) return;
+    if (safeImages.length <= 1) return;
 
     const interval = setInterval(() => {
-      setSelectedImage((prev) => (prev + 1) % images.length);
+      setSelectedImage((prev) => (prev + 1) % safeImages.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, [safeImages.length]);
 
   const nextImage = () =>
-    setSelectedImage((prev) => (prev + 1) % images.length);
+    setSelectedImage((prev) => (prev + 1) % safeImages.length);
   const prevImage = () =>
-    setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
+    setSelectedImage((prev) => (prev - 1 + safeImages.length) % safeImages.length);
 
   return (
     <div
@@ -37,17 +78,16 @@ export default function ProductSlideshow({
     >
       {/* Imagen principal */}
       <div className="relative w-full aspect-square md:aspect-auto md:h-[600px] lg:h-[800px] rounded-2xl overflow-hidden group shadow-lg">
-        {images.map((image, index) => (
+        {safeImages.map((image, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
               selectedImage === index ? "opacity-100" : "opacity-0"
             }`}
           >
-            <Image
-              src={`/products/${image}`}
+            <FallbackImage
+              image={image}
               alt={`${title} ${index + 1}`}
-              fill
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 1024px"
               priority={index === 0}
@@ -56,7 +96,7 @@ export default function ProductSlideshow({
         ))}
 
         {/* Botones de navegación */}
-        {images.length > 1 && (
+        {safeImages.length > 1 && (
           <>
             <button
               onClick={prevImage}
@@ -76,9 +116,9 @@ export default function ProductSlideshow({
         )}
 
         {/* Indicadores inferiores */}
-        {images.length > 1 && (
+        {safeImages.length > 1 && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-            {images.map((_, idx) => (
+            {safeImages.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedImage(idx)}
@@ -94,9 +134,9 @@ export default function ProductSlideshow({
       </div>
 
       {/* Miniaturas */}
-      {images.length > 1 && (
+      {safeImages.length > 1 && (
         <div className="flex gap-4 mt-4 overflow-x-auto scrollbar-hide px-2">
-          {images.map((img, idx) => (
+          {safeImages.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setSelectedImage(idx)}
@@ -106,10 +146,9 @@ export default function ProductSlideshow({
                   : "border-transparent hover:border-gray-400"
               }`}
             >
-              <Image
-                src={`/products/${img}`}
+              <FallbackImage
+                image={img}
                 alt={`${title} miniatura ${idx + 1}`}
-                fill
                 className="object-cover"
                 sizes="96px"
               />

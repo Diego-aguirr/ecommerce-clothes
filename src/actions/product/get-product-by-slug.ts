@@ -14,6 +14,7 @@ export const getProductBySlug = async (slug: string) => {
       },
       where: {
         slug: slug,
+        isActive: true, // No mostrar productos desactivados en la tienda
       },
     });
 
