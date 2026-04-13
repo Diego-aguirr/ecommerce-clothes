@@ -132,8 +132,11 @@ export const Sidebar = () => {
         {isAuthenticated && (
           <button
             className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            onClick={() => logout()}
-            onClickCapture={() => closeMenu()}
+            onClick={async () => {
+              closeMenu();
+              const { signOut } = await import("next-auth/react");
+              await signOut({ callbackUrl: '/' });
+            }}
           >
             <IoLogOutOutline size={30} />
             <span className="ml-3 text-xl">Salir</span>
