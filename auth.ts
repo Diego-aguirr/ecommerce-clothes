@@ -45,9 +45,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        token.role = user.role ?? "user";
         // @ts-ignore
-        token.isSuperAdmin = user.isSuperAdmin;
+        token.isSuperAdmin = user.isSuperAdmin ?? false;
       }
       return token;
     },
