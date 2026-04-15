@@ -23,10 +23,9 @@ export const authenticate = async (values: z.infer<typeof loginSchema>) => {
 
     return { success: true };
   } catch (error) {
-    if (error instanceof AuthError) {
-      return { error: "Credenciales inválidas" };
-    }
+    console.error("Login error:", error);
 
-    return { error: "Error interno" };
+    // Generic message to prevent user enumeration
+    return { error: "Email o contraseña incorrectos" };
   }
 };
