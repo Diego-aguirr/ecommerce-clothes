@@ -18,7 +18,15 @@ function resolveImageSrc(image: string | undefined): string {
 }
 
 // Subcomponente para manejar el error de imagen individualmente
-function SlideImage({ image, title, i }: { image: string; title: string; i: number }) {
+function SlideImage({
+  image,
+  title,
+  i,
+}: {
+  image: string;
+  title: string;
+  i: number;
+}) {
   const [hasError, setHasError] = useState(false);
   const src = hasError ? PLACEHOLDER : resolveImageSrc(image);
 
@@ -35,7 +43,11 @@ function SlideImage({ image, title, i }: { image: string; title: string; i: numb
   );
 }
 
-export default function ProductMobileSlideshow({ images, title, className = "" }: Props) {
+export default function ProductMobileSlideshow({
+  images,
+  title,
+  className = "",
+}: Props) {
   // Garantizar que si llega un array vacío de la DB, se renderice al menos 1 placeholder
   const safeImages = images.length === 0 ? [""] : images;
 
@@ -50,15 +62,12 @@ export default function ProductMobileSlideshow({ images, title, className = "" }
           </div>
         ))}
       </div>
-      
+
       {/* Indicadores estilo iOS/Mobile */}
       {safeImages.length > 1 && (
         <div className="flex justify-center gap-2 mt-3">
           {safeImages.map((_, idx) => (
-            <div
-              key={idx}
-              className="w-2 h-2 rounded-full bg-gray-300"
-            />
+            <div key={idx} className="w-2 h-2 rounded-full bg-gray-300" />
           ))}
         </div>
       )}

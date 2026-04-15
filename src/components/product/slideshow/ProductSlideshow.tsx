@@ -1,161 +1,170 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, createContext, useContext } from "react";
 import Image from "next/image";
 
-interface Props {
-  images: string[];
+// ─── Context ────────────────────────────────────────────────────
+type Ctx = {
+  selectedImage: number;
+  setSelectedImage: React.Dispatch<React.SetStateAction<number>>;
+  safeImages: string[];
   title: string;
-  className?: string;
+};
+
+const SlideshowContext = createContext<Ctx | null>(null);
+
+function useCtx(): Ctx {
+  const ctx = useContext(SlideshowContext);
+  if (!ctx) throw new Error("Must be inside <ProductSlideshow>");
+  return ctx;
 }
 
+// ─── Helpers ────────────────────────────────────────────────────
 const PLACEHOLDER = "/imgs/placeholder.jpg";
 
-function resolveImageSrc(image: string | undefined): string {
-  if (!image) return PLACEHOLDER;
-  if (image.startsWith("http")) return image;
-  return `/products/${image}`;
-}
-
-// Función auxiliar para renderizar con manejo de error local
-function FallbackImage({
-  image,
+function Img({
+  src,
   alt,
-  priority = false,
+  className,
   sizes,
-  className
+  priority = false,
 }: {
-  image: string;
+  src: string;
   alt: string;
+  className?: string;
+  sizes?: string;
   priority?: boolean;
-  sizes: string;
-  className: string;
 }) {
-  const [hasError, setHasError] = useState(false);
-  const src = hasError ? PLACEHOLDER : resolveImageSrc(image);
+  const [err, setErr] = useState(false);
+
+  const resolved = err
+    ? PLACEHOLDER
+    : src.startsWith("http") || src.startsWith("/")
+    ? src
+    : `/products/${src}`;
 
   return (
     <Image
-      src={src}
+      src={resolved}
       alt={alt}
       fill
-      className={className}
       sizes={sizes}
       priority={priority}
-      onError={() => setHasError(true)}
+      className={className}
+      onError={() => setErr(true)}
     />
   );
 }
 
-export default function ProductSlideshow({
-  images,
-  title,
-  className = "",
-}: Props) {
-  const [selectedImage, setSelectedImage] = useState(0);
-
-  // Garantizar que haya al menos 1 elemento para que renderice el placeholder si la DB lo manda vacío
-  const safeImages = images.length === 0 ? [""] : images;
-
-  // ⏱️ Cambio automático cada 2 segundos
-  useEffect(() => {
-    if (safeImages.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setSelectedImage((prev) => (prev + 1) % safeImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [safeImages.length]);
-
-  const nextImage = () =>
-    setSelectedImage((prev) => (prev + 1) % safeImages.length);
-  const prevImage = () =>
-    setSelectedImage((prev) => (prev - 1 + safeImages.length) % safeImages.length);
+// ─── Column 1: Thumbnails ────────────────────────────────────────
+export function ProductThumbnails() {
+  const { safeImages, selectedImage, setSelectedImage, title } = useCtx();
+  if (safeImages.length <= 1) return null;
 
   return (
     <div
-      className={`relative w-full max-w-5xl mx-auto ${className} flex flex-col items-center`}
+      className="flex flex-col gap-3 overflow-y-auto py-1 scrollbar-hide"
+      style={{ maxHeight: "clamp(380px, 58vh, 640px)" }}
     >
-      {/* Imagen principal */}
-      <div className="relative w-full aspect-square md:aspect-auto md:h-[600px] lg:h-[800px] rounded-2xl overflow-hidden group shadow-lg">
-        {safeImages.map((image, index) => (
+      {safeImages.map((img, idx) => (
+        <button
+          key={idx}
+          type="button"
+          onClick={() => setSelectedImage(idx)}
+          onMouseEnter={() => setSelectedImage(idx)}
+          aria-label={`Ver imagen ${idx + 1}`}
+          className={[
+            "relative w-[72px] h-[72px] shrink-0 overflow-hidden rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111]",
+            selectedImage === idx
+              ? "border-[#111] opacity-100 shadow-sm"
+              : "border-transparent opacity-50 hover:opacity-75 hover:border-gray-200",
+          ].join(" ")}
+        >
+          <Img src={img} alt={`${title} ${idx + 1}`} className="object-cover" sizes="72px" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Column 2: Main Image ────────────────────────────────────────
+export function ProductMainImage() {
+  const { safeImages, selectedImage, title } = useCtx();
+  const [fullscreen, setFullscreen] = useState(false);
+
+  return (
+    <>
+      {/* Main image container */}
+      <div
+        className="relative w-full overflow-hidden cursor-zoom-in group"
+        style={{ height: "clamp(380px, 58vh, 640px)" }}
+        onClick={() => setFullscreen(true)}
+      >
+        {safeImages.map((img, idx) => (
           <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              selectedImage === index ? "opacity-100" : "opacity-0"
-            }`}
+            key={idx}
+            className={[
+              "absolute inset-0 transition-opacity duration-500",
+              selectedImage === idx ? "opacity-100 z-10" : "opacity-0 z-0",
+            ].join(" ")}
           >
-            <FallbackImage
-              image={image}
-              alt={`${title} ${index + 1}`}
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, 1024px"
-              priority={index === 0}
+            <Img
+              src={img}
+              alt={`${title} — vista ${idx + 1}`}
+              className="object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+              sizes="(max-width: 1024px) 100vw, 640px"
+              priority={idx === 0}
             />
           </div>
         ))}
-
-        {/* Botones de navegación */}
-        {safeImages.length > 1 && (
-          <>
-            <button
-              onClick={prevImage}
-              aria-label="Imagen anterior"
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-            >
-              ‹
-            </button>
-            <button
-              onClick={nextImage}
-              aria-label="Siguiente imagen"
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-            >
-              ›
-            </button>
-          </>
-        )}
-
-        {/* Indicadores inferiores */}
-        {safeImages.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-            {safeImages.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedImage(idx)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  selectedImage === idx
-                    ? "bg-white scale-125"
-                    : "bg-white/60 hover:bg-white/90"
-                }`}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Miniaturas */}
-      {safeImages.length > 1 && (
-        <div className="flex gap-4 mt-4 overflow-x-auto scrollbar-hide px-2">
-          {safeImages.map((img, idx) => (
-            <button
-              key={idx}
-              onClick={() => setSelectedImage(idx)}
-              className={`relative w-24 h-20 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${
-                selectedImage === idx
-                  ? "border-gray-900 shadow-lg"
-                  : "border-transparent hover:border-gray-400"
-              }`}
-            >
-              <FallbackImage
-                image={img}
-                alt={`${title} miniatura ${idx + 1}`}
-                className="object-cover"
-                sizes="96px"
-              />
-            </button>
-          ))}
+      {/* Fullscreen modal */}
+      {fullscreen && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setFullscreen(false)}
+        >
+          <button
+            className="absolute top-5 right-5 text-white text-4xl leading-none hover:text-gray-300 transition-colors z-10"
+            onClick={() => setFullscreen(false)}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+          <div
+            className="relative w-full max-w-4xl h-[85vh] cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Img
+              src={safeImages[selectedImage]}
+              alt={`${title} — pantalla completa`}
+              className="object-contain"
+              sizes="100vw"
+              priority
+            />
+          </div>
         </div>
       )}
-    </div>
+    </>
+  );
+}
+
+// ─── Provider (default export) ──────────────────────────────────
+interface Props {
+  images: string[];
+  title: string;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export default function ProductSlideshow({ images, title, className = "", children }: Props) {
+  const safeImages = images.length === 0 ? [""] : images;
+  const [selectedImage, setSelectedImage] = useState(0);
+
+  return (
+    <SlideshowContext.Provider value={{ selectedImage, setSelectedImage, safeImages, title }}>
+      <div className={className}>{children}</div>
+    </SlideshowContext.Provider>
   );
 }

@@ -5,7 +5,6 @@ import bcryptjs from "bcryptjs";
 import { registerSchema } from "@/lib/zod";
 import { z } from "zod";
 import crypto from "crypto";
-import { AuthError } from "next-auth";
 import { signIn } from "../../../auth";
 import { sendEmail } from "@/lib/mailer";
 import { verifyEmailTemplate } from "@/lib/verify-email";
@@ -31,20 +30,10 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
     });
 
     if (existingUser) {
-      const hasOAuth = existingUser.accounts.some(
-        (acc) => acc.type === "oauth",
-      );
-
-      if (hasOAuth) {
-        return {
-          ok: false,
-          error: "Este email fue registrado con Google u otro proveedor",
-        };
-      }
-
+      // Generic message to prevent user enumeration
       return {
         ok: false,
-        error: "El usuario ya existe",
+        error: "El email ya está en uso",
       };
     }
 
@@ -102,18 +91,12 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       user,
     };
   } catch (error) {
-    if (error instanceof AuthError) {
-      return {
-        ok: false,
-        error: error.cause?.err?.message,
-      };
-    }
-
-    console.error(error);
+    // Log internally only - never expose to client
+    console.error("Register error:", error);
 
     return {
       ok: false,
-      error: "Error interno del servidor",
+      error: "Error al registrar usuario",
     };
   }
 }

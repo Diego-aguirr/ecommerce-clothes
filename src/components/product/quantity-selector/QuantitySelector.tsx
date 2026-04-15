@@ -1,6 +1,6 @@
 "use client";
 
-import { IoAddCircleOutline, IoRemoveCircleOutline } from "react-icons/io5";
+import { IoAddOutline, IoRemoveOutline } from "react-icons/io5";
 
 interface Props {
   quantity: number;
@@ -8,25 +8,37 @@ interface Props {
 }
 
 export const QuantitySelector = ({ quantity, onQuantityChanged }: Props) => {
-  const onValueChange = (value: number) => {
-    if (quantity + value < 1) return;
-
-    onQuantityChanged(quantity + value);
+  const change = (delta: number) => {
+    if (quantity + delta < 1) return;
+    onQuantityChanged(quantity + delta);
   };
 
   return (
-    <div className="flex">
-      <button onClick={() => onValueChange(-1)}>
-        <IoRemoveCircleOutline size={30} />
-      </button>
-
-      <span className="w-20 mx-3 px-5 bg-gray-100 text-center rounded">
-        {quantity}
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+        Cantidad
       </span>
-
-      <button onClick={() => onValueChange(+1)}>
-        <IoAddCircleOutline size={30} />
-      </button>
+      <div className="flex items-center w-fit border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <button
+          type="button"
+          onClick={() => change(-1)}
+          aria-label="Disminuir cantidad"
+          className="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#111] transition-colors"
+        >
+          <IoRemoveOutline size={18} />
+        </button>
+        <span className="w-12 h-11 flex items-center justify-center font-semibold text-[#111] border-x border-gray-200 select-none">
+          {quantity}
+        </span>
+        <button
+          type="button"
+          onClick={() => change(1)}
+          aria-label="Aumentar cantidad"
+          className="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#111] transition-colors"
+        >
+          <IoAddOutline size={18} />
+        </button>
+      </div>
     </div>
   );
 };

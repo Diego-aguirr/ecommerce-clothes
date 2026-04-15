@@ -199,9 +199,11 @@ export const TopMenu = () => {
                   <div className="border-t border-gray-100"></div>
                   
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       setIsUserMenuOpen(false);
-                      logout();
+                      // Usar el signOut nativo de cliente fuerza refresco de sesión
+                      const { signOut } = await import("next-auth/react");
+                      await signOut({ callbackUrl: '/' });
                     }}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none"
                     role="menuitem"
