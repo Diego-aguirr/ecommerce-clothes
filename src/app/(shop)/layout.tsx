@@ -1,4 +1,4 @@
-import { Footer, Sidebar, TopMenu } from "@/components";
+import { Footer, Sidebar, TopMenu, WhatsappButton } from "@/components";
 import { auth } from "../../../auth";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
@@ -41,6 +41,9 @@ export default async function ShopLayout({
       <div className="px-0 sm:px-10">{children}</div>
 
       <Footer />
+      
+      {/* ── WhatsApp Global Button ── */}
+      <WhatsappButton />
     </main>
   );
 }
