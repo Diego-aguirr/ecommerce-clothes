@@ -49,125 +49,125 @@ export default async function OrderPage({ params }: Props) {
     notFound();
   }
 
-  return (
-    <div className="flex justify-center items-center mb-72 px-10 sm:px-0">
-      <div className="flex flex-col w-[1000px]">
-        <Title title={`Orden #${id.split("-").at(-1)}`} />
+    return (
+      <div className="flex justify-center items-center mb-40 px-5 sm:px-0">
+        <div className="flex flex-col w-full max-w-[1000px]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-6 mb-8 gap-4">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 antialiased">
+              Orden #{id.split("-").at(-1)}
+            </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-          {/* Carrito */}
-          <div className="flex flex-col mt-5">
+            {/* Premium Status Pill */}
             <div
               className={clsx(
-                "flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5",
+                "flex items-center w-fit rounded-full py-2 px-4 text-sm font-semibold border shadow-sm",
                 {
-                  "bg-red-500": !order.isPaid,
-                  "bg-green-700": order.isPaid,
-                },
+                  "bg-red-50 text-red-800 border-red-200": !order.isPaid,
+                  "bg-green-50 text-green-800 border-green-200": order.isPaid,
+                }
               )}
             >
-              <IoCardOutline size={30} />
-              <span className="mx-2">
-                {order.isPaid ? "Pagada" : "Pendiente de pago"}
-              </span>
+              <IoCardOutline size={20} className="mr-2" />
+              <span>{order.isPaid ? "Orden Pagada" : "Pendiente de Pago"}</span>
             </div>
-
-            {/* Items */}
-            {order.OrderItem.map((item) => (
-              <div
-                key={item.product.slug + "-" + item.size}
-                className="flex mb-5"
-              >
-                <Image
-                  src={`/products/${item.product.ProductImage[0].url}`}
-                  width={100}
-                  height={100}
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                  }}
-                  alt={item.product.title}
-                  className="mr-5 rounded"
-                />
-
-                <div>
-                  <p>{item.product.title}</p>
-                  <p>
-                    {currencyFormat(item.price)} x {item.quantity}
-                  </p>
-                  <p className="font-bold">
-                    Subtotal: {currencyFormat(item.price * item.quantity)}
-                  </p>
-                </div>
-              </div>
-            ))}
           </div>
 
-          {/* Checkout - Resumen de orden */}
-          <div className="bg-white rounded-xl shadow-xl p-7">
-            <h2 className="text-2xl mb-2">Dirección de entrega</h2>
-            <div className="mb-10 text-gray-700">
-              <p className="text-xl font-bold">{address.fullname}</p>
-              <p>{address.street}</p>
-              {address.apartment && <p>Dpto: {address.apartment}</p>}
-              <p>
-                {address.city}, {address.province.name}
-              </p>
-              <p>CP: {address.zip}</p>
-              <p>Tel: {address.phone}</p>
-              <p>DNI: {address.dni}</p>
-              {address.description && (
-                <p className="mt-2 italic">Ref: {address.description}</p>
-              )}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 lg:gap-12">
+            
+            {/* Columna Izquierda: Artículos */}
+            <div className="flex flex-col gap-6">
+              <h2 className="text-xl font-semibold text-gray-900 border-b border-gray-100 pb-3">Artículos comprados</h2>
+              <div className="flex flex-col gap-5">
+                {order.OrderItem.map((item) => (
+                  <div
+                    key={item.product.slug + "-" + item.size}
+                    className="flex items-center gap-5 p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <Image
+                      src={`/products/${item.product.ProductImage[0].url}`}
+                      width={90}
+                      height={90}
+                      alt={item.product.title}
+                      className="rounded-lg object-cover bg-gray-50 aspect-square"
+                    />
+
+                    <div className="flex-1 flex flex-col">
+                      <p className="font-semibold text-gray-900 leading-tight">
+                        {item.product.title}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {currencyFormat(item.price)} <span className="mx-1">×</span> {item.quantity} un.
+                      </p>
+                      <p className="font-bold text-gray-900 mt-2">
+                        {currencyFormat(item.price * item.quantity)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Divider */}
-            <div className="w-full h-0.5 rounded bg-gray-200 mb-10" />
+            {/* Columna Derecha: Tarjeta de Resumen y Dirección */}
+            <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 p-8 h-fit">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Dirección de entrega</h2>
+              <div className="text-sm text-gray-600 space-y-1.5 mb-8">
+                <p className="font-semibold text-gray-900 text-base">{address.fullname}</p>
+                <p>{address.street} {address.apartment && `- Dpto: ${address.apartment}`}</p>
+                <p>{address.city}, {address.province.name}</p>
+                <p>CP: {address.zip}</p>
+                <p>Tel: {address.phone}</p>
+                <p>DNI: {address.dni}</p>
+                {address.description && (
+                  <p className="pt-2 text-gray-500 italic">" {address.description} "</p>
+                )}
+              </div>
 
-            <h2 className="text-2xl mb-2">Resumen de orden</h2>
+              {/* Divider */}
+              <div className="w-full h-px border-t border-dashed border-gray-200 mb-8" />
 
-            <div className="grid grid-cols-2 text-gray-700">
-              <span>No. Productos</span>
-              <span className="text-right">
-                {order.itemsInOrder === 1
-                  ? "1 artículo"
-                  : `${order.itemsInOrder} artículos`}
-              </span>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Resumen de cuenta</h2>
 
-              <span>Subtotal</span>
-              <span className="text-right">
-                {currencyFormat(order.subTotal)}
-              </span>
-
-              <span>Impuestos (21%)</span>
-              <span className="text-right">{currencyFormat(order.tax)}</span>
-
-              <span>Costo de envío</span>
-              <span className="text-right">
-                {order.shipping === 0
-                  ? "Envío Gratis"
-                  : currencyFormat(order.shipping)}
-              </span>
-
-              <span className="mt-5 text-2xl font-bold">Total:</span>
-              <span className="mt-5 text-2xl text-right font-bold">
-                {currencyFormat(order.total)}
-              </span>
-            </div>
-
-            <div className="mt-5 mb-2 w-full">
-              {order.isPaid ? (
-                <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                  <IoCardOutline size={30} />
-                  <span className="mx-2">Pagada</span>
+              <div className="flex flex-col gap-3 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>Productos ({order.itemsInOrder})</span>
+                  <span className="font-medium text-gray-900">{currencyFormat(order.subTotal)}</span>
                 </div>
-              ) : (
-                <MercadoPagoButton orderId={order.id} amount={order.total} />
-              )}
+
+                <div className="flex justify-between">
+                  <span>Impuestos (21%)</span>
+                  <span className="font-medium text-gray-900">{currencyFormat(order.tax)}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Envío</span>
+                  <span className="font-medium text-gray-900">
+                    {order.shipping === 0 ? "Gratis" : currencyFormat(order.shipping)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center border-t border-gray-100 pt-4 mt-2">
+                  <span className="text-base font-bold text-gray-900">Total a pagar</span>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {currencyFormat(order.total)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                {order.isPaid ? (
+                  <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-white bg-green-600 shadow-sm">
+                    <IoCardOutline size={22} className="mr-2" />
+                    <span>Transacción completada</span>
+                  </div>
+                ) : (
+                  <div className="w-full pt-2">
+                    <MercadoPagoButton orderId={order.id} amount={order.total} />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 }
