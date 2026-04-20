@@ -34,7 +34,10 @@ function verifySignature(request: NextRequest, body: string): boolean {
 // ---------------------------------------------------------------------------
 // 🧱 Confirm payment + decrement stock (ATÓMICO sin anidar tx)
 // ---------------------------------------------------------------------------
-async function confirmPaymentAndUpdateStock(tx: Prisma.TransactionClient, orderId: string) {
+async function confirmPaymentAndUpdateStock(
+  tx: Prisma.TransactionClient,
+  orderId: string,
+) {
   const order = await tx.order.findUnique({
     where: { id: orderId },
     include: { OrderItem: true },
