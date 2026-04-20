@@ -46,7 +46,7 @@ export default async function Page({ params }: Props) {
       <ProductSlideshow
         images={product.images}
         title={product.title}
-        className="hidden md:grid md:grid-cols-[72px_1fr_380px] lg:grid-cols-[80px_1fr_420px] gap-6 lg:gap-12"
+        className="hidden md:grid md:grid-cols-[72px_1fr_300px] lg:grid-cols-[80px_1fr_340px] gap-6 lg:gap-10"
       >
         {/* Col 1 — Miniaturas verticales */}
         <ProductThumbnails />
