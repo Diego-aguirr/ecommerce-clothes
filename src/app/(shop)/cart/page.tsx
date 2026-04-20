@@ -17,13 +17,17 @@ export default function CartPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Sección de Items del Carrito */}
-          <ProductIncard />
+          <div className="lg:col-span-8 xl:col-span-8">
+            <ProductIncard />
+          </div>
 
           {/* Resumen del Pedido */}
-          <div className="xl:col-span-1">
-            <OrderSummary />
+          <div className="lg:col-span-4 xl:col-span-4">
+            <div className="sticky top-24">
+              <OrderSummary />
+            </div>
           </div>
         </div>
       </div>

@@ -77,7 +77,7 @@ export async function createPreference(orderId: string) {
 
       notification_url: `${baseUrl}/api/webhooks/mercadopago`,
 
-      //   auto_return: "approved",
+      auto_return: "approved",
     };
     console.log("SUCCESS FINAL:", `${baseUrl}/orders/${orderId}`);
 

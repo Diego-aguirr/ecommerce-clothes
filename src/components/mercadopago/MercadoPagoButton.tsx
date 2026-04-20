@@ -44,15 +44,15 @@ export const MercadoPagoButton = ({ orderId, amount }: Props) => {
       <button
         onClick={handlePayment}
         disabled={loading}
-        className={`w-full py-3 px-4 rounded-md text-white font-bold transition-all flex justify-center items-center ${
+        className={`w-full py-3.5 px-4 rounded-xl text-white font-bold transition-all flex justify-center items-center shadow-[0_2px_12px_rgba(0,0,0,0.06)] ${
           loading
-            ? "bg-blue-300 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700 shadow-md"
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-[#111] hover:bg-[#333] active:scale-[0.98]"
         }`}
       >
         {loading
-          ? "Conectando con Mercado Pago..."
-          : `Pagar $${amount.toLocaleString()} con Mercado Pago`}
+          ? "Procesando redirección..."
+          : "Pagar con Mercado Pago"}
       </button>
     </div>
   );
