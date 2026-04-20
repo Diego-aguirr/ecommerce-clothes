@@ -8,7 +8,7 @@ import Link from "next/link";
 export const ProductIncard = () => {
   const removeProduct = useCartStore((state) => state.removeProduct);
   const updateProductQuantity = useCartStore(
-    (state) => state.updateProductQuantity
+    (state) => state.updateProductQuantity,
   );
   const [loaded, setLoaded] = useState(false);
 
@@ -22,7 +22,7 @@ export const ProductIncard = () => {
   }
 
   return (
-    <div className="xl:col-span-2 space-y-4 sm:space-y-6">
+    <div className="flex flex-col space-y-4 sm:space-y-6">
       {productIncart.map((product) => (
         <div
           key={`${product.slug}-${product.size} `}
