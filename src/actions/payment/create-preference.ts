@@ -58,6 +58,27 @@ export async function createPreference(orderId: string) {
       currency_id: "ARS",
     }));
 
+    // Inyectar impuestos y envío para que el total de MP coincida con el de la Base de Datos
+    if (order.tax > 0) {
+      items.push({
+        id: "TAX",
+        title: "Impuestos (21%)",
+        quantity: 1,
+        unit_price: Number(order.tax),
+        currency_id: "ARS",
+      });
+    }
+
+    if (order.shipping > 0) {
+      items.push({
+        id: "SHIPPING",
+        title: "Costo de Envío",
+        quantity: 1,
+        unit_price: Number(order.shipping),
+        currency_id: "ARS",
+      });
+    }
+
     // URL dinámica (ngrok o localhost según .env)
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 

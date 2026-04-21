@@ -26,10 +26,8 @@ const OrderSummary = () => {
   const taxRate = 0.21;
   const tax = subTotal * taxRate;
 
-  // 👇 Envío: gratis si subTotal > 500.000
-  const shippingThreshold = 8000.0;
-  const shipping = subTotal > shippingThreshold ? 0 : 8000.0;
-  const missingForFreeShipping = Math.max(0, shippingThreshold - subTotal);
+  // 👇 Envío: removida lógica de umbrales
+  const shipping = 0;
 
   // 👇 Total final
   const total = subTotal + tax + shipping;
@@ -55,28 +53,13 @@ const OrderSummary = () => {
           <span className="font-medium">{currencyFormat(tax)}</span>
         </div>
 
-        {/* Envío - CONDICIONAL */}
+        {/* Envío */}
         <div className="flex justify-between text-gray-600">
           <span>Envío</span>
-          <span
-            className={`font-medium ${shipping === 0 ? "text-green-600" : ""}`}
-          >
-            {shipping === 0 ? "Gratis" : `${currencyFormat(shipping)}`}
+          <span className="font-medium text-green-600">
+            Gratis
           </span>
         </div>
-
-        {/* Mensaje de envío gratis - solo si falta dinero */}
-        {missingForFreeShipping > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm text-blue-700 text-center">
-              ¡Faltan{" "}
-              <span className="font-semibold">
-                {currencyFormat(missingForFreeShipping)}
-              </span>{" "}
-              para envío gratis!
-            </p>
-          </div>
-        )}
 
         {/* Línea separadora y Total */}
         <div className="border-t border-gray-200 pt-3">
@@ -110,12 +93,6 @@ const OrderSummary = () => {
       {/* Beneficios */}
       <div className="mt-6 pt-6 border-t border-gray-100">
         <div className="space-y-2 text-sm text-gray-600">
-          <div className="flex items-center gap-2">
-            <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
-            <span>
-              Envío gratis en pedidos +{currencyFormat(shippingThreshold)}
-            </span>
-          </div>
           <div className="flex items-center gap-2">
             <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
             <span>Devolución gratuita 30 días</span>

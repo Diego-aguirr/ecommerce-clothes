@@ -77,7 +77,8 @@ export const placeOrder = async (
     }, 0);
 
     const tax = subTotal * 0.21;
-    const shipping = subTotal > 50000 ? 0 : 2500;
+    // Quitamos la lógica de envíos condicionales según el requerimiento.
+    const shipping = 0;
     const total = subTotal + tax + shipping;
 
     // 🧱 6. TRANSACCIÓN
