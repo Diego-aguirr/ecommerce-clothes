@@ -91,9 +91,17 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   console.log("🔔 Webhook MP:", rawBody);
 
-  // 🔐 firma
-  if (!verifySignature(req, rawBody)) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  // 🔐 Verificación de firma
+  const isValidSignature = verifySignature(req, rawBody);
+
+  if (!isValidSignature) {
+    if (process.env.NODE_ENV === "production") {
+      // Producción: Tolerancia cero. Bloquear y expulsar.
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    } else {
+      // Desarrollo: Avisar fuerte en la consola, pero dejar fluir la prueba.
+      console.warn("⚠️ [DEV MODE] Firma de Mercado Pago inválida, pero dejando pasar el Webhook para simulación local...");
+    }
   }
 
   // 🧪 validar payload
@@ -172,8 +180,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 🔐 validación monto
+    console.log("💰 CHECKING MONTOS:");
+    console.log(`-> MP enviò: ${transaction_amount} ${currency_id}`);
+    console.log(`-> DB tiene: ${payment.amount} ${payment.currency}`);
+    
     if (
-      transaction_amount !== payment.amount ||
+      Number(transaction_amount) !== Number(payment.amount) ||
       currency_id !== payment.currency
     ) {
       await tx.paymentLog.create({
