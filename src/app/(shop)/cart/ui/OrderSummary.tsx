@@ -26,11 +26,12 @@ const OrderSummary = () => {
   const taxRate = 0.21;
   const tax = subTotal * taxRate;
 
-  // 👇 Envío: removida lógica de umbrales
+  // 💡 Precios con IVA incluido (modelo B2C Argentina)
+  // El total que ve el cliente = precio de lista. El IVA se extrae para mostrarlo como info.
+  const IVA_RATE = 0.21;
+  const total = subTotal; // subTotal ya incluye IVA
+  const ivaIncluido = total - total / (1 + IVA_RATE); // IVA extraído para mostrar
   const shipping = 0;
-
-  // 👇 Total final
-  const total = subTotal + tax + shipping;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 sticky top-6">
@@ -47,18 +48,10 @@ const OrderSummary = () => {
           <span className="font-medium">{currencyFormat(subTotal)}</span>
         </div>
 
-        {/* Impuestos (21% IVA) */}
-        <div className="flex justify-between text-gray-600">
-          <span>Impuestos (21%)</span>
-          <span className="font-medium">{currencyFormat(tax)}</span>
-        </div>
-
         {/* Envío */}
         <div className="flex justify-between text-gray-600">
           <span>Envío</span>
-          <span className="font-medium text-green-600">
-            Gratis
-          </span>
+          <span className="font-medium text-green-600">Gratis</span>
         </div>
 
         {/* Línea separadora y Total */}
@@ -67,7 +60,9 @@ const OrderSummary = () => {
             <span>Total</span>
             <span>{currencyFormat(total)}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">IVA incluido</p>
+          <p className="text-xs text-gray-400 mt-1">
+            IVA incluido: {currencyFormat(ivaIncluido)}
+          </p>
         </div>
       </div>
 

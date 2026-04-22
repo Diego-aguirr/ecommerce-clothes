@@ -70,11 +70,53 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                 </div>
               ))}
             </div>
-            <div className="mt-4 pt-4 border-t flex flex-col items-end gap-1 text-gray-700">
-              <p>Envío: ${order.shipping}</p>
-              <p>Impuestos: ${order.tax}</p>
-              <p className="text-xl font-bold mt-2 text-gray-900">Total: ${order.total.toFixed(2)}</p>
+            <div className="mt-4 pt-4 border-t flex flex-col gap-2">
+              <div className="flex justify-between text-gray-500">
+                <span>Subtotal (Neto):</span>
+                <span>${order.subTotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>IVA (21% Incluido):</span>
+                <span>${order.tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>Envío:</span>
+                <span>{order.shipping === 0 ? "Gratis" : `$${order.shipping}`}</span>
+              </div>
+              <div className="flex justify-between text-xl font-bold text-gray-900 border-t pt-2 mt-2">
+                <span>Total Facturado:</span>
+                <span>${order.total.toFixed(2)}</span>
+              </div>
             </div>
+          </div>
+
+          {/* Estado Bancario Detallado */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2">Intentos de Pago (Gateway)</h2>
+            {order.payments.length === 0 ? (
+              <p className="text-gray-500">Aún no se generó link de pago.</p>
+            ) : (
+              <div className="space-y-3">
+                {order.payments.map((payment) => (
+                  <div key={payment.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-4 border rounded shadow-sm">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold uppercase">{payment.provider}</span>
+                      <span className="text-xs text-gray-500">ID: {payment.providerPaymentId || "Sin procesar"}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 sm:mt-0">
+                      <span className="font-bold text-gray-900">${Number(payment.amount).toFixed(2)}</span>
+                      <span className={`px-3 py-1 rounded w-fit text-xs font-bold text-white
+                        ${payment.status === 'APPROVED' ? 'bg-green-600' :
+                        payment.status === 'REJECTED' ? 'bg-red-600' : 
+                        payment.status === 'PENDING' ? 'bg-orange-500' : 
+                        payment.status === 'CANCELLED' ? 'bg-gray-600' : 'bg-gray-800'}`}>
+                        {payment.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Gestión Logística Server Action Form */}

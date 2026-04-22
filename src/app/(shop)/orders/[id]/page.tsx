@@ -130,18 +130,13 @@ export default async function OrderPage({ params }: Props) {
               <div className="flex flex-col gap-3 text-sm text-gray-600">
                 <div className="flex justify-between">
                   <span>Productos ({order.itemsInOrder})</span>
-                  <span className="font-medium text-gray-900">{currencyFormat(order.subTotal)}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>Impuestos (21%)</span>
-                  <span className="font-medium text-gray-900">{currencyFormat(order.tax)}</span>
+                  <span className="font-medium text-gray-900">{currencyFormat(order.total)}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span>Envío</span>
-                  <span className="font-medium text-gray-900">
-                    {order.shipping === 0 ? "Gratis" : currencyFormat(order.shipping)}
+                  <span className="font-medium text-green-600">
+                    Gratis
                   </span>
                 </div>
 
@@ -151,6 +146,9 @@ export default async function OrderPage({ params }: Props) {
                     {currencyFormat(order.total)}
                   </span>
                 </div>
+                <p className="text-xs text-gray-400 -mt-2">
+                  IVA incluido: {currencyFormat(order.total - order.total / 1.21)}
+                </p>
               </div>
 
               <div className="mt-8">

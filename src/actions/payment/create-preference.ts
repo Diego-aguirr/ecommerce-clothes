@@ -50,33 +50,26 @@ export async function createPreference(orderId: string) {
     const preference = new Preference(mpClient);
 
     // 💳 4. Construir cuerpo de la preferencia
-    const items = order.OrderItem.map((item) => ({
-      id: item.productId,
-      title: item.product.title,
-      quantity: item.quantity,
-      unit_price: item.price,
-      currency_id: "ARS",
-    }));
-
-    // Inyectar impuestos y envío para que el total de MP coincida con el de la Base de Datos
-    if (order.tax > 0) {
-      items.push({
-        id: "TAX",
-        title: "Impuestos (21%)",
-        quantity: 1,
-        unit_price: Number(order.tax),
+    // Los precios de productos YA incluyen IVA (modelo B2C Argentina).
+    // La suma de los ítems = order.total exacto. No se agregan ítems extra de TAX.
+    let totalAcumulado = 0;
+    const items = order.OrderItem.map((item) => {
+      const price = Number(item.price);
+      totalAcumulado += price * item.quantity;
+      return {
+        id: item.productId,
+        title: item.product.title,
+        quantity: item.quantity,
+        unit_price: price, // precio con IVA incluido
         currency_id: "ARS",
-      });
-    }
+      };
+    });
 
-    if (order.shipping > 0) {
-      items.push({
-        id: "SHIPPING",
-        title: "Costo de Envío",
-        quantity: 1,
-        unit_price: Number(order.shipping),
-        currency_id: "ARS",
-      });
+    // 🛡️ Seguridad: Proteger la creación de MP validando que el total de la preferencia a cobrar es 100% igual a la Base de Datos.
+    // Esto previene cobros falsos si en el futuro alguien expusiera este archivo de cara al frontend client-side.
+    if (Number(order.total) !== totalAcumulado) {
+      console.error(`🚨 Fraude Detectado: Intento de manipular Checkout. DB: ${order.total} | Checkout MP intentaba: ${totalAcumulado}`);
+      return { ok: false, message: "Hubo un error calculando los montos de tu carrito (Desbalance de datos)." };
     }
 
     // URL dinámica (ngrok o localhost según .env)
@@ -84,6 +77,11 @@ export async function createPreference(orderId: string) {
 
     if (!baseUrl) {
       throw new Error("BASE URL not defined");
+    }
+
+    // 🛡️ Seguridad: Evitar lanzar MP si estamos en Producción pero no cambiamos el NEXT_PUBLIC_APP_URL de Ngrok a Vercel
+    if (process.env.NODE_ENV === "production" && baseUrl.includes("ngrok")) {
+        throw new Error("⛔ Estás intentando lanzar una compra local de MP Webhooks en Producción usando Ngrok. Cambiar APP_URL al dominio público.");
     }
 
     const body = {
@@ -100,7 +98,6 @@ export async function createPreference(orderId: string) {
 
       auto_return: "approved",
     };
-    console.log("SUCCESS FINAL:", `${baseUrl}/orders/${orderId}`);
 
     // 📡  5. Crear preferencia en Mercado Pago
     const result = await preference.create({ body });
