@@ -71,14 +71,24 @@ export const placeOrder = async (
       0,
     );
 
-    const subTotal = productsToOrder.reduce((total, item) => {
+    // 💡 Precios con IVA incluido (modelo B2C Argentina)
+    // El precio del producto ya lleva el IVA adentro.
+    // El total cobrado es el precio de lista. El IVA se extrae "hacia atrás" para contabilidad.
+    const totalBruto = productsToOrder.reduce((total, item) => {
       const product = products.find((p) => p.id === item.productId)!;
+      // 🛡️ Seguridad: Si el precio de BD o la cantidad en el DTO vienen corruptos, cortamos
+      if (typeof product.price !== 'number' || isNaN(product.price) || isNaN(item.quantity)) {
+        throw new Error('Manipulación detectada: Precio o cantidad de producto inválida');
+      }
       return total + product.price * item.quantity;
     }, 0);
 
-    const tax = subTotal * 0.21;
-    const shipping = subTotal > 50000 ? 0 : 2500;
-    const total = subTotal + tax + shipping;
+    const IVA_RATE = 0.21;
+    // Extraer IVA desde adentro: IVA = totalBruto - (totalBruto / 1.21)
+    const tax = totalBruto - totalBruto / (1 + IVA_RATE);
+    const subTotal = totalBruto - tax; // Neto sin IVA (para contabilidad)
+    const shipping = 0;
+    const total = totalBruto; // Lo que paga el cliente = precio de lista
 
     // 🧱 6. TRANSACCIÓN
     const result = await prisma.$transaction(async (tx) => {

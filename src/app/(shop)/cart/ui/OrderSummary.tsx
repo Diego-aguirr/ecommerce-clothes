@@ -26,13 +26,12 @@ const OrderSummary = () => {
   const taxRate = 0.21;
   const tax = subTotal * taxRate;
 
-  // 👇 Envío: gratis si subTotal > 500.000
-  const shippingThreshold = 8000.0;
-  const shipping = subTotal > shippingThreshold ? 0 : 8000.0;
-  const missingForFreeShipping = Math.max(0, shippingThreshold - subTotal);
-
-  // 👇 Total final
-  const total = subTotal + tax + shipping;
+  // 💡 Precios con IVA incluido (modelo B2C Argentina)
+  // El total que ve el cliente = precio de lista. El IVA se extrae para mostrarlo como info.
+  const IVA_RATE = 0.21;
+  const total = subTotal; // subTotal ya incluye IVA
+  const ivaIncluido = total - total / (1 + IVA_RATE); // IVA extraído para mostrar
+  const shipping = 0;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 sticky top-6">
@@ -49,34 +48,11 @@ const OrderSummary = () => {
           <span className="font-medium">{currencyFormat(subTotal)}</span>
         </div>
 
-        {/* Impuestos (21% IVA) */}
-        <div className="flex justify-between text-gray-600">
-          <span>Impuestos (21%)</span>
-          <span className="font-medium">{currencyFormat(tax)}</span>
-        </div>
-
-        {/* Envío - CONDICIONAL */}
+        {/* Envío */}
         <div className="flex justify-between text-gray-600">
           <span>Envío</span>
-          <span
-            className={`font-medium ${shipping === 0 ? "text-green-600" : ""}`}
-          >
-            {shipping === 0 ? "Gratis" : `${currencyFormat(shipping)}`}
-          </span>
+          <span className="font-medium text-green-600">Gratis</span>
         </div>
-
-        {/* Mensaje de envío gratis - solo si falta dinero */}
-        {missingForFreeShipping > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm text-blue-700 text-center">
-              ¡Faltan{" "}
-              <span className="font-semibold">
-                {currencyFormat(missingForFreeShipping)}
-              </span>{" "}
-              para envío gratis!
-            </p>
-          </div>
-        )}
 
         {/* Línea separadora y Total */}
         <div className="border-t border-gray-200 pt-3">
@@ -84,7 +60,9 @@ const OrderSummary = () => {
             <span>Total</span>
             <span>{currencyFormat(total)}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">IVA incluido</p>
+          <p className="text-xs text-gray-400 mt-1">
+            IVA incluido: {currencyFormat(ivaIncluido)}
+          </p>
         </div>
       </div>
 
@@ -110,12 +88,6 @@ const OrderSummary = () => {
       {/* Beneficios */}
       <div className="mt-6 pt-6 border-t border-gray-100">
         <div className="space-y-2 text-sm text-gray-600">
-          <div className="flex items-center gap-2">
-            <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
-            <span>
-              Envío gratis en pedidos +{currencyFormat(shippingThreshold)}
-            </span>
-          </div>
           <div className="flex items-center gap-2">
             <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
             <span>Devolución gratuita 30 días</span>
