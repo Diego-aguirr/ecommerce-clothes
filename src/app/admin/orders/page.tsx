@@ -22,7 +22,13 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
       skip,
       take: PAGE_SIZE,
       orderBy: { createdAt: "desc" },
-      include: { user: { select: { name: true, email: true } } },
+      include: {
+        user: { select: { name: true, email: true } },
+        payments: {
+          orderBy: { createdAt: "desc" },
+          take: 1, // Traemos solo el último intento de pago para saber el estado real
+        },
+      },
     }),
     prisma.order.count(),
   ]);
@@ -60,9 +66,48 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                   ${order.total.toFixed(2)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${order.isPaid ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-                    {order.isPaid ? "Pagado" : "Pendiente"}
-                  </span>
+                  {(() => {
+                    // Lógica para mostrar siempre la verdad financiera
+                    if (order.isPaid) {
+                      return (
+                        <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                          Pagado
+                        </span>
+                      );
+                    }
+
+                    const lastPayment = order.payments[0];
+
+                    if (!lastPayment) {
+                      return (
+                        <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                          Iniciada
+                        </span>
+                      );
+                    }
+
+                    if (lastPayment.status === "REJECTED") {
+                      return (
+                        <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                          Pago Rechazado
+                        </span>
+                      );
+                    }
+
+                    if (lastPayment.status === "PENDING" || lastPayment.status === "CREATED") {
+                      return (
+                        <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-amber-100 text-amber-700">
+                          Aguardando Pago
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                        Abandonada / Cancelada
+                      </span>
+                    );
+                  })()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${order.deliveryStatus === "shipped" || order.deliveryStatus === "delivered" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"}`}>
