@@ -8,6 +8,7 @@ import { orderSchema } from "@/lib/schemas/order.schema";
 export const placeOrder = async (
   productsToOrderInput: any,
   addressInput: any,
+  shippingMethodInput: "delivery" | "pickup" = "delivery",
   idempotencyTokenInput?: string,
 ) => {
   try {
@@ -24,6 +25,7 @@ export const placeOrder = async (
     const parsed = orderSchema.safeParse({
       productsToOrder: productsToOrderInput,
       address: addressInput,
+      shippingMethod: shippingMethodInput,
       idempotencyToken: idempotencyTokenInput,
     });
 
@@ -34,7 +36,7 @@ export const placeOrder = async (
       };
     }
 
-    const { productsToOrder, address, idempotencyToken } = parsed.data;
+    const { productsToOrder, address, shippingMethod, idempotencyToken } = parsed.data;
 
     // 🔒 3. Obtener productos reales
     const products = await prisma.product.findMany({
