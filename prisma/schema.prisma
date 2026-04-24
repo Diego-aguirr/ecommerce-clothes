@@ -67,6 +67,10 @@ enum OrderStatus {
   paid
   cancelled
 }
+enum ShippingMethod {
+  delivery
+  pickup
+}
 
 model Category {
   id      String    @id @default(uuid())
@@ -204,10 +208,10 @@ model Province {
 model UserAddress {
   id          String  @id @default(cuid())
   fullname    String
-  street      String
+  street      String?
   apartment   String?
-  zip         String
-  city        String
+  zip         String?
+  city        String?
   phone       String
   dni         String
   description String?
@@ -218,8 +222,8 @@ model UserAddress {
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
 
-  provinceId String
-  province   Province @relation(fields: [provinceId], references: [id])
+  provinceId String?
+  province   Province? @relation(fields: [provinceId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -244,6 +248,7 @@ model Order {
 
   status         OrderStatus    @default(pending)
   deliveryStatus DeliveryStatus @default(pending)
+  shippingMethod ShippingMethod @default(delivery)
 
   idempotencyToken String? @unique
 
@@ -289,16 +294,16 @@ model OrderAddress {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   fullname    String
-  street      String
+  street      String?
   apartment   String?
-  zip         String
-  city        String
+  zip         String?
+  city        String?
   phone       String
   dni         String
   description String?
 
-  provinceId String
-  province   Province @relation(fields: [provinceId], references: [id])
+  provinceId String?
+  province   Province? @relation(fields: [provinceId], references: [id])
 
   createdAt DateTime @default(now())
 }
