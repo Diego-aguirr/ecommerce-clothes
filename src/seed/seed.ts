@@ -34,6 +34,15 @@ export const initialData: SeedData = {
   users: [
     // 🔥 SUPER ADMIN (control total del sistema)
     {
+      email: "javagutierrrez@gmail.com",
+      password: bcryptjs.hashSync("a244#DDSSA09", 10),
+      name: "Java Gutierrez",
+      role: Role.admin,
+      isSuperAdmin: true,
+      status: UserStatus.ACTIVE,
+      emailVerified: new Date(),
+    },
+    {
       email: "superadmin@shop.com",
       password: bcryptjs.hashSync("admin123", 10),
       name: "Super Admin",
