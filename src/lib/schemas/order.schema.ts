@@ -24,4 +24,35 @@ export const orderSchema = z.object({
   shippingMethod: z.enum(["delivery", "pickup"]),
 
   idempotencyToken: z.string().uuid("Token de idempotencia inválido").optional(),
+}).superRefine((data, ctx) => {
+  if (data.shippingMethod === "delivery") {
+    if (!data.address.street || data.address.street.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La calle es obligatoria para envíos a domicilio",
+        path: ["address", "street"],
+      });
+    }
+    if (!data.address.zip || data.address.zip.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "El código postal es obligatorio",
+        path: ["address", "zip"],
+      });
+    }
+    if (!data.address.city || data.address.city.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La ciudad es obligatoria",
+        path: ["address", "city"],
+      });
+    }
+    if (!data.address.provinceId || data.address.provinceId.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La provincia es obligatoria",
+        path: ["address", "provinceId"],
+      });
+    }
+  }
 });
