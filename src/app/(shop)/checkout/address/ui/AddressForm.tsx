@@ -2,11 +2,14 @@
 
 import { AddressFormValues, Province } from "@/interfaces";
 import { useAddressStore } from "@/store";
+import { ShippingMethodSelector } from "@/components";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { deleteUserAddress, setUserAddress } from "@/actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { setUserAddressSchema } from "@/lib/schemas/address.schema";
 
 interface AddressFormProps {
   provinces: Province[];
@@ -17,16 +20,20 @@ interface AddressFormProps {
 export default function AddressForm({
   provinces,
   userAddress,
-  ...restProps
 }: AddressFormProps) {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, errors },
     reset,
+    setValue,
+    watch,
   } = useForm<AddressFormValues>({
+    mode: "onChange",
+    resolver: zodResolver(setUserAddressSchema),
     defaultValues: {
-      ...(userAddress as any),
+      ...userAddress,
+      shippingMethod: userAddress?.shippingMethod ?? "delivery",
     },
   }); // Use useForm hook to manage form state and validation
 
@@ -38,19 +45,26 @@ export default function AddressForm({
 
   const setAddress = useAddressStore((state) => state.setAddress);
   const address = useAddressStore((state) => state.address);
+  const globalShippingMethod = useAddressStore((state) => state.shippingMethod);
+  const setShippingMethod = useAddressStore((state) => state.setShippingMethod);
+
+  // Observamos el valor local del formulario para renderizado rápido
+  const formShippingMethod = watch("shippingMethod");
+  const currentShippingMethod = formShippingMethod || globalShippingMethod;
+  const isDelivery = currentShippingMethod === "delivery";
 
   useEffect(() => {
     // Si hay una dirección guardada en el store (del usuario local), precargar el formulario con esos datos.
-    // O si hay un address desde la bd del servidor (este ya vino en los defaultValues, pero si queremos sobreescribir con zustand lo manejamos acá)
     if (address && address.fullname) {
-      reset(address); // Preload form with saved address (local Zustand store takes precedence over BD fallback if they continued)
+      reset(address); 
+      setValue("shippingMethod", globalShippingMethod);
     }
-  }, [address, reset]);
+  }, [address, reset, globalShippingMethod, setValue]);
 
   const onSubmit = async (data: AddressFormValues) => {
-    // Aquí puedes agregar lógica para guardar la dirección o avanzar al siguiente paso
     const { rememberAddress, ...rest } = data;
     setAddress(data);
+    setShippingMethod(data.shippingMethod); // Aseguramos que el store global se entere
 
     if (rememberAddress) {
       await setUserAddress(rest);
@@ -62,6 +76,15 @@ export default function AddressForm({
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
+      {/* Selector de Método de Envío */}
+      <ShippingMethodSelector
+        value={currentShippingMethod}
+        onChange={(method) => {
+          setShippingMethod(method); // Update global
+          setValue("shippingMethod", method, { shouldValidate: true }); // Update form
+        }}
+      />
+
       {/* Nombre completo */}
       <div>
         <label
@@ -80,102 +103,107 @@ export default function AddressForm({
         />
       </div>
 
-      {/* Dirección */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="street"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Calle y Número
-          </label>
-          <input
-            type="text"
-            id="street"
-            placeholder="Av. Corrientes 1234"
-            required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
-            {...register("street", { required: true })}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="apartment"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Piso, Depto, Timbre{" "}
-            <span className="text-gray-500 font-normal">(Opcional)</span>
-          </label>
-          <input
-            type="text"
-            id="apartment"
-            placeholder="5B"
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
-            {...register("apartment")}
-          />
-        </div>
-      </div>
+      {/* Campos de dirección - Solo visibles en modo delivery */}
+      {isDelivery && (
+        <>
+          {/* Dirección */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="street"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Calle y Número
+              </label>
+              <input
+                type="text"
+                id="street"
+                placeholder="Av. Corrientes 1234"
+                required
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                {...register("street", { required: isDelivery })}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="apartment"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Piso, Depto, Timbre{" "}
+                <span className="text-gray-500 font-normal">(Opcional)</span>
+              </label>
+              <input
+                type="text"
+                id="apartment"
+                placeholder="5B"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                {...register("apartment")}
+              />
+            </div>
+          </div>
 
-      {/* Código postal y ciudad */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="zip"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Código Postal
-          </label>
-          <input
-            type="text"
-            id="zip"
-            placeholder="C1043AAS"
-            required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
-            {...register("zip", { required: true })}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="city"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Ciudad
-          </label>
-          <input
-            type="text"
-            id="city"
-            placeholder="Resistencia"
-            required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
-            {...register("city", { required: true })}
-          />
-        </div>
-      </div>
+          {/* Código postal y ciudad */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="zip"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Código Postal
+              </label>
+              <input
+                type="text"
+                id="zip"
+                placeholder="C1043AAS"
+                required
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                {...register("zip", { required: isDelivery })}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="city"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Ciudad
+              </label>
+              <input
+                type="text"
+                id="city"
+                placeholder="Resistencia"
+                required
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                {...register("city", { required: isDelivery })}
+              />
+            </div>
+          </div>
 
-      {/* Provincia */}
-      <div>
-        <label
-          htmlFor="province"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Provincia
-        </label>
-        <select
-          id="province"
-          required
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
-          {...register("provinceId", { required: true })}
-        >
-          <option value="">Selecciona una provincia</option>
-          {provinces.map((province) => (
-            <option key={province.id} value={province.id}>
-              {province.name}
-            </option>
-          ))}
-        </select>
-      </div>
+          {/* Provincia */}
+          <div>
+            <label
+              htmlFor="province"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Provincia
+            </label>
+            <select
+              id="province"
+              required
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+              {...register("provinceId", { required: isDelivery })}
+            >
+              <option value="">Selecciona una provincia</option>
+              {provinces.map((province) => (
+                <option key={province.id} value={province.id}>
+                  {province.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
 
-      {/* Teléfono y DNI */}
+      {/* Teléfono y DNI - Siempre visibles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label
@@ -193,7 +221,9 @@ export default function AddressForm({
             {...register("phone", { required: true })}
           />
           <p className="mt-1 text-xs text-gray-500">
-            Para que el repartidor pueda contactarte
+            {isDelivery
+              ? "Para que el repartidor pueda contactarte"
+              : "Para avisarte cuando tu pedido esté listo"}
           </p>
         </div>
         <div>
@@ -212,49 +242,54 @@ export default function AddressForm({
             {...register("dni", { required: true })}
           />
           <p className="mt-1 text-xs text-gray-500">
-            Requerido por algunas empresas de correo
+            Requerido para la facturación
           </p>
         </div>
       </div>
 
-      {/* Descripción opcional - Ahora al final */}
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Descripción adicional{" "}
-          <span className="text-gray-500 font-normal">(Opcional)</span>
-        </label>
-        <textarea
-          id="description"
-          placeholder="Ej: Casa con reja negra, timbre roto, dejar paquete en portería..."
-          rows={3}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300 resize-none"
-          {...register("description")}
-        />
-        <p className="mt-1 text-xs text-gray-500">
-          Información adicional que ayude al repartidor a encontrar tu domicilio
-        </p>
-      </div>
+      {/* Descripción opcional - Solo en delivery */}
+      {isDelivery && (
+        <div>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Descripción adicional{" "}
+            <span className="text-gray-500 font-normal">(Opcional)</span>
+          </label>
+          <textarea
+            id="description"
+            placeholder="Ej: Casa con reja negra, timbre roto, dejar paquete en portería..."
+            rows={3}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300 resize-none"
+            {...register("description")}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Información adicional que ayude al repartidor a encontrar tu
+            domicilio
+          </p>
+        </div>
+      )}
 
-      {/* Recordar dirección checkbox */}
-      <div className="mb-4 flex items-center">
-        <input
-          type="checkbox"
-          id="rememberAddress"
-          className="mr-2 h-4 w-4 text-brand-primary focus:ring-brand-accent border-gray-300 rounded"
-          {...register("rememberAddress")}
-        />
-        <label
-          htmlFor="rememberAddress"
-          className="text-sm font-medium text-gray-700"
-        >
-          Recordar dirección?
-        </label>
-      </div>
+      {/* Recordar dirección checkbox - Solo en delivery */}
+      {isDelivery && (
+        <div className="mb-4 flex items-center">
+          <input
+            type="checkbox"
+            id="rememberAddress"
+            className="mr-2 h-4 w-4 text-brand-primary focus:ring-brand-accent border-gray-300 rounded"
+            {...register("rememberAddress")}
+          />
+          <label
+            htmlFor="rememberAddress"
+            className="text-sm font-medium text-gray-700"
+          >
+            Recordar dirección?
+          </label>
+        </div>
+      )}
 
-      {/* Botones de navegación - MEJORADO */}
+      {/* Botones de navegación */}
       <div className="pt-8 border-t border-gray-200">
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
           {/* Botones izquierda */}

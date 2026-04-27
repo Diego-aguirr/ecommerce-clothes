@@ -12,11 +12,9 @@ export const PlaceOrder = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [idempotencyToken, setIdempotencyToken] = useState("");
-  const [shippingMethod, setShippingMethod] = useState<"delivery" | "pickup">(
-    "delivery",
-  );
 
   const address = useAddressStore((state) => state.address);
+  const shippingMethod = useAddressStore((state) => state.shippingMethod);
 
   const productsInCart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clearCart);
