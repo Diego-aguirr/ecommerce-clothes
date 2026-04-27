@@ -1,25 +1,31 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
+type ShippingMethod = "delivery" | "pickup";
+
 interface State {
   address: {
     fullname: string;
-    street: string;
+    street?: string;
     apartment?: string;
-    zip: string;
-    city: string;
-    provinceId: string;
+    zip?: string;
+    city?: string;
+    provinceId?: string;
     phone: string;
     dni: string;
     description?: string;
   };
 
+  shippingMethod: ShippingMethod;
+
   //Methods
-  setAddress: (adress: State["address"]) => void;
+  setAddress: (address: State["address"]) => void;
+  setShippingMethod: (method: ShippingMethod) => void;
 }
 
 export const useAddressStore = create<State>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       address: {
         fullname: "",
         street: "",
@@ -31,7 +37,11 @@ export const useAddressStore = create<State>()(
         dni: "",
         description: "",
       },
+
+      shippingMethod: "delivery",
+
       setAddress: (address) => set({ address }),
+      setShippingMethod: (shippingMethod) => set({ shippingMethod }),
     }),
     {
       name: "address-storage",
