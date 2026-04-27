@@ -76,7 +76,7 @@ export default async function PaymentPage() {
             <div className="space-y-6">
               <OrderItems />
 
-              <AddressDetails userId={user.id} />
+              <AddressDetails />
 
               {/* Información de pago */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
