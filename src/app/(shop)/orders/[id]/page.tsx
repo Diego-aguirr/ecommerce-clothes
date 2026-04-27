@@ -111,29 +111,64 @@ export default async function OrderPage({ params }: Props) {
 
           {/* Columna Derecha: Tarjeta de Resumen y Dirección */}
           <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 p-8 h-fit">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Dirección de entrega
-            </h2>
-            <div className="text-sm text-gray-600 space-y-1.5 mb-8">
-              <p className="font-semibold text-gray-900 text-base">
-                {address.fullname}
-              </p>
-              <p>
-                {address.street}{" "}
-                {address.apartment && `- Dpto: ${address.apartment}`}
-              </p>
-              <p>
-                {address.city}, {address.province.name}
-              </p>
-              <p>CP: {address.zip}</p>
-              <p>Tel: {address.phone}</p>
-              <p>DNI: {address.dni}</p>
-              {address.description && (
-                <p className="pt-2 text-gray-500 italic">
-                  " {address.description} "
-                </p>
-              )}
-            </div>
+            {order.shippingMethod === "pickup" ? (
+              <>
+                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5 text-brand-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
+                  </svg>
+                  Retiro en local
+                </h2>
+                <div className="text-sm text-gray-600 space-y-1.5 mb-8 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <p className="font-semibold text-blue-900 text-base mb-2">
+                    ¡Tu pedido te espera!
+                  </p>
+                  <p className="text-blue-800">
+                    Retira a nombre de: <strong>{address.fullname}</strong>
+                  </p>
+                  <p className="text-blue-800">DNI: {address.dni}</p>
+                  <p className="text-blue-800 mt-2">
+                    📍 Dirigite a nuestro local central con tu DNI para retirar la compra.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-bold text-gray-900 mb-4">
+                  Dirección de entrega
+                </h2>
+                <div className="text-sm text-gray-600 space-y-1.5 mb-8">
+                  <p className="font-semibold text-gray-900 text-base">
+                    {address.fullname}
+                  </p>
+                  <p>
+                    {address.street}{" "}
+                    {address.apartment && `- Dpto: ${address.apartment}`}
+                  </p>
+                  <p>
+                    {address.city}, {address.province?.name ?? "N/A"}
+                  </p>
+                  <p>CP: {address.zip}</p>
+                  <p>Tel: {address.phone}</p>
+                  <p>DNI: {address.dni}</p>
+                  {address.description && (
+                    <p className="pt-2 text-gray-500 italic">
+                      " {address.description} "
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
 
             {/* Divider */}
             <div className="w-full h-px border-t border-dashed border-gray-200 mb-8" />
