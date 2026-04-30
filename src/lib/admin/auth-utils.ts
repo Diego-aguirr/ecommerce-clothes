@@ -12,7 +12,7 @@ export async function requireAdmin() {
 export async function requireSuperAdmin() {
   const session = await auth();
   // Casting for type safety since we know the field is there
-  const user = session?.user as any;
+  const user = session?.user as { role: string; isSuperAdmin?: boolean; id: string } | undefined;
   if (!user || user.role !== "admin" || !user.isSuperAdmin) {
     redirect("/");
   }

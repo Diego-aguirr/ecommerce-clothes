@@ -6,11 +6,11 @@ export const Footer = () => {
   return (
     <footer className="bg-white border-t border-gray-200 mt-20">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
 
-          {/* Contact Info */}
+          {/* Col 1: Atención al Cliente */}
           <div className="flex flex-col space-y-4">
-            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Contacto</h3>
+            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Atención al Cliente</h3>
             <div className="flex flex-col space-y-3 text-sm text-gray-600">
               <a 
                 href="https://wa.me/5493624024624" 
@@ -37,15 +37,37 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Navigation Links */}
+          {/* Col 2: Historia */}
           <div className="flex flex-col space-y-4">
-            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Enlaces Útiles</h3>
+            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Historia</h3>
             <nav className="flex flex-col space-y-3 text-sm">
               <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Quiénes Somos</Link>
               <Link href="/contact" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Contacto</Link>
+            </nav>
+          </div>
+
+          {/* Col 3: Enlaces Útiles */}
+          <div className="flex flex-col space-y-4">
+            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Enlaces Útiles</h3>
+            <nav className="flex flex-col space-y-3 text-sm">
               <Link href="/terms" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Términos y Condiciones</Link>
               <Link href="/privacy" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Políticas de Privacidad</Link>
             </nav>
+          </div>
+
+          {/* Col 4: Botón de Arrepentimiento */}
+          <div className="flex flex-col space-y-4">
+            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Defensa del Consumidor</h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              ¿Te arrepentiste de tu compra? Podés cancelarla dentro de los 10 días de haberla realizado.
+            </p>
+            <Link 
+              href="/contact" 
+              className="mt-1 flex items-center justify-center w-full max-w-xs text-xs font-bold uppercase tracking-wider text-gray-700 bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 hover:bg-gray-100 hover:text-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 shadow-sm"
+              aria-label="Botón de Arrepentimiento"
+            >
+              Botón de Arrepentimiento
+            </Link>
           </div>
 
         </div>

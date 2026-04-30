@@ -163,7 +163,7 @@ export default async function OrderPage({ params }: Props) {
                   <p>DNI: {address.dni}</p>
                   {address.description && (
                     <p className="pt-2 text-gray-500 italic">
-                      " {address.description} "
+                      &quot; {address.description} &quot;
                     </p>
                   )}
                 </div>

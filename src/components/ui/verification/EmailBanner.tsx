@@ -27,8 +27,9 @@ export default function EmailBanner({ reason }: Props) {
       setError(null);
       await resendVerificationEmail();
       setSent(true);
-    } catch (err: any) {
-      setError(err.message || "Ocurrió un error. Intentá nuevamente.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Ocurrió un error. Intentá nuevamente.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

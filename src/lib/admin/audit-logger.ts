@@ -11,12 +11,13 @@ export interface AuditLogData {
 export async function logAdminAction(data: AuditLogData) {
   try {
     let derivedEntity = data.entity || "System";
-    
+
     // Auto-derive entity if not provided, based on action name
     if (!data.entity) {
       const actionUpper = data.action.toUpperCase();
       if (actionUpper.includes("ORDER")) derivedEntity = "Order";
-      else if (actionUpper.includes("PRODUCT") || actionUpper.includes("STOCK")) derivedEntity = "Product";
+      else if (actionUpper.includes("PRODUCT") || actionUpper.includes("STOCK"))
+        derivedEntity = "Product";
       else if (actionUpper.includes("USER")) derivedEntity = "User";
       else if (actionUpper.includes("CATEGORY")) derivedEntity = "Category";
     }
@@ -31,7 +32,10 @@ export async function logAdminAction(data: AuditLogData) {
       },
     });
   } catch (error) {
-    console.error("[AUDIT LOG ERROR] Fallo al crear trazabilidad de auditoría:", error);
+    console.error(
+      "[AUDIT LOG ERROR] Fallo al crear trazabilidad de auditoría:",
+      error,
+    );
     // Fallback silencioso para no romper la acción principal, aunque se loggea el error en el servidor.
   }
 }
