@@ -213,14 +213,29 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             <p className="text-gray-500 text-sm mb-4">{order.user.email}</p>
             
             {order.OrderAddress && (
-              <div className="text-sm text-gray-700 space-y-1">
+              <div className="text-sm text-gray-700 space-y-1 mt-4 pt-4 border-t border-gray-100">
+                <div className="mb-3">
+                  <span className={`px-2.5 py-1 inline-flex text-xs font-bold uppercase rounded-md ${order.shippingMethod === 'pickup' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                    {order.shippingMethod === 'pickup' ? '🏪 Retiro en Local' : '🚚 Envío a Domicilio'}
+                  </span>
+                </div>
                 <p><strong>Destinatario:</strong> {order.OrderAddress.fullname}</p>
                 <p><strong>DNI:</strong> {order.OrderAddress.dni}</p>
                 <p><strong>Tel:</strong> {order.OrderAddress.phone}</p>
-                <p><strong>Dirección:</strong> {order.OrderAddress.street} {order.OrderAddress.apartment && `Depto ${order.OrderAddress.apartment}`}</p>
-                <p><strong>Ciudad:</strong> {order.OrderAddress.city}, {order.OrderAddress.zip}</p>
-                <p><strong>Provincia/Región:</strong> {order.OrderAddress.provinceId}</p>
-                {order.OrderAddress.description && <p><strong>Nota entrega:</strong> {order.OrderAddress.description}</p>}
+
+                {order.shippingMethod === 'delivery' && (
+                  <>
+                    <p><strong>Dirección:</strong> {order.OrderAddress.street} {order.OrderAddress.apartment && `Depto ${order.OrderAddress.apartment}`}</p>
+                    <p><strong>Ciudad:</strong> {order.OrderAddress.city}, {order.OrderAddress.zip}</p>
+                    <p><strong>Provincia/Región:</strong> {order.OrderAddress.provinceId}</p>
+                  </>
+                )}
+                
+                {order.OrderAddress.description && (
+                  <p className="mt-2 bg-yellow-50 p-2 rounded text-yellow-800 border border-yellow-200">
+                    <strong>Nota del cliente:</strong> {order.OrderAddress.description}
+                  </p>
+                )}
               </div>
             )}
           </div>
