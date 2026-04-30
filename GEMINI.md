@@ -38,6 +38,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Handling database transactions, queries, or Prisma schema changes                     | `prisma-7`         |
 | Working with Authentication (NextAuth v5 / Auth.js)                                   | `nextauth-5`       |
 | Working with payments, webhooks, or generating checkout links                         | `mercadopago`      |
+| Building or modifying UI components, styling layouts, or adding interactive elements  | `ui-a11y`          |
 | Fill .github/pull_request_template.md (Context/Description/Steps to review/Checklist) | `prowler-pr`       |
 | Regenerate AGENTS.md Auto-invoke tables (sync.sh)                                     | `skill-sync`       |
 | Reviewing JSON:API compliance                                                         | `jsonapi`          |
