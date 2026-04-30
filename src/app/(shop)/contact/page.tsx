@@ -46,7 +46,7 @@ export default function ContactPage() {
             Respondemos rápido. Escribinos para coordinar envíos o consultar stock.
           </p>
           <p className="font-semibold text-gray-900 text-lg">
-            362 402-4624
+            +54 9 362 402-4624
           </p>
         </a>
 
