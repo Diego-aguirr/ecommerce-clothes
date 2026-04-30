@@ -35,6 +35,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Building AI chat features                                                             | `ai-sdk-5`         |
 | Creating Zod schemas                                                                  | `zod-4`            |
 | Creating new skills                                                                   | `skill-creator`    |
+| Working with Authentication (NextAuth v5 / Auth.js)                                   | `nextauth-5`       |
 | Fill .github/pull_request_template.md (Context/Description/Steps to review/Checklist) | `prowler-pr`       |
 | Regenerate AGENTS.md Auto-invoke tables (sync.sh)                                     | `skill-sync`       |
 | Reviewing JSON:API compliance                                                         | `jsonapi`          |
