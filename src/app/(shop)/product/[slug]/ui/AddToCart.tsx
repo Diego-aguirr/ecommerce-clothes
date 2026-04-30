@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { QuantitySelector, SizeSelector } from "@/components";
 import type { CartProduct, Product, Size } from "@/interfaces";
 import { useCartStore } from "@/store";
@@ -58,14 +59,29 @@ export const AddToCart = ({ product }: Props) => {
       {/* Quantity selector */}
       <QuantitySelector quantity={quantity} onQuantityChanged={setQuantity} />
 
-      {/* CTA button */}
-      <button
-        type="button"
-        onClick={handleAdd}
-        className="w-full h-14 bg-[#111] text-white font-semibold text-base rounded-lg hover:bg-[#333] active:scale-[0.98] transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111] focus-visible:ring-offset-2"
-      >
-        {added ? "✓ Agregado al carrito" : "Agregar al carrito"}
-      </button>
+      {/* CTA buttons */}
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={handleAdd}
+          className={`w-full h-14 font-semibold text-base rounded-lg transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+            added 
+            ? 'bg-green-600 hover:bg-green-700 text-white focus-visible:ring-green-600' 
+            : 'bg-gray-900 text-white hover:bg-black active:scale-[0.98] focus-visible:ring-gray-900'
+          }`}
+        >
+          {added ? "✓ Agregado" : "Agregar al carrito"}
+        </button>
+
+        {added && (
+          <Link 
+            href="/cart"
+            className="w-full h-14 bg-indigo-600 text-white font-bold text-base rounded-lg hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 flex items-center justify-center gap-2"
+          >
+            Ir a Pagar ➡️
+          </Link>
+        )}
+      </div>
 
       {/* Shipping info */}
       <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
