@@ -13,8 +13,8 @@ const authRoutes = ["/login", "/new-account"];
 // Rutas privadas
 const protectedRoutes = [
   "/dashboard",
-  "/checkout/address",
-  "/checkout/payment",
+  "/admin",
+  "/checkout",
 ];
 
 const apiAuthPrefix = "/api/auth";

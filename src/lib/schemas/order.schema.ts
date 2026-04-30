@@ -11,15 +11,48 @@ export const orderSchema = z.object({
   
   address: z.object({
     fullname: z.string().min(1, "El nombre completo es obligatorio"),
-    street: z.string().min(1, "La calle es obligatoria"),
+    street: z.string().optional(),
     apartment: z.string().optional().nullable(),
-    zip: z.string().min(1, "El código postal es obligatorio"),
-    city: z.string().min(1, "La ciudad es obligatoria"),
+    zip: z.string().optional(),
+    city: z.string().optional(),
     phone: z.string().min(1, "El teléfono es obligatorio"),
     dni: z.string().min(1, "El DNI es obligatorio"),
     description: z.string().optional().nullable(),
-    provinceId: z.string().min(1, "La provincia es obligatoria"),
+    provinceId: z.string().optional(),
   }),
 
+  shippingMethod: z.enum(["delivery", "pickup"]),
+
   idempotencyToken: z.string().uuid("Token de idempotencia inválido").optional(),
+}).superRefine((data, ctx) => {
+  if (data.shippingMethod === "delivery") {
+    if (!data.address.street || data.address.street.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La calle es obligatoria para envíos a domicilio",
+        path: ["address", "street"],
+      });
+    }
+    if (!data.address.zip || data.address.zip.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "El código postal es obligatorio",
+        path: ["address", "zip"],
+      });
+    }
+    if (!data.address.city || data.address.city.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La ciudad es obligatoria",
+        path: ["address", "city"],
+      });
+    }
+    if (!data.address.provinceId || data.address.provinceId.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La provincia es obligatoria",
+        path: ["address", "provinceId"],
+      });
+    }
+  }
 });

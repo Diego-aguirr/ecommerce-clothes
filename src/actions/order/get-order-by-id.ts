@@ -23,6 +23,7 @@ export const getOrderById = async (id: string) => {
         shipping: true,
         total: true,
         itemsInOrder: true,
+        shippingMethod: true,
         isPaid: true,
         paidAt: true,
         status: true,

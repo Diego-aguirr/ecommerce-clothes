@@ -14,6 +14,7 @@ export const PlaceOrder = () => {
   const [idempotencyToken, setIdempotencyToken] = useState("");
 
   const address = useAddressStore((state) => state.address);
+  const shippingMethod = useAddressStore((state) => state.shippingMethod);
 
   const productsInCart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clearCart);
@@ -44,8 +45,8 @@ export const PlaceOrder = () => {
       return;
     }
 
-    if (!address.fullname || !address.street || !address.zip || !address.phone) {
-      setErrorMessage("La dirección de entrega es incompleta");
+    if (!address.fullname || !address.phone) {
+      setErrorMessage("La dirección de entrega está incompleta");
       return;
     }
 
@@ -60,13 +61,18 @@ export const PlaceOrder = () => {
     }));
 
     try {
-      const resp = await placeOrder(productsToOrder, address, idempotencyToken);
+      const resp = await placeOrder(
+        productsToOrder,
+        address,
+        shippingMethod,
+        idempotencyToken,
+      );
 
       if (!resp.ok) {
         setIsPlacingOrder(false);
         setErrorMessage(resp.message ?? "Error al crear la orden");
-        
-        // Si es un error de duplicado (idempotencia), podrías generar un nuevo token 
+
+        // Si es un error de duplicado (idempotencia), podrías generar un nuevo token
         // o invitar al usuario a revisar su historial.
         return;
       }

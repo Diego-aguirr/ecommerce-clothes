@@ -110,9 +110,14 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                   })()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${order.deliveryStatus === "shipped" || order.deliveryStatus === "delivered" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"}`}>
-                    {order.deliveryStatus}
-                  </span>
+                  <div className="flex flex-col gap-1 items-start">
+                    <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${order.deliveryStatus === "shipped" || order.deliveryStatus === "delivered" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"}`}>
+                      {order.deliveryStatus}
+                    </span>
+                    <span className={`px-2 py-0.5 inline-flex text-[10px] font-bold uppercase rounded-md ${order.shippingMethod === 'pickup' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-orange-50 text-orange-700 border border-orange-200'}`}>
+                      {order.shippingMethod === 'pickup' ? '🏪 Retiro' : '🚚 Domicilio'}
+                    </span>
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <Link

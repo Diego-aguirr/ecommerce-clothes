@@ -23,3 +23,4 @@ export * from "./ui/verification/EmailBanner";
 export * from "./mercadopago/MercadoPagoButton";
 export * from "./ui/whatsapp-button/WhatsappButton";
 export * from "./ui/marquee/Marquee";
+export * from "./ui/shipping-method-selector/ShippingMethodSelector";

@@ -25,7 +25,28 @@ export const setUserAddress = async (data: SetUserAddressInput) => {
       };
     }
 
-    const { id, apartment, description, ...restData } = parsed.data;
+    const {
+      id,
+      apartment,
+      description,
+      shippingMethod,
+      street,
+      zip,
+      city,
+      provinceId,
+      ...restData
+    } = parsed.data;
+
+    const addressData = {
+      ...restData,
+      street: street ?? null,
+      zip: zip ?? null,
+      city: city ?? null,
+      provinceId: provinceId ?? null,
+      apartment: apartment ?? null,
+      description: description ?? null,
+      userId,
+    };
 
     const existingAddress = await prisma.userAddress.findFirst({
       where: { userId },
@@ -34,24 +55,14 @@ export const setUserAddress = async (data: SetUserAddressInput) => {
     if (existingAddress) {
       const updatedAddress = await prisma.userAddress.update({
         where: { id: existingAddress.id },
-        data: {
-          ...restData,
-          apartment: apartment ?? null,
-          description: description ?? null,
-          userId,
-        },
+        data: addressData,
       });
 
       return { ok: true, data: updatedAddress };
     }
 
     const newAddress = await prisma.userAddress.create({
-      data: {
-        ...restData,
-        apartment: apartment ?? null,
-        description: description ?? null,
-        userId,
-      },
+      data: addressData,
     });
 
     return { ok: true, data: newAddress };

@@ -11,7 +11,15 @@ export default async function AddressPage() {
   const session = await auth();
   const provinces = await getProvincies(); // Obtener provincias para el formulario de dirección
   const userAddressResponse = await getUserAddress();
-  const userAddress = userAddressResponse.ok ? userAddressResponse.data : null;
+  const userAddress = userAddressResponse.ok && userAddressResponse.data ? {
+    ...userAddressResponse.data,
+    street: userAddressResponse.data.street ?? undefined,
+    zip: userAddressResponse.data.zip ?? undefined,
+    city: userAddressResponse.data.city ?? undefined,
+    provinceId: userAddressResponse.data.provinceId ?? undefined,
+    apartment: userAddressResponse.data.apartment ?? undefined,
+    description: userAddressResponse.data.description ?? undefined,
+  } : undefined;
 
   // 🔒 1. No logueado → login
   if (!session?.user?.id) {
@@ -73,10 +81,10 @@ export default async function AddressPage() {
           <div className="w-full max-w-2xl flex flex-col justify-center text-left">
             <div className="bg-white p-8 rounded-lg shadow-md">
               <Title
-                title="Dirección de Envío"
-                subtitle="Completa tus datos para recibir tu pedido"
+                title="Datos de Envío"
+                subtitle="Elegí cómo recibir tu pedido y completá tus datos"
               />
-              <AddressForm provinces={provinces} userAddress={userAddress ?? undefined} />
+              <AddressForm provinces={provinces} userAddress={userAddress} />
             </div>
           </div>
         </div>

@@ -5,9 +5,15 @@ import type { Size } from "@/interfaces";
 import { auth } from "../../../auth";
 import { orderSchema } from "@/lib/schemas/order.schema";
 
+import { z } from "zod";
+
+type ProductsToOrderInput = z.infer<typeof orderSchema>["productsToOrder"];
+type AddressInput = z.infer<typeof orderSchema>["address"];
+
 export const placeOrder = async (
-  productsToOrderInput: any,
-  addressInput: any,
+  productsToOrderInput: ProductsToOrderInput,
+  addressInput: AddressInput,
+  shippingMethodInput: "delivery" | "pickup" = "delivery",
   idempotencyTokenInput?: string,
 ) => {
   try {
@@ -24,6 +30,7 @@ export const placeOrder = async (
     const parsed = orderSchema.safeParse({
       productsToOrder: productsToOrderInput,
       address: addressInput,
+      shippingMethod: shippingMethodInput,
       idempotencyToken: idempotencyTokenInput,
     });
 
@@ -34,7 +41,7 @@ export const placeOrder = async (
       };
     }
 
-    const { productsToOrder, address, idempotencyToken } = parsed.data;
+    const { productsToOrder, address, shippingMethod, idempotencyToken } = parsed.data;
 
     // 🔒 3. Obtener productos reales
     const products = await prisma.product.findMany({
@@ -123,14 +130,14 @@ export const placeOrder = async (
           OrderAddress: {
             create: {
               fullname: address.fullname,
-              street: address.street,
-              apartment: address.apartment,
-              zip: address.zip,
-              city: address.city,
+              street: address.street ?? null,
+              apartment: address.apartment ?? null,
+              zip: address.zip ?? null,
+              city: address.city ?? null,
               phone: address.phone,
               dni: address.dni,
-              description: address.description,
-              provinceId: address.provinceId,
+              description: address.description ?? null,
+              provinceId: address.provinceId ?? null,
             },
           },
         },
