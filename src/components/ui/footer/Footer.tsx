@@ -1,4 +1,3 @@
-import { titleFont } from "@/config/fonts";
 import Link from "next/link";
 import { FaInstagram, FaWhatsapp, FaMapMarkerAlt, FaLock } from "react-icons/fa";
 import { SiMercadopago, SiVisa, SiMastercard } from "react-icons/si";
@@ -7,23 +6,7 @@ export const Footer = () => {
   return (
     <footer className="bg-white border-t border-gray-200 mt-20">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          
-          {/* Brand & Story */}
-          <div className="flex flex-col space-y-4">
-            <Link 
-              href="/" 
-              className="inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
-              aria-label="Ir a inicio de SATORU"
-            >
-              <span className={`${titleFont.className} text-3xl font-black italic tracking-tighter text-black`}>
-                ST <span className="text-blue-600 text-lg align-middle not-italic font-bold">SATORU</span>
-              </span>
-            </Link>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Exclusividad, calidad y buen precio. Somos una familia apasionada por la moda masculina y femenina.
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
           {/* Contact Info */}
           <div className="flex flex-col space-y-4">
@@ -58,31 +41,11 @@ export const Footer = () => {
           <div className="flex flex-col space-y-4">
             <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Enlaces Útiles</h3>
             <nav className="flex flex-col space-y-3 text-sm">
-              <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Nuestra Historia</Link>
+              <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Quiénes Somos</Link>
               <Link href="/contact" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Contacto</Link>
               <Link href="/terms" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Términos y Condiciones</Link>
               <Link href="/privacy" className="text-gray-600 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded w-fit">Políticas de Privacidad</Link>
             </nav>
-          </div>
-
-          {/* CRO: Newsletter & Trust Signals */}
-          <div className="flex flex-col space-y-4">
-            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">¿10% OFF en tu compra?</h3>
-            <p className="text-xs text-gray-500">Suscribite a nuestro newsletter y enterate de las exclusividades antes que nadie.</p>
-            <form className="flex mt-2" onSubmit={(e) => e.preventDefault()}>
-              <input 
-                type="email" 
-                placeholder="tu@email.com" 
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Email para newsletter"
-              />
-              <button 
-                type="submit" 
-                className="bg-blue-600 text-white px-4 py-2 text-sm font-bold rounded-r-lg hover:bg-blue-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-              >
-                Suscribir
-              </button>
-            </form>
           </div>
 
         </div>
