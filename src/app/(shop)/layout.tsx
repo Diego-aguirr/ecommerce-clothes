@@ -1,4 +1,4 @@
-import { Footer, Sidebar, TopMenu, WhatsappButton } from "@/components";
+import { Footer, Sidebar, TopMenu, WhatsappButton, AnnouncementBar } from "@/components";
 import { auth } from "../../../auth";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
@@ -25,6 +25,7 @@ export default async function ShopLayout({
 
   return (
     <main className="min-h-screen">
+      <AnnouncementBar />
       <TopMenu />
       <Sidebar />
 
