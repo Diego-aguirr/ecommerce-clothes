@@ -3,7 +3,7 @@ import { IoLogoWhatsapp } from "react-icons/io5";
 
 export const WhatsappButton = () => {
   // Número mockeado (debe reemplazarse por variable de entorno)
-  const phoneNumber = "5491123456789"; 
+  const phoneNumber = "5493624024624"; 
   const message = "Hola! Me interesa obtener más información.";
   const waLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 

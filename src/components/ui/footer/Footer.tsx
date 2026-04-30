@@ -8,9 +8,9 @@ export const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
 
-          {/* Col 1: Atención al Cliente */}
+          {/* Col 1: Nuestras Redes */}
           <div className="flex flex-col space-y-4">
-            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Atención al Cliente</h3>
+            <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">Nuestras Redes</h3>
             <div className="flex flex-col space-y-3 text-sm text-gray-600">
               <a 
                 href="https://wa.me/5493624024624" 
