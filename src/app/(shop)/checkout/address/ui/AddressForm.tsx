@@ -1,5 +1,8 @@
 "use client";
 
+import React from "react";
+import { FaShieldAlt, FaLock, FaCheckCircle } from "react-icons/fa";
+
 import { AddressFormValues, Province } from "@/interfaces";
 import { useAddressStore } from "@/store";
 import { ShippingMethodSelector } from "@/components";
@@ -288,6 +291,22 @@ export default function AddressForm({
           </label>
         </div>
       )}
+
+      {/* Sección de Confianza / Seguridad */}
+      <div className="flex flex-wrap justify-center items-center gap-6 py-6 border-t border-gray-100 bg-gray-50/50 rounded-b-lg">
+        <div className="flex items-center text-gray-500 text-xs">
+          <FaShieldAlt className="text-green-600 mr-2" size={16} />
+          <span>Compra 100% Segura</span>
+        </div>
+        <div className="flex items-center text-gray-500 text-xs">
+          <FaLock className="text-gray-400 mr-2" size={14} />
+          <span>Datos Protegidos</span>
+        </div>
+        <div className="flex items-center text-gray-500 text-xs">
+          <FaCheckCircle className="text-blue-500 mr-2" size={14} />
+          <span>Garantía Satoru</span>
+        </div>
+      </div>
 
       {/* Botones de navegación */}
       <div className="pt-8 border-t border-gray-200">
