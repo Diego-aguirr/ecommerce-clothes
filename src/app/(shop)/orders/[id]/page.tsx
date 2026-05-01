@@ -187,7 +187,13 @@ export default async function OrderPage({ params }: Props) {
 
               <div className="flex justify-between">
                 <span>Envío</span>
-                <span className="font-medium text-green-600">Gratis</span>
+                {order.shippingMethod === "pickup" ? (
+                  <span className="font-medium text-green-600">Gratis</span>
+                ) : (
+                  <span className="font-medium text-blue-600">
+                    A acordar con vendedor
+                  </span>
+                )}
               </div>
 
               <div className="flex justify-between items-center border-t border-gray-100 pt-4 mt-2">

@@ -1,6 +1,5 @@
-import { Title, SatoruLogo } from "@/components";
+import { Title } from "@/components";
 import AddressForm from "./ui/AddressForm";
-import Link from "next/link";
 import { auth } from "../../../../../auth";
 import { redirect } from "next/dist/client/components/navigation";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
@@ -48,10 +47,8 @@ export default async function AddressPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        {/* Header con logo */}
-        <div className="flex justify-center mb-12">
-          <SatoruLogo />
-        </div>
+        {/* Header (Limpio) */}
+        <div className="mt-4"></div>
 
         {/* Barra de progreso */}
         <div className="w-full max-w-2xl mx-auto mb-8">

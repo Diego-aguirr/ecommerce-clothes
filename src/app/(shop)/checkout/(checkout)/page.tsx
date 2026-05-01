@@ -34,12 +34,8 @@ export default async function PaymentPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        {/* Header con logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-brand-primary">
-            URBANWEAR
-          </Link>
-        </div>
+        {/* Header (Limpio) */}
+        <div className="mt-4"></div>
 
         {/* Breadcrumbs */}
         <div className="flex justify-center items-center text-sm mb-8">
@@ -124,11 +120,8 @@ export default async function PaymentPage() {
                       ¿Necesitas ayuda?
                     </p>
                     <p className="text-sm text-blue-700 mt-1">
-                      Contactanos en{" "}
-                      <span className="font-semibold">
-                        support@urbanwear.com
-                      </span>{" "}
-                      o al <span className="font-semibold">0800-123-4567</span>
+                      Contactanos por WhatsApp o al email{" "}
+                      <span className="font-semibold">hola@satoru.com.ar</span>
                     </p>
                   </div>
                 </div>
