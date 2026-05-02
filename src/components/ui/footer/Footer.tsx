@@ -23,6 +23,7 @@ export const Footer = () => {
             links={[
               { label: "Términos y Condiciones", href: "/terms" },
               { label: "Políticas de Privacidad", href: "/privacy" },
+              { label: "Métodos de Envío", href: "/envios" },
             ]}
           />
           
