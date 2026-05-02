@@ -69,7 +69,6 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
     const verifyUrl = `${process.env.APP_URL}/api/auth/verify?token=${verificationToken}`;
 
     // 4️⃣➕ Enviar email de confirmación
-    console.log('🔔 Enviando email de bienvenida a:', email);
     try {
       await sendEmail({
         to: email,

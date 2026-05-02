@@ -30,6 +30,5 @@ export async function sendEmail({
     throw error;
   }
 
-  console.log("Resend email sent:", data);
   return data;
 }

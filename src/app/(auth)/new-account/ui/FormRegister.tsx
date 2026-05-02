@@ -9,13 +9,14 @@ import { z } from "zod";
 
 import { registerSchema } from "@/lib/zod";
 import { useRouter } from "next/navigation";
-import { registerAction } from "@/actions";
+import { registerAction, signInWithGoogle } from "@/actions";
 
 type FormInputs = z.infer<typeof registerSchema>;
 
 export const FormRegister = () => {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isGooglePending, setIsGooglePending] = useState(false);
   const router = useRouter();
 
   const {
@@ -27,72 +28,143 @@ export const FormRegister = () => {
   });
 
   const onSubmit = (data: FormInputs) => {
-    setErrorMessage(null);
+    setError(null);
 
     startTransition(async () => {
       const resp = await registerAction(data);
 
       if (resp?.error) {
-        setErrorMessage(resp.error);
+        setError(resp.error);
         return;
       }
 
-      router.push("/"); // o donde quieras
+      router.push("/");
     });
   };
 
+  async function handleGoogleSignIn() {
+    setIsGooglePending(true);
+    await signInWithGoogle("/");
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-      <label>Nombre completo</label>
-      <input
-        className={clsx("px-5 py-2 border bg-gray-200 rounded mb-5", {
-          "border-red-500": errors.name,
-        })}
-        type="text"
-        autoFocus
-        {...register("name")}
-      />
-      {errors.name && (
-        <span className="text-red-500">{errors.name.message}</span>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      {/* NAME */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-neutral-800">Nombre completo</label>
+        <input
+          className={clsx(
+            "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
+            { "border-red-500": errors.name }
+          )}
+          type="text"
+          autoFocus
+          {...register("name")}
+        />
+        {errors.name && (
+          <p className="text-red-600 text-xs">{errors.name.message}</p>
+        )}
+      </div>
 
-      <label>Correo electrónico</label>
-      <input
-        className={clsx("px-5 py-2 border bg-gray-200 rounded mb-5", {
-          "border-red-500": errors.email,
-        })}
-        type="email"
-        {...register("email")}
-      />
-      {errors.email && (
-        <span className="text-red-500">{errors.email.message}</span>
-      )}
+      {/* EMAIL */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-neutral-800">Correo electrónico</label>
+        <input
+          className={clsx(
+            "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
+            { "border-red-500": errors.email }
+          )}
+          type="email"
+          {...register("email")}
+        />
+        {errors.email && (
+          <p className="text-red-600 text-xs">{errors.email.message}</p>
+        )}
+      </div>
 
-      <label>Contraseña</label>
-      <input
-        className={clsx("px-5 py-2 border bg-gray-200 rounded mb-5", {
-          "border-red-500": errors.password,
-        })}
-        type="password"
-        {...register("password")}
-      />
-      {errors.password && (
-        <span className="text-red-500">{errors.password.message}</span>
-      )}
+      {/* PASSWORD */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-neutral-800">Contraseña</label>
+        <input
+          className={clsx(
+            "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
+            { "border-red-500": errors.password }
+          )}
+          type="password"
+          {...register("password")}
+        />
+        {errors.password && (
+          <p className="text-red-600 text-xs">{errors.password.message}</p>
+        )}
+      </div>
 
-      {errorMessage && <span className="text-red-500">{errorMessage}</span>}
+      {/* ERROR GENERAL */}
+      {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
-      <button className="btn-primary" disabled={isPending}>
+      {/* CTA PRINCIPAL */}
+      <button
+        type="submit"
+        disabled={isPending}
+        className="
+          mt-2 w-full rounded-md bg-black py-2.5 text-sm font-medium
+          text-white transition-colors hover:bg-neutral-800
+          focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
+          disabled:opacity-60 disabled:cursor-not-allowed
+        "
+      >
         {isPending ? "Creando cuenta..." : "Crear cuenta"}
       </button>
 
-      <div className="flex items-center my-5">
-        <div className="flex-1 border-t border-gray-500"></div>
-        <div className="px-2 text-gray-800">O</div>
-        <div className="flex-1 border-t border-gray-500"></div>
+      {/* GOOGLE BUTTON */}
+      <button
+        type="button"
+        disabled={isGooglePending}
+        onClick={handleGoogleSignIn}
+        className="
+          w-full rounded-md border border-neutral-300 bg-white py-2.5 text-sm font-medium
+          text-neutral-800 transition-colors hover:bg-neutral-100
+          focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
+          disabled:opacity-60 disabled:cursor-not-allowed
+          flex items-center justify-center gap-2
+        "
+      >
+        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            fill="#4285F4"
+          />
+          <path
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.96 20.95 7.58 23 12 23z"
+            fill="#34A853"
+          />
+          <path
+            d="M5.84 14.09c-.22-.66-.38-1.36-.38-2.09s.16-1.43.38-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+            fill="#FBBC05"
+          />
+          <path
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.58 1 3.96 3.05 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            fill="#EA4335"
+          />
+        </svg>
+        Continuar con Google
+      </button>
+
+      {/* DIVIDER */}
+      <div className="flex items-center gap-3 my-4">
+        <div className="flex-1 border-t border-neutral-300" />
+        <span className="text-xs text-neutral-500">O</span>
+        <div className="flex-1 border-t border-neutral-300" />
       </div>
 
-      <Link href="/login" className="btn-secondary text-center">
+      {/* CTA SECUNDARIO */}
+      <Link
+        href="/login"
+        className="
+          w-full rounded-md border border-neutral-300
+          py-2.5 text-center text-sm font-medium text-neutral-800
+          hover:bg-neutral-100 transition-colors 
+        "
+      >
         Ingresar
       </Link>
     </form>
