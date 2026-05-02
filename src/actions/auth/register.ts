@@ -11,6 +11,7 @@ import { verifyEmailTemplate } from "@/lib/verify-email";
 
 export async function registerAction(data: z.infer<typeof registerSchema>) {
   try {
+
     // 1️⃣ Validación Zod
     const parsed = registerSchema.safeParse(data);
 
@@ -62,9 +63,13 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
     });
 
     // 4️⃣➕ Armar URL de verificación
+    if (!process.env.APP_URL) {
+      console.error('⚠️ APP_URL no está definido en .env');
+    }
     const verifyUrl = `${process.env.APP_URL}/api/auth/verify?token=${verificationToken}`;
 
     // 4️⃣➕ Enviar email de confirmación
+    console.log('🔔 Enviando email de bienvenida a:', email);
     try {
       await sendEmail({
         to: email,
@@ -74,9 +79,11 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
           verifyUrl,
         }),
       });
+      console.log('✅ Email de verificación enviado exitosamente');
     } catch (err) {
-      console.error("  Error enviando email de verificación:", err);
-      // NO lanzar error
+      console.error('❌ Error enviando email de verificación:', err);
+      // Propagar el error para que el cliente reciba la falla
+      throw err;
     }
 
     // 5️⃣ Login automático

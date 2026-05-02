@@ -38,7 +38,7 @@ export async function POST() {
   });
 
   // 3️⃣ 🔥 ENVIAR EMAIL REAL
-  await sendVerificationEmail(user.email, token);
+  await sendVerificationEmail(user.email, user.name ?? '', token);
 
   return NextResponse.json({ ok: true });
 }
