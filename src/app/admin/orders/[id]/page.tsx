@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import prisma from "@/lib/prisma";
-import { updateOrderStatus, updateOrderNotes, updateDeliveryStatus } from "@/actions/admin/orders";
+import { updateOrderStatus, updateOrderNotes, updateDeliveryStatus, markAsShippedFormAction, markAsDeliveredFormAction, saveNotesFormAction } from "@/actions/admin/orders";
 import { notFound } from "next/navigation";
 import { OrderStatus, DeliveryStatus } from "@/generated/prisma/client";
 import { FiPackage, FiTruck, FiCheckCircle } from "react-icons/fi";
@@ -27,17 +27,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   if (!order) return notFound();
 
   // Next.js 15 Native Server Actions bound forms
-  const markAsShipped = async (formData: FormData) => {
-    "use server";
-    const tracking = formData.get("trackingCode")?.toString() || "";
-    await updateDeliveryStatus(order.id, "shipped", tracking);
-  };
-
-  const saveNotes = async (formData: FormData) => {
-    "use server";
-    const notes = formData.get("notes")?.toString() || "";
-    await updateOrderNotes(order.id, notes);
-  };
+  const markAsShipped = markAsShippedFormAction.bind(null, order.id);
+  const markAsDelivered = markAsDeliveredFormAction.bind(null, order.id, order.trackingCode || "");
+  const saveNotes = saveNotesFormAction.bind(null, order.id);
 
   return (
     <div className="space-y-6">
@@ -185,15 +177,27 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                   {order.shippedAt ? `Salida confirmada: ${new Date(order.shippedAt).toLocaleString()}` : "Paquete sin mover."}
                 </span>
 
-                <button 
-                  type="submit" 
-                  disabled={!order.isPaid && order.status !== "paid"}
-                  className={`px-5 py-2.5 rounded-lg shadow-sm text-white font-bold text-sm focus:outline-none transition-all flex items-center gap-2
-                    ${order.deliveryStatus === 'shipped' ? 'bg-gray-800 hover:bg-black' : 
-                      !order.isPaid && order.status !== "paid" ? 'bg-gray-300 cursor-not-allowed opacity-70' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg'}`}
-                >
-                  {order.deliveryStatus === 'shipped' ? 'Actualizar N° Envío' : '➡️ Pasar a Despachado'}
-                </button>
+                <div className="flex gap-2">
+                  {order.deliveryStatus === 'shipped' && (
+                    <button
+                      formAction={markAsDelivered}
+                      className="px-5 py-2.5 rounded-lg shadow-sm text-white font-bold text-sm focus:outline-none transition-all bg-green-600 hover:bg-green-700 hover:shadow-lg flex items-center gap-2"
+                    >
+                      ✅ Marcar Entregado
+                    </button>
+                  )}
+                  {order.deliveryStatus !== 'delivered' && (
+                    <button 
+                      type="submit" 
+                      disabled={!order.isPaid && order.status !== "paid"}
+                      className={`px-5 py-2.5 rounded-lg shadow-sm text-white font-bold text-sm focus:outline-none transition-all flex items-center gap-2
+                        ${order.deliveryStatus === 'shipped' ? 'bg-gray-800 hover:bg-black' : 
+                          !order.isPaid && order.status !== "paid" ? 'bg-gray-300 cursor-not-allowed opacity-70' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg'}`}
+                    >
+                      {order.deliveryStatus === 'shipped' ? 'Actualizar N° Envío' : '➡️ Pasar a Despachado'}
+                    </button>
+                  )}
+                </div>
               </div>
               
               {(!order.isPaid && order.status !== "paid") && (
