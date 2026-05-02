@@ -1,6 +1,6 @@
 export const revalidate = 60;
 import { getPaginatedProductsWithImages } from "@/actions";
-import { Pagination, Title, Marquee } from "@/components";
+import { Pagination, Title } from "@/components";
 import { ProductGrid } from "@/components/products/product-grid/ProductGrid";
 import { redirect } from "next/navigation";
 
@@ -22,8 +22,6 @@ export default async function HomePage({ searchParams }: Props) {
 
   return (
     <>
-      <Marquee />
-
       <Title 
         title="Descubrí tu estilo" 
         subtitle="Explorá las últimas tendencias y llegadas exclusivas de temporada." 

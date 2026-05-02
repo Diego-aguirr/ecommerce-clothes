@@ -16,8 +16,8 @@ const OPTIONS: {
   {
     value: "delivery",
     label: "A domicilio",
-    subtitle: "Envío estándar",
-    subtitleClassName: "text-gray-500",
+    subtitle: "A acordar con vendedor",
+    subtitleClassName: "text-blue-600 font-medium",
   },
   {
     value: "pickup",
@@ -69,10 +69,23 @@ export const ShippingMethodSelector = ({
         })}
       </div>
 
+      {value === "delivery" && (
+        <div className="mt-3 p-3 bg-blue-50 text-blue-800 border border-blue-100 rounded-lg text-sm flex items-start">
+          <span className="mr-2">🚚</span>
+          <span>
+            Coordinaremos la empresa de transporte y el costo del envío
+            directamente con vos después de tu compra.
+          </span>
+        </div>
+      )}
+
       {value === "pickup" && (
-        <div className="mt-3 p-3 bg-blue-50 text-blue-800 border border-blue-100 rounded-lg text-sm">
-          📍 Retirás tu pedido por nuestro local central. Te avisaremos cuando
-          esté listo.
+        <div className="mt-3 p-3 bg-green-50 text-green-800 border border-green-100 rounded-lg text-sm flex items-start">
+          <span className="mr-2">📍</span>
+          <span>
+            Retirás tu pedido por nuestro local central. Te avisaremos cuando
+            esté listo.
+          </span>
         </div>
       )}
     </div>

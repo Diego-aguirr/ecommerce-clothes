@@ -163,7 +163,7 @@ export default async function OrderPage({ params }: Props) {
                   <p>DNI: {address.dni}</p>
                   {address.description && (
                     <p className="pt-2 text-gray-500 italic">
-                      " {address.description} "
+                      &quot; {address.description} &quot;
                     </p>
                   )}
                 </div>
@@ -187,7 +187,13 @@ export default async function OrderPage({ params }: Props) {
 
               <div className="flex justify-between">
                 <span>Envío</span>
-                <span className="font-medium text-green-600">Gratis</span>
+                {order.shippingMethod === "pickup" ? (
+                  <span className="font-medium text-green-600">Gratis</span>
+                ) : (
+                  <span className="font-medium text-blue-600">
+                    A acordar con vendedor
+                  </span>
+                )}
               </div>
 
               <div className="flex justify-between items-center border-t border-gray-100 pt-4 mt-2">

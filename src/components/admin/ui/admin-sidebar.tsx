@@ -38,7 +38,7 @@ export function AdminSidebar({
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 shadow-sm flex flex-col justify-between shrink-0">
+    <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 shadow-sm flex-col justify-between shrink-0">
       <div>
         <div className="p-6 border-b border-gray-100">
           <Link
@@ -66,20 +66,21 @@ export function AdminSidebar({
           </div>
         </div>
 
-        <nav className="p-4 space-y-1">
+        <nav className="p-4 space-y-1" aria-label="Menú principal">
           {links.map((link) => {
             const isActive = checkHover(link.href, link.exact);
             return (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold ${
+                aria-current={isActive ? "page" : undefined}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
                   isActive
                     ? "bg-blue-50 text-blue-700 shadow-sm"
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
-                <span className={isActive ? "text-blue-600" : "text-gray-400"}>
+                <span aria-hidden="true" className={isActive ? "text-blue-600" : "text-gray-400"}>
                   {link.icon}
                 </span>
                 {link.name}
@@ -89,30 +90,34 @@ export function AdminSidebar({
 
           {isSuperAdmin && (
             <div className="pt-6 mt-6 border-t border-gray-100">
-              <p className="text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest px-3">
+              <p className="text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest px-3" id="security-nav-heading">
                 Seguridad
               </p>
-              {superAdminLinks.map((link) => {
-                const isActive = checkHover(link.href);
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold ${
-                      isActive
-                        ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
-                  >
-                    <span
-                      className={isActive ? "text-indigo-600" : "text-gray-400"}
+              <nav aria-labelledby="security-nav-heading" className="space-y-1">
+                {superAdminLinks.map((link) => {
+                  const isActive = checkHover(link.href);
+                  return (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 ${
+                        isActive
+                          ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                      }`}
                     >
-                      {link.icon}
-                    </span>
-                    {link.name}
-                  </Link>
-                );
-              })}
+                      <span
+                        aria-hidden="true"
+                        className={isActive ? "text-indigo-600" : "text-gray-400"}
+                      >
+                        {link.icon}
+                      </span>
+                      {link.name}
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
           )}
         </nav>

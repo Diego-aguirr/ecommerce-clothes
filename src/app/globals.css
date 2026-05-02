@@ -43,3 +43,18 @@
 .btn-danger {
   @apply bg-red-500 hover:bg-red-700 text-white py-2 px-2 transition-all;
 }
+
+/* Marquee Animation */
+@keyframes sway {
+  0%, 100% { transform: translateX(15px); }
+  50% { transform: translateX(-15px); }
+}
+
+.animate-sway {
+  display: inline-block;
+  animation: sway 8s ease-in-out infinite;
+}
+
+.animate-sway:hover {
+  animation-play-state: paused;
+}

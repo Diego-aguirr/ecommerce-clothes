@@ -51,7 +51,9 @@ const OrderSummary = () => {
         {/* Envío */}
         <div className="flex justify-between text-gray-600">
           <span>Envío</span>
-          <span className="font-medium text-green-600">Gratis</span>
+          <span className="font-medium text-gray-900">
+            Retiro gratis / Envío a acordar
+          </span>
         </div>
 
         {/* Línea separadora y Total */}

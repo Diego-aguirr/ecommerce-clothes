@@ -6,11 +6,11 @@ import { Provider } from "@/components";
 
 export const metadata: Metadata = {
   title: {
-    default: "JAVA CREW - Tienda Oficial",
-    template: "%s - JAVA CREW",
+    default: "SATORU - Tienda Oficial",
+    template: "%s - SATORU",
   },
   description:
-    "La mejor tienda de ropa con diseños únicos. Explora la colección de JAVA CREW.",
+    "La mejor tienda de ropa con diseños únicos. Explora la colección de SATORU.",
 };
 
 export default async function RootLayout({
@@ -20,7 +20,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body className={`${inter.className} antialiased text-gray-900 bg-white`}>
         <Provider>{children}</Provider>
       </body>
     </html>

@@ -22,5 +22,6 @@ export * from "./ui/top-menu/TopMenu";
 export * from "./ui/verification/EmailBanner";
 export * from "./mercadopago/MercadoPagoButton";
 export * from "./ui/whatsapp-button/WhatsappButton";
-export * from "./ui/marquee/Marquee";
 export * from "./ui/shipping-method-selector/ShippingMethodSelector";
+export * from "./ui/announcement-bar/AnnouncementBar";
+export * from "./ui/logo/SatoruLogo";

@@ -1,31 +1,34 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false, // true solo para 465
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Initialize Resend client with API key from environment
+const resend = new Resend(process.env.RESEND_API_KEY as string);
 
+/**
+ * Sends an email using Resend.
+ * @param to - Recipient email address (or array of addresses)
+ * @param subject - Email subject line
+ * @param html - HTML content of the email
+ */
 export async function sendEmail({
   to,
   subject,
   html,
 }: {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
 }) {
-  await transporter.verify();
-  console.log("SMTP OK");
-
-  await transporter.sendMail({
-    from: process.env.MAIL_FROM,
+  const { data, error } = await resend.emails.send({
+    from: process.env.MAIL_FROM as string,
     to,
     subject,
     html,
   });
+
+  if (error) {
+    console.error("Resend email error:", error);
+    throw error;
+  }
+
+  return data;
 }

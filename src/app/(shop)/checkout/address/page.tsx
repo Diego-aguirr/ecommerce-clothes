@@ -1,25 +1,28 @@
 import { Title } from "@/components";
 import AddressForm from "./ui/AddressForm";
-import Link from "next/link";
 import { auth } from "../../../../../auth";
 import { redirect } from "next/dist/client/components/navigation";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
 import { getProvincies, getUserAddress } from "@/actions";
+import { FaInfoCircle } from "react-icons/fa";
 
 export default async function AddressPage() {
   const session = await auth();
   const provinces = await getProvincies(); // Obtener provincias para el formulario de dirección
   const userAddressResponse = await getUserAddress();
-  const userAddress = userAddressResponse.ok && userAddressResponse.data ? {
-    ...userAddressResponse.data,
-    street: userAddressResponse.data.street ?? undefined,
-    zip: userAddressResponse.data.zip ?? undefined,
-    city: userAddressResponse.data.city ?? undefined,
-    provinceId: userAddressResponse.data.provinceId ?? undefined,
-    apartment: userAddressResponse.data.apartment ?? undefined,
-    description: userAddressResponse.data.description ?? undefined,
-  } : undefined;
+  const userAddress =
+    userAddressResponse.ok && userAddressResponse.data
+      ? {
+          ...userAddressResponse.data,
+          street: userAddressResponse.data.street ?? undefined,
+          zip: userAddressResponse.data.zip ?? undefined,
+          city: userAddressResponse.data.city ?? undefined,
+          provinceId: userAddressResponse.data.provinceId ?? undefined,
+          apartment: userAddressResponse.data.apartment ?? undefined,
+          description: userAddressResponse.data.description ?? undefined,
+        }
+      : undefined;
 
   // 🔒 1. No logueado → login
   if (!session?.user?.id) {
@@ -44,12 +47,8 @@ export default async function AddressPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        {/* Header con logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-brand-primary">
-            URBANWEAR
-          </Link>
-        </div>
+        {/* Header (Limpio) */}
+        <div className="mt-4"></div>
 
         {/* Barra de progreso */}
         <div className="w-full max-w-2xl mx-auto mb-8">
@@ -84,6 +83,25 @@ export default async function AddressPage() {
                 title="Datos de Envío"
                 subtitle="Elegí cómo recibir tu pedido y completá tus datos"
               />
+
+              {/* Banner de Información de Logística */}
+              <div className="mt-4 mb-6 p-4 bg-blue-50 border-l-4 border-blue-600 rounded-r-lg flex items-start space-x-3">
+                <FaInfoCircle
+                  className="text-blue-600 mt-0.5 shrink-0"
+                  size={20}
+                />
+                <div>
+                  <h4 className="text-sm font-bold text-blue-900">
+                    Sobre la Logística
+                  </h4>
+                  <p className="text-sm text-blue-800 leading-relaxed">
+                    Si elegís <strong>Envío a Domicilio</strong>, el servicio de
+                    transporte y el costo del mismo se coordinarán directamente
+                    con nosotros luego de finalizar la compra.
+                  </p>
+                </div>
+              </div>
+
               <AddressForm provinces={provinces} userAddress={userAddress} />
             </div>
           </div>

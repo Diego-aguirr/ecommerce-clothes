@@ -10,6 +10,7 @@ import {
 import { useCartStore, useUIStore } from "@/store";
 import { useSession } from "next-auth/react";
 import { logout } from "@/actions";
+import { SatoruLogo } from "@/components";
 
 export const TopMenu = () => {
   const openSideMenu = useUIStore((state) => state.openSideMenu);
@@ -51,13 +52,7 @@ export const TopMenu = () => {
     <nav className="bg-brand-primary py-3 px-6 shadow-md relative z-30">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo / Brand Name */}
-        <Link
-          href="/"
-          className="text-xl font-bold hover:text-brand-accent transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent rounded"
-          aria-label="Inicio"
-        >
-          JAVA CREW
-        </Link>
+        <SatoruLogo />
 
         {/* Center Navigation - Hidden on small, visible on medium and up */}
         <div 

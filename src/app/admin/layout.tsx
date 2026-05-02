@@ -19,16 +19,29 @@ export default async function AdminLayout({
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
-          <h1 className="text-lg font-bold text-gray-800 tracking-tight">
-            Panel de Control General
-          </h1>
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shrink-0 shadow-sm z-10">
+          <div className="flex items-center gap-3">
+            <span className="md:hidden font-black text-xl text-blue-600">S.</span>
+            <h1 className="text-lg font-bold text-gray-800 tracking-tight hidden sm:block">
+              Panel de Control General
+            </h1>
+            <h1 className="text-lg font-bold text-gray-800 tracking-tight sm:hidden">
+              Admin
+            </h1>
+          </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+            <span className="hidden sm:inline-block text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
               Modo Administrador
             </span>
           </div>
         </header>
+
+        {/* Mobile Warning Banner */}
+        <div className="md:hidden bg-blue-50 p-3 text-center border-b border-blue-100">
+          <p className="text-xs text-blue-800 font-medium">
+            El panel de control está optimizado para su uso en computadoras.
+          </p>
+        </div>
 
         {/* Main Content Scrollable */}
         <main className="flex-1 overflow-auto p-8 relative">

@@ -105,6 +105,17 @@ export const PlaceOrder = () => {
           <span className="font-medium">${tax.toLocaleString()}</span>
         </div>
 
+        <div className="flex justify-between text-gray-600">
+          <span>Envío</span>
+          {shippingMethod === "pickup" ? (
+            <span className="font-medium text-green-600">Gratis</span>
+          ) : (
+            <span className="font-medium text-blue-600">
+              A acordar con vendedor
+            </span>
+          )}
+        </div>
+
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between text-lg font-bold text-gray-900">
             <span>Total</span>

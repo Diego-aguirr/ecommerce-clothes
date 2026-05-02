@@ -98,3 +98,18 @@ export async function updateOrderNotes(orderId: string, notes: string): Promise<
     return { ok: false, error: error.message };
   }
 }
+
+// UI Form Wrappers
+export async function markAsShippedFormAction(orderId: string, formData: FormData) {
+  const trackingCode = formData.get("trackingCode")?.toString() || "";
+  await updateDeliveryStatus(orderId, "shipped", trackingCode);
+}
+
+export async function markAsDeliveredFormAction(orderId: string, trackingCode: string) {
+  await updateDeliveryStatus(orderId, "delivered", trackingCode);
+}
+
+export async function saveNotesFormAction(orderId: string, formData: FormData) {
+  const notes = formData.get("notes")?.toString() || "";
+  await updateOrderNotes(orderId, notes);
+}
