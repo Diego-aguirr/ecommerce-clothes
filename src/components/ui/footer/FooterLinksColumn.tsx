@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReactNode } from "react";
 
 interface LinkItem {
   label: string;
@@ -8,9 +9,10 @@ interface LinkItem {
 interface Props {
   title: string;
   links: LinkItem[];
+  children?: ReactNode;
 }
 
-export const FooterLinksColumn = ({ title, links }: Props) => {
+export const FooterLinksColumn = ({ title, links, children }: Props) => {
   return (
     <div className="flex flex-col space-y-4">
       <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">
@@ -27,6 +29,11 @@ export const FooterLinksColumn = ({ title, links }: Props) => {
           </Link>
         ))}
       </nav>
+      {children && (
+        <div className="mt-4">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
