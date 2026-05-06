@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin/auth-utils";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -25,6 +26,7 @@ export type CreateColorInput = z.infer<typeof createColorSchema>;
  * Obtener todos los colores de un producto con sus imágenes
  */
 export async function getProductColors(productId: string) {
+  await requireAdmin();
   try {
     const colors = await prisma.productColor.findMany({
       where: { productId },
@@ -50,6 +52,7 @@ export async function getProductColors(productId: string) {
  * Crear un nuevo color para el producto
  */
 export async function createColor(input: CreateColorInput) {
+  await requireAdmin();
   try {
     const validated = createColorSchema.parse(input);
 
@@ -87,6 +90,7 @@ export async function createColor(input: CreateColorInput) {
  * Eliminar un color (solo si no tiene variantes asociadas)
  */
 export async function deleteColor(colorId: string, productId: string) {
+  await requireAdmin();
   try {
     // Verificar si hay variantes usando este color
     const variantsCount = await prisma.productVariant.count({
@@ -120,6 +124,7 @@ export async function addColorImage(input: {
   url: string;
   order?: number;
 }) {
+  await requireAdmin();
   try {
     const validated = addImageSchema.parse(input);
 
@@ -149,6 +154,7 @@ export async function addColorImage(input: {
  * Eliminar imagen de un color
  */
 export async function deleteColorImage(imageId: string, productId: string) {
+  await requireAdmin();
   try {
     await prisma.productColorImage.delete({
       where: { id: imageId },
@@ -169,6 +175,7 @@ export async function reorderColorImages(
   productColorId: string,
   imageOrders: { id: string; order: number }[]
 ) {
+  await requireAdmin();
   try {
     await Promise.all(
       imageOrders.map((item) =>

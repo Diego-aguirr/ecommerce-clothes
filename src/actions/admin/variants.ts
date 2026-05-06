@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin/auth-utils";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -33,6 +34,7 @@ export type UpdateStockInput = z.infer<typeof updateStockSchema>;
  * Obtener todas las variantes de un producto
  */
 export async function getProductVariants(productId: string) {
+  await requireAdmin();
   try {
     const variants = await prisma.productVariant.findMany({
       where: { productId },
@@ -50,6 +52,7 @@ export async function getProductVariants(productId: string) {
  * Crear una nueva variante
  */
 export async function createVariant(input: CreateVariantInput) {
+  await requireAdmin();
   try {
     const validated = createVariantSchema.parse(input);
 
@@ -111,6 +114,7 @@ export async function createVariant(input: CreateVariantInput) {
  * Actualizar stock de una variante
  */
 export async function updateVariantStock(input: UpdateStockInput) {
+  await requireAdmin();
   try {
     const validated = updateStockSchema.parse(input);
 
@@ -156,6 +160,7 @@ export async function updateVariantStock(input: UpdateStockInput) {
  * Activar/Desactivar variante
  */
 export async function toggleVariantStatus(input: { variantId: string; isActive: boolean }) {
+  await requireAdmin();
   try {
     const validated = toggleVariantSchema.parse(input);
 
@@ -178,6 +183,7 @@ export async function toggleVariantStatus(input: { variantId: string; isActive: 
 export async function bulkUpdateStock(
   updates: { variantId: string; stock: number; note?: string }[]
 ) {
+  await requireAdmin();
   try {
     const results = await Promise.all(
       updates.map((update) => updateVariantStock(update))
