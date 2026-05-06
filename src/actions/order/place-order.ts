@@ -60,30 +60,52 @@ export const placeOrder = async (
       return { ok: false, message: "Algunos productos no fueron encontrados" };
     }
 
-    // 🔴 4. VALIDAR STOCK (SIN MODIFICAR)
-    for (const item of productsToOrder) {
-      const product = products.find((p) => p.id === item.productId)!;
+    // 🔒 4. Obtener variantes para validar stock
+    const variantIds = productsToOrder
+      .map((p) => p.variantId)
+      .filter(Boolean) as string[];
+    
+    const variants = await prisma.productVariant.findMany({
+      where: {
+        id: {
+          in: variantIds,
+        },
+      },
+    });
 
-      if (product.inStock < item.quantity) {
+    // ✅ NUEVO: Validar que todas las variantes existan
+    if (variants.length !== variantIds.length) {
+      return { ok: false, message: "Algunas variantes de producto no fueron encontradas" };
+    }
+
+    // 🔴 5. VALIDAR STOCK POR VARIANTE
+    for (const item of productsToOrder) {
+      const variant = variants.find((v) => v.id === item.variantId);
+      
+      if (!variant) {
         return {
           ok: false,
-          message: `Stock insuficiente para ${product.title}`,
+          message: `Variante no encontrada para uno de los productos`,
+        };
+      }
+
+      if (variant.stock < item.quantity) {
+        const product = products.find((p) => p.id === item.productId)!;
+        return {
+          ok: false,
+          message: `Stock insuficiente para ${product.title} - ${variant.color} - Talle ${variant.size}`,
         };
       }
     }
 
-    // 💰 5. Calcular totales
+    // 💰 6. Calcular totales
     const itemsInOrder = productsToOrder.reduce(
       (count, p) => count + p.quantity,
       0,
     );
 
-    // 💡 Precios con IVA incluido (modelo B2C Argentina)
-    // El precio del producto ya lleva el IVA adentro.
-    // El total cobrado es el precio de lista. El IVA se extrae "hacia atrás" para contabilidad.
     const totalBruto = productsToOrder.reduce((total, item) => {
       const product = products.find((p) => p.id === item.productId)!;
-      // 🛡️ Seguridad: Si el precio de BD o la cantidad en el DTO vienen corruptos, cortamos
       if (typeof product.price !== 'number' || isNaN(product.price) || isNaN(item.quantity)) {
         throw new Error('Manipulación detectada: Precio o cantidad de producto inválida');
       }
@@ -91,15 +113,14 @@ export const placeOrder = async (
     }, 0);
 
     const IVA_RATE = 0.21;
-    // Extraer IVA desde adentro: IVA = totalBruto - (totalBruto / 1.21)
     const tax = totalBruto - totalBruto / (1 + IVA_RATE);
-    const subTotal = totalBruto - tax; // Neto sin IVA (para contabilidad)
+    const subTotal = totalBruto - tax;
     const shipping = 0;
-    const total = totalBruto; // Lo que paga el cliente = precio de lista
+    const total = totalBruto;
 
-    // 🧱 6. TRANSACCIÓN
+    // 🧱 7. TRANSACCIÓN
     const result = await prisma.$transaction(async (tx) => {
-      // 🧾 6a. Crear orden
+      // 🧾 7a. Crear orden
       const newOrder = await tx.order.create({
         data: {
           userId,
@@ -115,6 +136,8 @@ export const placeOrder = async (
             createMany: {
               data: productsToOrder.map((item) => {
                 const product = products.find((p) => p.id === item.productId)!;
+                const variant = variants.find((v) => v.id === item.variantId)!;
+                
                 return {
                   productId: item.productId,
                   quantity: item.quantity,
@@ -122,6 +145,9 @@ export const placeOrder = async (
                   price: product.price,
                   productName: product.title,
                   productDescription: product.description,
+                  // ✅ NUEVO: Guardar datos de la variante
+                  variantId: item.variantId,
+                  color: item.color || variant.color,
                 };
               }),
             },
@@ -143,7 +169,7 @@ export const placeOrder = async (
         },
       });
 
-      // 🟡 6b. Crear registro de Payment (IMPORTANTE)
+      // 🟡 7b. Crear registro de Payment
       const payment = await tx.payment.create({
         data: {
           orderId: newOrder.id,
@@ -152,6 +178,29 @@ export const placeOrder = async (
           status: "CREATED",
           provider: "mercadopago",
         },
+      });
+
+      // ✅ NUEVO: 7c. Actualizar stock de variantes
+      for (const item of productsToOrder) {
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
+
+      // ✅ NUEVO: 7d. Crear movimientos de stock por variante
+      await tx.stockMovement.createMany({
+        data: productsToOrder.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          type: "sale",
+          quantity: -item.quantity,
+          note: `Venta orden #${newOrder.orderNumber}`,
+        })),
       });
 
       return { newOrder, payment };
@@ -170,7 +219,6 @@ export const placeOrder = async (
       },
     };
   } catch (error: any) {
-    // 🕵️ Registrar el error crudo sólo internamente en el backend (logs)
     console.error("Error crítico procesando la orden:", error);
 
     if (error.code === "P2002") {
@@ -180,7 +228,6 @@ export const placeOrder = async (
       };
     }
 
-    // 🛡️ Regla de Seguridad: NUNCA regresar error.message al cliente si el error viene de DB
     return {
       ok: false,
       message: "Ocurrió un inconveniente procesando los datos. Por favor, intenta nuevamente más tarde.",

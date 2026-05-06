@@ -94,7 +94,7 @@ export async function adjustStock(
   const { productId: validId, adjustment: validAdj, type: validType, note: validNote } = parsed.data;
 
   try {
-    const { updatedProduct, movement, previousStock } = await adjustProductStockService(
+    const { updatedVariant, movement, previousStock } = await adjustProductStockService(
       validId,
       validAdj,
       validType,
@@ -105,11 +105,11 @@ export async function adjustStock(
       adminId: admin.id,
       action: "ADJUST_STOCK",
       targetId: validId,
-      metadata: { previousStock, newStock: updatedProduct.inStock, type: validType, note: validNote },
+      metadata: { previousStock, variantSku: updatedVariant.sku, type: validType, note: validNote },
     });
 
     revalidatePath("/admin/products");
-    return { ok: true, product: updatedProduct, movement };
+    return { ok: true, movement };
   } catch (error: any) {
     return { ok: false, error: error.message };
   }
@@ -123,23 +123,42 @@ export async function createProduct(payload: unknown): Promise<ProductActionResp
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
   try {
-    const product = await createProductService(parsed.data);
+    const { colors, variants, ...productData } = parsed.data as any;
+    
+    // Validar server-side (el schema ya no exige .min(1))
+    if (!colors || colors.length === 0) return { ok: false, error: "Debes agregar al menos un color" };
+    if (!variants || variants.length === 0) return { ok: false, error: "Debes agregar al menos una variante (selecciona tallas)" };
+    
+    console.log("Creating product with data:", { 
+      productData: { title: productData.title, price: productData.price },
+      imagesCount: productData.images?.length,
+      colorsCount: colors?.length,
+      variantsCount: variants?.length
+    });
+    
+    const product = await createProductService({ ...productData, colors, variants });
 
     await logAdminAction({
       adminId: admin.id,
       action: "CREATE_PRODUCT",
       targetId: product.id,
-      metadata: { title: product.title, price: product.price, inStock: product.inStock },
+      metadata: { title: product.title, price: product.price },
     });
 
     revalidatePath("/admin/products");
     return { ok: true, product };
   } catch (error: any) {
     console.error("Error creating product:", error);
+    console.error("Error details:", {
+      message: error.message,
+      code: error.code,
+      meta: error.meta,
+      stack: error.stack?.split('\n').slice(0, 5)
+    });
     if (error.code === "P2002") {
       return { ok: false, error: "Ya existe un producto con el mismo título/slug." };
     }
-    return { ok: false, error: "Error al crear el producto en la base de datos." };
+    return { ok: false, error: `Error al crear el producto: ${error.message || 'Error desconocido'}` };
   }
 }
 
@@ -156,15 +175,15 @@ export async function updateProduct(productId: string, payload: unknown): Promis
   if (!parsed.success)
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
-  const { imagesToDelete, ...productData } = parsed.data;
+  const { imagesToDelete, colors, variants, ...productData } = parsed.data as any;
 
   try {
     // Primero eliminar de Cloudinary las imágenes que el admin quitó
     if (imagesToDelete.length > 0) {
-      await Promise.all(imagesToDelete.map((publicId) => deleteImageService(publicId)));
+      await Promise.all(imagesToDelete.map((publicId: string) => deleteImageService(publicId)));
     }
 
-    const product = await updateProductService(productId, { ...productData, imagesToDelete });
+    const product = await updateProductService(productId, productData);
 
     await logAdminAction({
       adminId: admin.id,
