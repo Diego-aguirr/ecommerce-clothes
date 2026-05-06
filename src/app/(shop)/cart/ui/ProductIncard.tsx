@@ -33,7 +33,7 @@ export const ProductIncard = () => {
             <div className="shrink-0">
               <div className="relative w-20 h-24 sm:w-24 sm:h-32 bg-gray-100 rounded-lg overflow-hidden">
                 <Image
-                  src={`/products/${product.image}`}
+                  src={product.image?.startsWith('http') ? product.image : `/products/${product.image}`}
                   alt={product.title}
                   fill
                   className="object-cover"
