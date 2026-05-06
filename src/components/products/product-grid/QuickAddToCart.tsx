@@ -145,11 +145,18 @@ export const QuickAddToCart = ({ product }: Props) => {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                    Elegí tu talle
+                    {selectedVariant 
+                      ? `Agregar ${selectedVariant.color.replace(/_/g, " ")}` 
+                      : "Elegí tu talle"}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1 line-clamp-1">
                     {product.title}
                   </p>
+                  {selectedVariant && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      Talle: {selectedSize}
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={handleClose}
@@ -169,6 +176,19 @@ export const QuickAddToCart = ({ product }: Props) => {
               ) : (
                 <>
                   <div className="py-2">
+                    {/* ✅ NUEVO: Mostrar color seleccionado */}
+                    {selectedVariant && (
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <span className="font-semibold">Color seleccionado:</span>{" "}
+                          <span className="capitalize">{selectedVariant.color.replace(/_/g, " ")}</span>
+                        </p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          SKU: {selectedVariant.sku}
+                        </p>
+                      </div>
+                    )}
+
                     <SizeSelector
                       selectedSize={selectedSize}
                       availableSizes={product.sizes}
@@ -217,6 +237,8 @@ export const QuickAddToCart = ({ product }: Props) => {
                         ? 'Verificando...' 
                         : selectedVariant && selectedVariant.stock <= 0
                         ? 'Sin stock'
+                        : selectedVariant
+                        ? `Agregar ${selectedVariant.color.replace(/_/g, " ")} - ${selectedSize}`
                         : 'Confirmar talle'
                       }
                     </button>
