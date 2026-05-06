@@ -85,7 +85,9 @@ export default async function OrderPage({ params }: Props) {
                   className="flex items-center gap-5 p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow"
                 >
                   <Image
-                    src={`/products/${item.product.ProductImage[0].url}`}
+                    src={item.product.ProductImage[0].url.startsWith('http') 
+                      ? item.product.ProductImage[0].url 
+                      : `/products/${item.product.ProductImage[0].url}`}
                     width={90}
                     height={90}
                     alt={item.product.title}

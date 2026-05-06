@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import type { Size } from "@/interfaces";
 import { auth } from "../../../auth";
 import { orderSchema } from "@/lib/schemas/order.schema";
+import { provinces } from "@/seed/seed-province";
 
 import { z } from "zod";
 
@@ -42,6 +43,29 @@ export const placeOrder = async (
     }
 
     const { productsToOrder, address, shippingMethod, idempotencyToken } = parsed.data;
+
+    // 🗺️ 3.5 Asegurar provincias y validar provinceId
+    if (shippingMethod === "delivery" && address.provinceId) {
+      let provinceCount = await prisma.province.count();
+      
+      // Seedear si la tabla está vacía
+      if (provinceCount === 0) {
+        await prisma.province.createMany({ data: provinces, skipDuplicates: true });
+        provinceCount = await prisma.province.count();
+      }
+      
+      // Validar que la provincia exista
+      const provinceExists = await prisma.province.findUnique({
+        where: { id: address.provinceId },
+      });
+      
+      if (!provinceExists) {
+        return {
+          ok: false,
+          message: "La provincia seleccionada no es válida. Por favor, actualizá tu dirección de envío.",
+        };
+      }
+    }
 
     // 🔒 3. Obtener productos reales
     const products = await prisma.product.findMany({

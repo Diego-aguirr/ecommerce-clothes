@@ -26,9 +26,9 @@ export async function generateMetadata(
       title: product?.title ?? "Producto no encontrado",
       description: product?.description ?? "",
       images: product?.images && product.images.length > 1 
-        ? [`/products/${product.images[1]}`]
+        ? [product.images[1].startsWith('http') ? product.images[1] : `/products/${product.images[1]}`]
         : product?.images && product.images.length > 0
-        ? [`/products/${product.images[0]}`]
+        ? [product.images[0].startsWith('http') ? product.images[0] : `/products/${product.images[0]}`]
         : [],
     },
   };
