@@ -5,12 +5,15 @@ import { IoAddOutline, IoRemoveOutline } from "react-icons/io5";
 interface Props {
   quantity: number;
   onQuantityChanged: (quantity: number) => void;
+  max?: number;
 }
 
-export const QuantitySelector = ({ quantity, onQuantityChanged }: Props) => {
+export const QuantitySelector = ({ quantity, onQuantityChanged, max }: Props) => {
   const change = (delta: number) => {
-    if (quantity + delta < 1) return;
-    onQuantityChanged(quantity + delta);
+    const newQuantity = quantity + delta;
+    if (newQuantity < 1) return;
+    if (max !== undefined && newQuantity > max) return;
+    onQuantityChanged(newQuantity);
   };
 
   return (
