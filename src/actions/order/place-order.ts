@@ -204,29 +204,6 @@ export const placeOrder = async (
         },
       });
 
-      // ✅ NUEVO: 7c. Actualizar stock de variantes
-      for (const item of productsToOrder) {
-        await tx.productVariant.update({
-          where: { id: item.variantId },
-          data: {
-            stock: {
-              decrement: item.quantity,
-            },
-          },
-        });
-      }
-
-      // ✅ NUEVO: 7d. Crear movimientos de stock por variante
-      await tx.stockMovement.createMany({
-        data: productsToOrder.map((item) => ({
-          productId: item.productId,
-          variantId: item.variantId,
-          type: "sale",
-          quantity: -item.quantity,
-          note: `Venta orden #${newOrder.orderNumber}`,
-        })),
-      });
-
       return { newOrder, payment };
     });
 
