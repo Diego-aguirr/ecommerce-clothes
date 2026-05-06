@@ -146,7 +146,7 @@ export const QuickAddToCart = ({ product }: Props) => {
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg leading-tight">
                     {selectedVariant 
-                      ? `Agregar ${selectedVariant.color.replace(/_/g, " ")}` 
+                      ? `Agregar - ${selectedVariant.colorLabel}` 
                       : "Elegí tu talle"}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1 line-clamp-1">
@@ -176,16 +176,16 @@ export const QuickAddToCart = ({ product }: Props) => {
               ) : (
                 <>
                   <div className="py-2">
-                    {/* ✅ NUEVO: Mostrar color seleccionado */}
+                    {/* Color seleccionado */}
                     {selectedVariant && (
-                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                          <span className="font-semibold">Color seleccionado:</span>{" "}
-                          <span className="capitalize">{selectedVariant.color.replace(/_/g, " ")}</span>
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1">
-                          SKU: {selectedVariant.sku}
-                        </p>
+                      <div className="mb-4 flex items-center gap-2">
+                        <div
+                          className="w-5 h-5 rounded-full border border-gray-200 shrink-0"
+                          style={{ backgroundColor: selectedVariant.colorHex ?? "#808080" }}
+                        />
+                        <span className="text-sm text-gray-700">
+                          Color: {selectedVariant.colorLabel}
+                        </span>
                       </div>
                     )}
 
@@ -238,7 +238,7 @@ export const QuickAddToCart = ({ product }: Props) => {
                         : selectedVariant && selectedVariant.stock <= 0
                         ? 'Sin stock'
                         : selectedVariant
-                        ? `Agregar ${selectedVariant.color.replace(/_/g, " ")} - ${selectedSize}`
+                        ? `Agregar ${selectedVariant.colorLabel} - ${selectedSize}`
                         : 'Confirmar talle'
                       }
                     </button>

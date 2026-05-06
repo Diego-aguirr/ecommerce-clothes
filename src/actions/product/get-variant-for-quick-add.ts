@@ -9,6 +9,8 @@ export interface QuickVariantInfo {
   size: Size;
   stock: number;
   color: string;
+  colorLabel: string;
+  colorHex?: string;
 }
 
 /**
@@ -45,6 +47,8 @@ export async function getVariantForQuickAdd(
       });
       
       if (!anyVariant) return null;
+
+      const colorInfo = await resolveColorInfo(productId, anyVariant.color);
       
       return {
         id: anyVariant.id,
@@ -52,8 +56,11 @@ export async function getVariantForQuickAdd(
         size: anyVariant.size as Size,
         stock: anyVariant.stock,
         color: anyVariant.color,
+        ...colorInfo,
       };
     }
+
+    const colorInfo = await resolveColorInfo(productId, variant.color);
 
     return {
       id: variant.id,
@@ -61,9 +68,38 @@ export async function getVariantForQuickAdd(
       size: variant.size as Size,
       stock: variant.stock,
       color: variant.color,
+      ...colorInfo,
     };
   } catch (error) {
     console.error("Error fetching variant for quick add:", error);
     return null;
   }
+}
+
+/**
+ * Resuelve colorLabel y colorHex desde la tabla ProductColor.
+ * Fallback: usa color.replace(/_/g, " ") como label y "#808080" como hex.
+ */
+async function resolveColorInfo(
+  productId: string,
+  color: string
+): Promise<{ colorLabel: string; colorHex: string }> {
+  const productColor = await prisma.productColor.findUnique({
+    where: {
+      productId_color: { productId, color },
+    },
+  });
+
+  if (productColor) {
+    return {
+      colorLabel: productColor.label,
+      colorHex: productColor.hexCode ?? "#808080",
+    };
+  }
+
+  // Fallback si no existe fila en ProductColor
+  return {
+    colorLabel: color.replace(/_/g, " "),
+    colorHex: "#808080",
+  };
 }
