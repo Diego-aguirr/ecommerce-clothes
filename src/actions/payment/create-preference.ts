@@ -73,7 +73,9 @@ export async function createPreference(orderId: string) {
     }
 
     // URL dinámica (ngrok o localhost según .env)
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+    console.log("🔗 Creando preferencia MP con baseUrl:", baseUrl, "orderId:", orderId);
 
     if (!baseUrl) {
       throw new Error("BASE URL not defined");
