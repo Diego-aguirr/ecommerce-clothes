@@ -41,7 +41,7 @@ export const OrderItems = () => {
           >
             <div className="w-16 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
               <Image
-                src={`/products/${item.image}`}
+                src={item.image?.startsWith('http') ? item.image : `/products/${item.image}`}
                 alt={item.title}
                 fill
                 className="object-cover"
