@@ -56,10 +56,15 @@ export const ProductIncard = () => {
                   </Link>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                      Talla: {product.size}
+                      Talle: {product.size}
                     </span>
+                    {product.color && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        {product.color.replace(/_/g, " ")}
+                      </span>
+                    )}
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                      price: {product.price}
+                      ${product.price}
                     </span>
                   </div>
                 </div>

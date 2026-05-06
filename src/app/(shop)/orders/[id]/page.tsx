@@ -98,6 +98,16 @@ export default async function OrderPage({ params }: Props) {
                     <p className="font-semibold text-gray-900 leading-tight">
                       {item.product.title}
                     </p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        Talle: {item.size}
+                      </span>
+                      {item.color && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 capitalize">
+                          {item.color.replace(/_/g, " ")}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500 mt-1">
                       {currencyFormat(item.price)}{" "}
                       <span className="mx-1">×</span> {item.quantity} un.
