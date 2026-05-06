@@ -54,8 +54,16 @@ export const OrderItems = () => {
               </h3>
               <div className="flex flex-wrap gap-1 mt-1">
                 <span className="text-xs text-gray-500">
-                  Talla: {item.size}
+                  Talle: {item.size}
                 </span>
+                {item.color && (
+                  <>
+                    <span className="text-xs text-gray-500">•</span>
+                    <span className="text-xs text-gray-500 capitalize">
+                      {item.color.replace(/_/g, " ")}
+                    </span>
+                  </>
+                )}
                 <span className="text-xs text-gray-500">•</span>
                 <span className="text-xs text-gray-500">
                   Cant: {item.quantity}
