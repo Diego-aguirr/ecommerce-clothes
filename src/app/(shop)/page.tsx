@@ -2,7 +2,6 @@ export const revalidate = 60;
 import { getPaginatedProductsWithImages } from "@/actions";
 import { Pagination, Title } from "@/components";
 import { ProductGrid } from "@/components/products/product-grid/ProductGrid";
-import { redirect } from "next/navigation";
 
 interface Props {
   searchParams: Promise<{
@@ -16,10 +15,6 @@ export default async function HomePage({ searchParams }: Props) {
   const { products, currentPage, totalPages } =
     await getPaginatedProductsWithImages({ page });
 
-  if (products.length === 0) {
-    redirect("/");
-  }
-
   return (
     <>
       <Title 
@@ -28,7 +23,13 @@ export default async function HomePage({ searchParams }: Props) {
         className="mb-8" 
       />
 
-      <ProductGrid products={products} />
+      {products.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-gray-500 text-lg">No se encontraron productos.</p>
+        </div>
+      ) : (
+        <ProductGrid products={products} />
+      )}
 
       <Pagination totalPages={totalPages} />
     </>

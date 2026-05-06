@@ -16,21 +16,30 @@ export const getPaginatedProductsWithImages = async ({
 }: PaginationOptions) => {
   if (isNaN(Number(page))) page = 1;
   if (page < 1) page = 1;
+  if (page > 1000) page = 1; // Cap razonable, evitar offsets gigantes
 
   if (isNaN(Number(take))) take = 12;
   if (take < 1) take = 1;
-  if (take > 100) take = 100; // Prevenir consultas muy grandes
+  if (take > 100) take = 100;
 
   try {
-    //Obtenemos datos de productos con paginación e imágenes
-
-    // isActive: true → solo mostramos productos activos en la tienda pública
     const whereCondition = gender
       ? { gender, isActive: true }
       : { isActive: true };
 
-    const [products, totalProducts] = await Promise.all([
-      prisma.product.findMany({
+    // Contar total primero para capar page correctamente
+    const totalProducts = await prisma.product.count({
+      where: whereCondition,
+    });
+
+    const totalPages = Math.ceil(totalProducts / take);
+    
+    // Si la página excede el total, ir a la última disponible
+    if (totalPages > 0 && page > totalPages) {
+      page = totalPages;
+    }
+
+    const products = await prisma.product.findMany({
         where: whereCondition,
         take: take,
         skip: (page - 1) * take,
@@ -40,16 +49,8 @@ export const getPaginatedProductsWithImages = async ({
             select: { url: true },
           },
         },
-      }),
-      // Total de productos activos (para calcular páginas correctamente)
-      prisma.product.count({
-        where: whereCondition,
-      }),
-    ]);
+      });
 
-    // Obetenemos el total de paginas
-    //todo:
-    const totalPages = Math.ceil(totalProducts / take);
     return {
       currentPage: page,
       totalPages: totalPages,

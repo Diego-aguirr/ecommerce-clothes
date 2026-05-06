@@ -32,7 +32,7 @@ export default async function Page({ params, searchParams }: Props) {
       gender: gender as Gender,
     });
 
-  if (products.length === 0) {
+  if (!products || products.length === 0) {
     redirect(`/gender/${gender}`);
   }
 
