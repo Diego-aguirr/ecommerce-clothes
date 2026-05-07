@@ -3,7 +3,7 @@ export const revalidate = 60;
 import { getPaginatedProductsWithImages } from "@/actions";
 import { Pagination, ProductGrid, Title } from "@/components";
 import { Gender } from "@/generated/prisma/enums";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 interface Props {
   params: Promise<{
@@ -21,6 +21,12 @@ export default async function Page({ params, searchParams }: Props) {
   ]);
   const { gender } = resolvedParams;
 
+  // Validación estricta: Si escriben "fruta", mandarlos a 404 para evitar que Prisma crashee
+  const validGenders = ['men', 'women', 'kid', 'unisex'];
+  if (!validGenders.includes(gender)) {
+    notFound();
+  }
+
   const page = resolvedSearchParams.page
     ? parseInt(resolvedSearchParams.page)
     : 1;
@@ -28,12 +34,14 @@ export default async function Page({ params, searchParams }: Props) {
   const { products, currentPage, totalPages } =
     await getPaginatedProductsWithImages({
       page,
-
       gender: gender as Gender,
     });
 
-  if (!products || products.length === 0) {
+  // Si no hay productos (ej. página 100 vacía o categoría vacía), redirigir al home en lugar de a sí mismo (evita loop infinito)
+  if (products.length === 0 && page > 1) {
     redirect(`/gender/${gender}`);
+  } else if (products.length === 0) {
+    redirect(`/`);
   }
 
   const labels: Record<string, string> = {
