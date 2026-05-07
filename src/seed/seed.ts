@@ -1,10 +1,18 @@
 import { Gender, Role, Size, UserStatus } from "@/generated/prisma/client";
 import bcryptjs from "bcryptjs";
 
+// ✅ NUEVO: Interfaz para colores de producto
+interface SeedProductColor {
+  color: string;
+  label: string;
+  hexCode?: string;
+  images?: string[]; // Si no se especifica, usa las imágenes principales
+}
+
+// ✅ ACTUALIZADO: Producto con soporte para colores
 interface SeedProduct {
   description: string;
   images: string[];
-  inStock: number;
   price: number;
   sizes: Size[];
   slug: string;
@@ -12,6 +20,7 @@ interface SeedProduct {
   title: string;
   type: string;
   gender: Gender;
+  colors?: SeedProductColor[];
 }
 
 interface SeedUser {
@@ -81,7 +90,6 @@ export const initialData: SeedData = {
     {
       description: "Women's Chill Half Zip Cropped Hoodie premium fleece.",
       images: ["mujer.avif", "mujer2.jpg"],
-      inStock: 10,
       price: 130,
       sizes: [Size.XS, Size.S, Size.M, Size.XXL],
       slug: "women_chill_half_zip_cropped_hoodie",
@@ -89,12 +97,15 @@ export const initialData: SeedData = {
       tags: ["hoodie"],
       title: "Women's Chill Half Zip Cropped Hoodie",
       gender: Gender.women,
+      colors: [
+        { color: "negro", label: "Negro", hexCode: "#000000" },
+        { color: "gris", label: "Gris", hexCode: "#808080" },
+      ],
     },
 
     {
       description: "Kids Cybertruck Long Sleeve Tee.",
       images: ["niños.avif", "niños1.avif"],
-      inStock: 10,
       price: 30,
       sizes: [Size.XS, Size.S, Size.M],
       slug: "kids_cybertruck_long_sleeve_te",
@@ -107,7 +118,6 @@ export const initialData: SeedData = {
     {
       description: "Classic silk tie for formal occasions.",
       images: ["remeras.avif", "remeras1.avif"],
-      inStock: 28,
       price: 45,
       sizes: [Size.XS, Size.S, Size.M, Size.XXL],
       slug: "silk_tie",
@@ -115,12 +125,16 @@ export const initialData: SeedData = {
       tags: ["tie", "silk"],
       title: "Classic Silk Tie",
       gender: Gender.men,
+      colors: [
+        { color: "azul_marino", label: "Azul Marino", hexCode: "#000080" },
+        { color: "negro", label: "Negro", hexCode: "#000000" },
+        { color: "rojo", label: "Rojo", hexCode: "#FF0000" },
+      ],
     },
 
     {
       description: "Anteojos de sol premium con protección UV 400.",
       images: ["anteojos.avif", "anteojos1.jpg"],
-      inStock: 15,
       price: 120,
       sizes: [Size.UNICO],
       slug: "anteojos_sol_premium",
@@ -128,6 +142,10 @@ export const initialData: SeedData = {
       tags: ["anteojos", "sol", "uv"],
       title: "Anteojos de Sol Premium",
       gender: Gender.unisex,
+      colors: [
+        { color: "negro", label: "Negro Brillante", hexCode: "#000000" },
+        { color: "marron", label: "Carey", hexCode: "#8B4513" },
+      ],
     },
   ],
 };

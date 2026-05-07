@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 
 interface state {
   cart: CartProduct[];
+  version: number; // ✅ NUEVO: Para migración de carritos viejos
 
   addProductToCart: (product: CartProduct) => void;
 
@@ -20,27 +21,32 @@ interface state {
   clearCart: () => void;
 }
 
+// ✅ NUEVO: Versión actual del schema del carrito
+const CART_VERSION = 2;
+
 export const useCartStore = create<state>()(
   persist(
     (set, get) => ({
       cart: [],
+      version: CART_VERSION,
 
-      //method
-
+      // ✅ ACTUALIZADO: Usa variantId como clave única
       addProductToCart: (product: CartProduct) => {
         const { cart } = get();
-        //1. Check if product already exists in cart
-        const productIncart = cart.some(
-          (item) => item.id === product.id && item.size === product.size
+        
+        // Check if product variant already exists in cart (by variantId)
+        const productInCart = cart.some(
+          (item) => item.variantId === product.variantId
         );
-        if (!productIncart) {
+        
+        if (!productInCart) {
           set({ cart: [...cart, product] });
           return;
         }
-        //2. I know the product exists in different sizes; I need to increase quantity.
-
+        
+        // Product variant exists, increase quantity
         const updatedCartProducts = cart.map((item) => {
-          if (item.id === product.id && item.size === product.size) {
+          if (item.variantId === product.variantId) {
             return { ...item, quantity: item.quantity + product.quantity };
           }
           return item;
@@ -49,10 +55,11 @@ export const useCartStore = create<state>()(
         set({ cart: updatedCartProducts });
       },
 
+      // ✅ ACTUALIZADO: Usa variantId
       updateProductQuantity: (product: CartProduct, quantity: number) => {
         const { cart } = get();
         const updatedCart = cart.map((item) => {
-          if (item.id === product.id && item.size === product.size) {
+          if (item.variantId === product.variantId) {
             return { ...item, quantity };
           }
           return item;
@@ -60,10 +67,11 @@ export const useCartStore = create<state>()(
         set({ cart: updatedCart });
       },
 
+      // ✅ ACTUALIZADO: Usa variantId
       removeProduct: (product: CartProduct) => {
         const { cart } = get();
         const updatedCart = cart.filter(
-          (item) => item.id !== product.id || item.size !== product.size
+          (item) => item.variantId !== product.variantId
         );
         set({ cart: updatedCart });
       },
@@ -96,6 +104,17 @@ export const useCartStore = create<state>()(
       },
     }),
 
-    { name: "cart-storage" }
+    { 
+      name: "cart-storage",
+      // ✅ NUEVO: Migración de versiones
+      onRehydrateStorage: () => (state) => {
+        if (state && state.version !== CART_VERSION) {
+          // Versión antigua detectada, limpiar carrito
+          console.log("🛒 Versión antigua del carrito detectada, limpiando...");
+          state.cart = [];
+          state.version = CART_VERSION;
+        }
+      }
+    }
   )
 );

@@ -11,6 +11,7 @@ export * from './order/get-orders-by-user';
 export * from './order/get-paginated-orders';
 export * from './product/get-product-by-slug';
 export * from './product/get-stock-by-slug';
+export * from './product/get-variant-for-quick-add';
 export * from './product/product-pagination';
 export * from './provincies/get-provincies';
 export * from './payment/create-preference';

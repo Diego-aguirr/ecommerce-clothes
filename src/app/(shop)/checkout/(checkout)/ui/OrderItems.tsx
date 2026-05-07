@@ -41,7 +41,7 @@ export const OrderItems = () => {
           >
             <div className="w-16 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
               <Image
-                src={`/products/${item.image}`}
+                src={item.image?.startsWith('http') ? item.image : `/products/${item.image}`}
                 alt={item.title}
                 fill
                 className="object-cover"
@@ -54,8 +54,16 @@ export const OrderItems = () => {
               </h3>
               <div className="flex flex-wrap gap-1 mt-1">
                 <span className="text-xs text-gray-500">
-                  Talla: {item.size}
+                  Talle: {item.size}
                 </span>
+                {item.color && (
+                  <>
+                    <span className="text-xs text-gray-500">•</span>
+                    <span className="text-xs text-gray-500 capitalize">
+                      {item.color.replace(/_/g, " ")}
+                    </span>
+                  </>
+                )}
                 <span className="text-xs text-gray-500">•</span>
                 <span className="text-xs text-gray-500">
                   Cant: {item.quantity}

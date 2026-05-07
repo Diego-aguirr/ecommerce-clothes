@@ -45,6 +45,13 @@ export const PlaceOrder = () => {
       return;
     }
 
+    // ✅ NUEVO: Validar que todos los productos tengan variantId
+    const productsWithoutVariant = productsInCart.filter((p) => !p.variantId);
+    if (productsWithoutVariant.length > 0) {
+      setErrorMessage("Algunos productos en el carrito están desactualizados. Por favor, elimínalos y agrégalos nuevamente.");
+      return;
+    }
+
     if (!address.fullname || !address.phone) {
       setErrorMessage("La dirección de entrega está incompleta");
       return;
@@ -53,11 +60,13 @@ export const PlaceOrder = () => {
     setIsPlacingOrder(true);
     setErrorMessage("");
 
-    // Solo enviamos IDs, cantidades y tallas (nunca precios)
+    // Solo enviamos IDs, cantidades, tallas, variantes y colores (nunca precios)
     const productsToOrder = productsInCart.map((p) => ({
       productId: p.id,
+      variantId: p.variantId!, // ✅ Ya validamos que existe arriba
       quantity: p.quantity,
       size: p.size,
+      color: p.color || "default",
     }));
 
     try {

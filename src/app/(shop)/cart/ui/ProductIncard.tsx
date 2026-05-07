@@ -33,7 +33,7 @@ export const ProductIncard = () => {
             <div className="shrink-0">
               <div className="relative w-20 h-24 sm:w-24 sm:h-32 bg-gray-100 rounded-lg overflow-hidden">
                 <Image
-                  src={`/products/${product.image}`}
+                  src={product.image?.startsWith('http') ? product.image : `/products/${product.image}`}
                   alt={product.title}
                   fill
                   className="object-cover"
@@ -56,10 +56,15 @@ export const ProductIncard = () => {
                   </Link>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                      Talla: {product.size}
+                      Talle: {product.size}
                     </span>
+                    {product.color && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        {product.color.replace(/_/g, " ")}
+                      </span>
+                    )}
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                      price: {product.price}
+                      ${product.price}
                     </span>
                   </div>
                 </div>

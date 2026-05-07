@@ -13,6 +13,7 @@ export async function seed() {
   console.log("🌱 Seeding...");
 
   // 🧹 ORDEN CORRECTO (muy importante)
+  // Primero los que tienen foreign keys a otros
   await prisma.paymentLog.deleteMany();
   await prisma.payment.deleteMany();
 
@@ -20,7 +21,11 @@ export async function seed() {
   await prisma.orderAddress.deleteMany();
   await prisma.order.deleteMany();
 
+  // ✅ NUEVO: Limpiar modelos de variantes ANTES de productos
   await prisma.stockMovement.deleteMany();
+  await prisma.productColorImage.deleteMany();
+  await prisma.productVariant.deleteMany();
+  await prisma.productColor.deleteMany();
 
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
@@ -54,9 +59,9 @@ export async function seed() {
     {} as Record<string, string>,
   );
 
-  // 🛍️ Productos
+  // 🛍️ Productos + Colores + Variantes
   for (const product of products) {
-    const { type, images, sizes, ...rest } = product;
+    const { type, images, sizes, colors, ...rest } = product;
 
     const dbProduct = await prisma.product.create({
       data: {
@@ -66,6 +71,59 @@ export async function seed() {
       },
     });
 
+    // ✅ NUEVO: Crear colores del producto
+    const productColors = colors && colors.length > 0
+      ? colors
+      : [{ color: "default", label: "Único", hexCode: "#808080" }];
+
+    const createdColors = [];
+    for (const colorData of productColors) {
+      const colorImages = colorData.images || images; // Usa imágenes del color o las principales
+      
+      const dbColor = await prisma.productColor.create({
+        data: {
+          productId: dbProduct.id,
+          color: colorData.color,
+          label: colorData.label,
+          hexCode: colorData.hexCode,
+        },
+      });
+
+      // ✅ NUEVO: Crear imágenes para este color
+      await prisma.productColorImage.createMany({
+        data: colorImages.map((url, index) => ({
+          url,
+          productColorId: dbColor.id,
+          order: index,
+        })),
+      });
+
+      createdColors.push(dbColor);
+    }
+
+    // Crear variantes para cada combinación color + talla
+    const sizesArray = sizes.length > 0 ? sizes : ["UNICO"];
+    const DEFAULT_STOCK = 10; // Stock por defecto para seed
+    
+    for (const color of createdColors) {
+      for (const size of sizesArray) {
+        const colorSuffix = color.color === "default" ? "DEF" : color.color.toUpperCase();
+        const sku = `${rest.slug.toUpperCase().replace(/-/g, "_")}-${colorSuffix}-${size}`;
+
+        await prisma.productVariant.create({
+          data: {
+            productId: dbProduct.id,
+            sku,
+            size: size as any,
+            color: color.color,
+            stock: DEFAULT_STOCK,
+            isActive: true,
+          },
+        });
+      }
+    }
+
+    // Crear ProductImage tradicional (backward compatibility)
     await prisma.productImage.createMany({
       data: images.map((url) => ({
         url,
@@ -74,7 +132,16 @@ export async function seed() {
     });
   }
 
-  console.log("✅ Productos creados");
+  // ✅ Contar todo lo creado
+  const variantCount = await prisma.productVariant.count();
+  const colorCount = await prisma.productColor.count();
+  const colorImageCount = await prisma.productColorImage.count();
+  
+  console.log("✅ Productos y variantes creadas:");
+  console.log(`   - Productos: ${products.length}`);
+  console.log(`   - Colores: ${colorCount}`);
+  console.log(`   - Variantes: ${variantCount}`);
+  console.log(`   - Imágenes de colores: ${colorImageCount}`);
 
   // ─────────────────────────────────────────────
   // 🧾 ORDENES + PAGOS + STOCK (TEST REAL)
@@ -87,6 +154,17 @@ export async function seed() {
     const user = usersDB[0];
     const product1 = productsDB[0];
     const product2 = productsDB[1];
+
+    // ✅ NUEVO: Obtener variantes de los productos
+    const variants1 = await prisma.productVariant.findMany({
+      where: { productId: product1.id },
+    });
+    const variants2 = await prisma.productVariant.findMany({
+      where: { productId: product2.id },
+    });
+
+    const variant1 = variants1[0];
+    const variant2 = variants2[0];
 
     const subTotal = product1.price * 1 + product2.price * 2;
     const tax = subTotal * 0.21;
@@ -114,16 +192,22 @@ export async function seed() {
               productName: product1.title,
               productDescription: product1.description,
               quantity: 1,
-              size: product1.sizes[0] ?? "M",
+              size: variant1?.size ?? product1.sizes[0] ?? "M",
               price: product1.price,
+              // ✅ NUEVO: Datos de variante
+              variantId: variant1?.id,
+              color: variant1?.color ?? "default",
             },
             {
               productId: product2.id,
               productName: product2.title,
               productDescription: product2.description,
               quantity: 2,
-              size: product2.sizes[0] ?? "L",
+              size: variant2?.size ?? product2.sizes[0] ?? "L",
               price: product2.price,
+              // ✅ NUEVO: Datos de variante
+              variantId: variant2?.id,
+              color: variant2?.color ?? "default",
             },
           ],
         },
@@ -153,15 +237,18 @@ export async function seed() {
     });
 
     // 📦 Simular movimiento de stock (IMPORTANTE)
+    // ✅ NUEVO: Incluir variantId en los movimientos
     await prisma.stockMovement.createMany({
       data: [
         {
           productId: product1.id,
+          variantId: variant1?.id, // ✅ NUEVO
           type: "sale",
           quantity: -1,
         },
         {
           productId: product2.id,
+          variantId: variant2?.id, // ✅ NUEVO
           type: "sale",
           quantity: -2,
         },

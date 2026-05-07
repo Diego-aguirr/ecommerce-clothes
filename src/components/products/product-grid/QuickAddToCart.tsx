@@ -6,6 +6,7 @@ import { Product, CartProduct, Size } from "@/interfaces";
 import { useCartStore } from "@/store/cart/cart-store";
 import { SizeSelector } from "@/components/product/size-selector/SizeSelector";
 import { IoCheckmarkCircleOutline, IoCartOutline } from "react-icons/io5";
+import { getVariantForQuickAdd, QuickVariantInfo } from "@/actions/product/get-variant-for-quick-add";
 
 interface Props {
   product: Product;
@@ -16,8 +17,10 @@ export const QuickAddToCart = ({ product }: Props) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState<Size | undefined>();
+  const [selectedVariant, setSelectedVariant] = useState<QuickVariantInfo | null>(null);
   const [hasAdded, setHasAdded] = useState(false);
   const [errorPrompt, setErrorPrompt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Funciones strictas para control de propagación debido a que
   // el contenedor padre es usualmente un <Link> a la PDP.
@@ -33,6 +36,7 @@ export const QuickAddToCart = ({ product }: Props) => {
     setIsOpen(false);
     setErrorPrompt(false);
     setSelectedSize(undefined);
+    setSelectedVariant(null);
   };
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -40,11 +44,39 @@ export const QuickAddToCart = ({ product }: Props) => {
     e.stopPropagation();
   };
 
+  // Cuando el usuario selecciona talla, buscamos la variante
+  const handleSizeChange = async (size: Size | undefined) => {
+    setSelectedSize(size);
+    setSelectedVariant(null);
+    
+    if (errorPrompt) setErrorPrompt(false);
+    
+    if (size) {
+      setIsLoading(true);
+      try {
+        const variant = await getVariantForQuickAdd(product.id, size);
+        if (variant) {
+          setSelectedVariant(variant);
+        }
+      } catch (error) {
+        console.error("Error fetching variant:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!selectedSize) {
+    if (!selectedSize || !selectedVariant) {
+      setErrorPrompt(true);
+      return;
+    }
+
+    // Si no hay stock, mostrar error
+    if (selectedVariant.stock <= 0) {
       setErrorPrompt(true);
       return;
     }
@@ -57,6 +89,10 @@ export const QuickAddToCart = ({ product }: Props) => {
       quantity: 1,
       size: selectedSize,
       image: product.images[0],
+      // ✅ AHORA SÍ: Datos de variante necesarios para el carrito
+      variantId: selectedVariant.id,
+      color: selectedVariant.color,
+      sku: selectedVariant.sku,
     };
 
     addProductToCart(cartProduct);
@@ -66,6 +102,8 @@ export const QuickAddToCart = ({ product }: Props) => {
     setTimeout(() => {
       setHasAdded(false);
       setIsOpen(false);
+      setSelectedSize(undefined);
+      setSelectedVariant(null);
     }, 2500);
   };
 
@@ -107,11 +145,18 @@ export const QuickAddToCart = ({ product }: Props) => {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                    Elegí tu talle
+                    {selectedVariant 
+                      ? `Agregar - ${selectedVariant.colorLabel}` 
+                      : "Elegí tu talle"}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1 line-clamp-1">
                     {product.title}
                   </p>
+                  {selectedVariant && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      Talle: {selectedSize}
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={handleClose}
@@ -131,17 +176,49 @@ export const QuickAddToCart = ({ product }: Props) => {
               ) : (
                 <>
                   <div className="py-2">
+                    {/* Color seleccionado */}
+                    {selectedVariant && (
+                      <div className="mb-4 flex items-center gap-2">
+                        <div
+                          className="w-5 h-5 rounded-full border border-gray-200 shrink-0"
+                          style={{ backgroundColor: selectedVariant.colorHex ?? "#808080" }}
+                        />
+                        <span className="text-sm text-gray-700">
+                          Color: {selectedVariant.colorLabel}
+                        </span>
+                      </div>
+                    )}
+
                     <SizeSelector
                       selectedSize={selectedSize}
                       availableSizes={product.sizes}
-                      onSizeChanged={(size) => {
-                        setSelectedSize(size);
-                        if (errorPrompt) setErrorPrompt(false);
-                      }}
+                      disabledSizes={[]} // Podríamos deshabilitar las sin stock
+                      onSizeChanged={handleSizeChange}
                     />
-                    {errorPrompt && (
+                    
+                    {/* Info de stock */}
+                    {selectedVariant && (
+                      <p className={`text-sm mt-3 font-medium px-3 py-2 rounded transition-all ${
+                        selectedVariant.stock > 0 
+                          ? 'text-green-600 bg-green-50' 
+                          : 'text-red-600 bg-red-50'
+                      }`}>
+                        {selectedVariant.stock > 0 
+                          ? `✓ Stock disponible: ${selectedVariant.stock} unidades` 
+                          : '✗ Sin stock disponible'
+                        }
+                      </p>
+                    )}
+                    
+                    {isLoading && (
+                      <p className="text-sm text-gray-500 mt-3 px-3">
+                        Verificando disponibilidad...
+                      </p>
+                    )}
+                    
+                    {errorPrompt && !selectedVariant && (
                       <p className="text-sm text-red-500 mt-3 font-medium bg-red-50 p-2 rounded px-3 transition-all">
-                        ⚠️ Seleccioná un talle por favor.
+                        ⚠️ Seleccioná un talle disponible.
                       </p>
                     )}
                   </div>
@@ -149,9 +226,21 @@ export const QuickAddToCart = ({ product }: Props) => {
                   <div className="mt-2 flex gap-3">
                     <button
                       onClick={handleAdd}
-                      className="flex-1 bg-[#111] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold text-base shadow-md transition-all active:scale-[0.98]"
+                      disabled={!selectedSize || !selectedVariant || selectedVariant.stock <= 0 || isLoading}
+                      className={`flex-1 py-3.5 rounded-lg font-bold text-base shadow-md transition-all active:scale-[0.98] ${
+                        !selectedSize || !selectedVariant || selectedVariant.stock <= 0 || isLoading
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-[#111] hover:bg-[#333] text-white'
+                      }`}
                     >
-                      Confirmar talle
+                      {isLoading 
+                        ? 'Verificando...' 
+                        : selectedVariant && selectedVariant.stock <= 0
+                        ? 'Sin stock'
+                        : selectedVariant
+                        ? `Agregar ${selectedVariant.colorLabel} - ${selectedSize}`
+                        : 'Confirmar talle'
+                      }
                     </button>
                   </div>
                 </>

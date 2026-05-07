@@ -46,31 +46,34 @@ async function confirmPaymentAndUpdateStock(
   if (!order) throw new Error("Order not found");
   if (order.isPaid) return order; // idempotencia
 
-  // 🔥 decremento atómico seguro usando la transacción PADRE (inyectada)
+  // 🔥 decremento atómico seguro usando variantes
   for (const item of order.OrderItem) {
-    const updated = await tx.product.updateMany({
-      where: {
-        id: item.productId,
-        inStock: { gte: item.quantity },
-      },
-      data: {
-        inStock: { decrement: item.quantity },
-      },
-    });
+    // Si tiene variantId, actualizar stock de la variante
+    if (item.variantId) {
+      const variant = await tx.productVariant.findUnique({
+        where: { id: item.variantId },
+      });
 
-    if (updated.count === 0) {
-      throw new Error(`Insufficient stock for product ${item.productId}`);
+      if (!variant || variant.stock < item.quantity) {
+        throw new Error(`Stock insuficiente para la variante ${item.variantId}`);
+      }
+
+      await tx.productVariant.update({
+        where: { id: item.variantId },
+        data: { stock: { decrement: item.quantity } },
+      });
+
+      // Registrar movimiento de stock
+      await tx.stockMovement.create({
+        data: {
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: -item.quantity,
+          type: "sale",
+          note: `Venta por Orden ${orderId}`,
+        },
+      });
     }
-
-    // 🔴 FIJO OBLIGATORIO: Mover stock dejando rastro (auditoría/debugging)
-    await tx.stockMovement.create({
-      data: {
-        productId: item.productId,
-        quantity: -item.quantity, // Número negativo por despacho/venta
-        type: "sale",
-        note: `Venta por Orden ${orderId}`,
-      },
-    });
   }
 
   // marcar orden como pagada

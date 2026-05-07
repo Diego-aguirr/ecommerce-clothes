@@ -23,7 +23,11 @@ export default async function AdminProductsPage({ searchParams }: Props) {
       skip,
       take: PAGE_SIZE,
       orderBy: { title: "asc" },
-      include: { category: true, ProductImage: { take: 1 } },
+      include: { 
+        category: true, 
+        ProductImage: { take: 1 },
+        _count: { select: { variants: true } }
+      },
     }),
     prisma.product.count(),
   ]);
@@ -51,7 +55,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Producto</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Categoría</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Variantes</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Precio</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -71,7 +75,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">{p.category.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{p.inStock} uds.</td>
+                <td className="px-6 py-4 text-sm text-gray-500">{p._count.variants} variantes</td>
                 <td className="px-6 py-4 text-sm text-gray-500">${p.price.toFixed(2)}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${p.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
