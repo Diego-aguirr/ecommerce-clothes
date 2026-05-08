@@ -16,3 +16,10 @@ export {
   deleteColorImage,
   reorderColorImages,
 } from "./colors";
+
+// Server Actions para gestión de categorías
+export {
+  getCategories,
+  createCategory,
+  deleteCategory,
+} from "./categories";
