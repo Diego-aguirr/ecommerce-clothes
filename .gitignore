@@ -1,7 +1,16 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# ─── ENV FILES (CRÍTICO: nunca subir secrets) ───
 .env
-/postgres-data/
-# dependencies
+.env.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.env.test
+.env.test.local
+
+# ─── Dependencies ───
 /node_modules
 /.pnp
 .pnp.*
@@ -11,44 +20,50 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# ─── Testing ───
 /coverage
 
-# next.js
+# ─── Next.js ───
 /.next/
 /out/
 
-# production
+# ─── Production build ───
 /build
 
-# misc
-.DS_Store
-*.pem
+# ─── Prisma generated client ───
+/src/generated/prisma
 
-# debug
+# ─── Database data (Docker volumes) ───
+/postgres-data/
+
+# ─── OS files ───
+.DS_Store
+Thumbs.db
+
+# ─── Keys & certificates ───
+*.pem
+*.key
+*.p12
+
+# ─── Debug logs ───
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env
-
-# vercel
+# ─── Vercel ───
 .vercel
 
-# typescript
+# ─── TypeScript ───
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
+# ─── IDE & editors ───
+.idea/
+.vscode/
+*.swp
+*.swo
 
-/generated/prisma
-
-/src/generated/prisma
-
-/src/generated/prisma
-
-/src/generated/prisma
-
-/src/generated/prisma
+# ─── AI agent artifacts (no subir al repo) ───
+.agents/
+.gemini/
