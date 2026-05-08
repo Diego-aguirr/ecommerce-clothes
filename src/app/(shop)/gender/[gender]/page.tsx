@@ -22,7 +22,7 @@ export default async function Page({ params, searchParams }: Props) {
   const { gender } = resolvedParams;
 
   // Validación estricta: Si escriben "fruta", mandarlos a 404 para evitar que Prisma crashee
-  const validGenders = ['men', 'women', 'kid', 'unisex'];
+  const validGenders = ['men', 'women', 'kid', 'unisex', 'outfits'];
   if (!validGenders.includes(gender)) {
     notFound();
   }
@@ -49,6 +49,7 @@ export default async function Page({ params, searchParams }: Props) {
     women: "para mujeres",
     kid: "para niños",
     unisex: "para todos",
+    outfits: "Cápsula / Combos Completos",
   };
 
   const subtitle = labels[gender] ? `Artículos ${labels[gender]}` : "Artículos";

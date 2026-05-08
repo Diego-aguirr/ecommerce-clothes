@@ -73,10 +73,10 @@ export const TopMenu = () => {
             Mujer
           </Link>
           <Link
-            href="/gender/kid"
+            href="/gender/outfits"
             className="hover:text-brand-accent transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent rounded px-1"
           >
-            Niños
+            Outfits
           </Link>
           <Link
             href="/gender/unisex"

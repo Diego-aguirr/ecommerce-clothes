@@ -106,7 +106,7 @@ export interface ProductImage {
   productId: string;
 }
 
-export type ProductGender = "men" | "women" | "kid" | "unisex";
+export type ProductGender = "men" | "women" | "kid" | "unisex" | "outfits";
 export type Type = "shirts" | "pants" | "hoodies" | "hats";
 
 // ✅ NUEVO: Input para crear variante

@@ -30,6 +30,7 @@ enum Gender {
   women
   kid
   unisex
+  outfits
 }
 
 enum Role {
