@@ -19,7 +19,7 @@ export const PageNotFound = () => {
         
         {/* Brand Name with Logo Styling */}
         <h2 className={`${titleFont.className} text-2xl md:text-3xl font-black italic tracking-tighter mb-4 drop-shadow-[0_0_15px_rgba(37,99,235,0.8)]`}>
-          SATORU <span className="text-blue-500 not-italic">///</span>
+          SATORU <span className="text-blue-500 not-italic">{"///"}</span>
         </h2>
 
         {/* Glitchy 404 */}

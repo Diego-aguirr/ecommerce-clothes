@@ -44,8 +44,8 @@ export async function toggleProductStatus(productId: string, isActive: boolean):
 
     revalidatePath("/admin/products");
     return { ok: true, product };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 
@@ -75,8 +75,8 @@ export async function updateProductDetails(
 
     revalidatePath("/admin/products");
     return { ok: true, product };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 
@@ -110,8 +110,8 @@ export async function adjustStock(
 
     revalidatePath("/admin/products");
     return { ok: true, movement };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 
@@ -123,6 +123,7 @@ export async function createProduct(payload: unknown): Promise<ProductActionResp
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { colors, variants, ...productData } = parsed.data as any;
     
     // Validar server-side (el schema ya no exige .min(1))
@@ -147,18 +148,19 @@ export async function createProduct(payload: unknown): Promise<ProductActionResp
 
     revalidatePath("/admin/products");
     return { ok: true, product };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating product:", error);
+    const err = error as { code?: string; meta?: unknown; stack?: string };
     console.error("Error details:", {
-      message: error.message,
-      code: error.code,
-      meta: error.meta,
-      stack: error.stack?.split('\n').slice(0, 5)
+      message: (error instanceof Error ? error.message : "Error"),
+      code: err.code,
+      meta: err.meta,
+      stack: err.stack?.split('\n').slice(0, 5)
     });
-    if (error.code === "P2002") {
+    if (err.code === "P2002") {
       return { ok: false, error: "Ya existe un producto con el mismo título/slug." };
     }
-    return { ok: false, error: `Error al crear el producto: ${error.message || 'Error desconocido'}` };
+    return { ok: false, error: `Error al crear el producto: ${(error instanceof Error ? error.message : "Error") || 'Error desconocido'}` };
   }
 }
 
@@ -175,6 +177,7 @@ export async function updateProduct(productId: string, payload: unknown): Promis
   if (!parsed.success)
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { imagesToDelete, colors, variants, ...productData } = parsed.data as any;
 
   try {
@@ -195,9 +198,10 @@ export async function updateProduct(productId: string, payload: unknown): Promis
     revalidatePath("/admin/products");
     revalidatePath(`/admin/products/${productId}`);
     return { ok: true, product };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating product:", error);
-    if (error.code === "P2002") {
+    const err = error as { code?: string };
+    if (err.code === "P2002") {
       return { ok: false, error: "Ya existe un producto con el mismo título/slug." };
     }
     return { ok: false, error: "Error al actualizar el producto." };

@@ -107,7 +107,7 @@ export const VariantForm = ({
         </select>
         {existingColors.length === 0 && (
           <p className="text-xs text-orange-600 mt-1">
-            Primero debes crear colores en "Gestionar Colores"
+            Primero debes crear colores en &quot;Gestionar Colores&quot;
           </p>
         )}
       </div>

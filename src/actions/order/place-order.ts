@@ -219,10 +219,11 @@ export const placeOrder = async (
         status: result.payment.status,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error crítico procesando la orden:", error);
 
-    if (error.code === "P2002") {
+    const err = error as { code?: string };
+    if (err.code === "P2002") {
       return {
         ok: false,
         message: "Ya existe un intento de orden en proceso. Verifica tu sesión.",

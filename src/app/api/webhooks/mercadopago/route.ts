@@ -1,6 +1,7 @@
 "use server";
 
 import { NextResponse, type NextRequest } from "next/server";
+import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { Payment } from "mercadopago";
 import { mpClient } from "@/lib/mercadopago";
@@ -17,7 +18,6 @@ function verifySignature(request: NextRequest, body: string): boolean {
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "";
   if (!secret) return false;
 
-  const crypto = require("crypto");
   const expected = crypto
     .createHmac("sha256", secret)
     .update(body)
@@ -130,11 +130,12 @@ export async function POST(req: NextRequest) {
     // 🔁 fallback seguro (MP puede fallar)
     try {
       mpResponse = await paymentClient.get({ id: payload.data.id });
-    } catch (error) {
+    } catch {
       await tx.paymentLog.create({
         data: {
           provider: "mercadopago",
           event: "mp_fetch_error",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           rawData: payload as any,
         },
       });
@@ -165,6 +166,7 @@ export async function POST(req: NextRequest) {
         data: {
           provider: "mercadopago",
           event: payload.action,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           rawData: payload as any,
         },
       });
@@ -196,6 +198,7 @@ export async function POST(req: NextRequest) {
           paymentId: payment.id,
           provider: "mercadopago",
           event: "amount_mismatch",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           rawData: { mp: mpResponse, db: payment } as any,
         },
       });
@@ -255,6 +258,7 @@ export async function POST(req: NextRequest) {
         rawData: {
           webhook: payload,
           mp: mpResponse,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
       },
     });

@@ -4,7 +4,7 @@ export interface AuditLogData {
   adminId: string;
   action: string;
   targetId?: string;
-  metadata?: any;
+  metadata?: unknown;
   entity?: string;
 }
 

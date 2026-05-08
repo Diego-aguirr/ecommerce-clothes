@@ -16,7 +16,7 @@ export async function getCategories() {
       }
     });
     return { ok: true, categories };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching categories:", error);
     return { ok: false, error: "Error al cargar las categorías" };
   }
@@ -47,7 +47,7 @@ export async function createCategory(name: string) {
     revalidatePath("/admin/categories");
     revalidatePath("/admin/products/new");
     return { ok: true, category };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating category:", error);
     return { ok: false, error: "Error al crear la categoría" };
   }
@@ -86,7 +86,7 @@ export async function deleteCategory(id: string) {
 
     revalidatePath("/admin/categories");
     return { ok: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting category:", error);
     return { ok: false, error: "Error al eliminar la categoría" };
   }

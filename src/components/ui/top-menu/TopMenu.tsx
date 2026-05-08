@@ -9,7 +9,6 @@ import {
 } from "react-icons/io5";
 import { useCartStore, useUIStore } from "@/store";
 import { useSession } from "next-auth/react";
-import { logout } from "@/actions";
 import { SatoruLogo } from "@/components";
 
 export const TopMenu = () => {

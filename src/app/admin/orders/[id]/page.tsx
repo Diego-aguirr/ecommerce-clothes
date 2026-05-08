@@ -1,8 +1,7 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import prisma from "@/lib/prisma";
-import { updateOrderStatus, updateOrderNotes, updateDeliveryStatus, markAsShippedFormAction, markAsDeliveredFormAction, saveNotesFormAction } from "@/actions/admin/orders";
+import { markAsShippedFormAction, markAsDeliveredFormAction, saveNotesFormAction } from "@/actions/admin/orders";
 import { notFound } from "next/navigation";
-import { OrderStatus, DeliveryStatus } from "@/generated/prisma/client";
 import { FiPackage, FiTruck, FiCheckCircle } from "react-icons/fi";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {

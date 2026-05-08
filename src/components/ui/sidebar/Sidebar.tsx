@@ -16,7 +16,6 @@ import {
   IoListOutline,
 } from "react-icons/io5";
 import { useUIStore } from "@/store";
-import { logout } from "@/actions";
 import { useSession } from "next-auth/react";
 
 export const Sidebar = () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCartStore } from "@/store";
 import { useEffect, useState } from "react";
 
@@ -20,12 +21,12 @@ export const OrderItems = () => {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500 mb-4">Tu carrito está vacío</p>
-        <a
+        <Link
           href="/"
           className="text-brand-primary font-semibold hover:text-brand-accent transition-colors"
         >
           Agregar productos
-        </a>
+        </Link>
       </div>
     );
   }
