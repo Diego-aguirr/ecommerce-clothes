@@ -37,11 +37,9 @@ export default async function Page({ params, searchParams }: Props) {
       gender: gender as Gender,
     });
 
-  // Si no hay productos (ej. página 100 vacía o categoría vacía), redirigir al home en lugar de a sí mismo (evita loop infinito)
+  // Si la página pedida excede el total, volver a la primera página de esta categoría
   if (products.length === 0 && page > 1) {
     redirect(`/gender/${gender}`);
-  } else if (products.length === 0) {
-    redirect(`/`);
   }
 
   const labels: Record<string, string> = {
@@ -58,8 +56,22 @@ export default async function Page({ params, searchParams }: Props) {
     <>
       <Title title={subtitle} subtitle="Todos los productos" className="mb-2" />
 
-      <ProductGrid products={products} />
-      <Pagination totalPages={totalPages} />
+      {products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <span className="text-6xl mb-4">🛍️</span>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Próximamente
+          </h2>
+          <p className="text-gray-500 max-w-md">
+            Estamos preparando productos increíbles para esta sección. ¡Volvé pronto!
+          </p>
+        </div>
+      ) : (
+        <>
+          <ProductGrid products={products} />
+          <Pagination totalPages={totalPages} />
+        </>
+      )}
     </>
   );
 }
