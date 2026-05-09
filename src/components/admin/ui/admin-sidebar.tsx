@@ -9,6 +9,7 @@ import {
   FiUsers,
   FiFileText,
   FiDollarSign,
+  FiList,
 } from "react-icons/fi";
 
 export function AdminSidebar({
@@ -23,6 +24,7 @@ export function AdminSidebar({
   const links = [
     { name: "Dashboard", href: "/admin", icon: <FiHome />, exact: true },
     { name: "Productos", href: "/admin/products", icon: <FiBox /> },
+    { name: "Categorías", href: "/admin/categories", icon: <FiList /> },
     { name: "Órdenes", href: "/admin/orders", icon: <FiShoppingCart /> },
   ];
 

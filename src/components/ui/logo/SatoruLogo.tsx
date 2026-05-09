@@ -21,14 +21,20 @@ export const SatoruLogo = () => {
 
           {/* Destello Superior */}
           <div className="absolute -top-1.5 -left-1.5 md:-top-2 md:-left-2 text-white drop-shadow-[0_0_5px_#fff]">
-            <svg className="w-3 h-3 md:w-3.5 md:h-3.5 fill-current" viewBox="0 0 24 24">
+            <svg
+              className="w-3 h-3 md:w-3.5 md:h-3.5 fill-current"
+              viewBox="0 0 24 24"
+            >
               <path d="M12 0L13.5 9L24 12L13.5 15L12 24L10.5 15L0 12L10.5 9Z" />
             </svg>
           </div>
 
           {/* Destello Inferior */}
           <div className="absolute -bottom-1.5 -right-1.5 md:-bottom-2 md:-right-2 text-white drop-shadow-[0_0_5px_#fff]">
-            <svg className="w-3.5 h-3.5 md:w-4 md:h-4 fill-current" viewBox="0 0 24 24">
+            <svg
+              className="w-3.5 h-3.5 md:w-4 md:h-4 fill-current"
+              viewBox="0 0 24 24"
+            >
               <path d="M12 0L13.5 9L24 12L13.5 15L12 24L10.5 15L0 12L10.5 9Z" />
             </svg>
           </div>
@@ -40,7 +46,7 @@ export const SatoruLogo = () => {
 
       {/* Texto de la Marca */}
       <span className="text-2xl md:text-3xl font-black italic tracking-tighter text-black drop-shadow-[2px_2px_0px_rgba(37,99,235,0.2)]">
-        SATORU <span className="text-xl md:text-2xl not-italic ml-1">💎</span>
+        SATORU
       </span>
     </Link>
   );

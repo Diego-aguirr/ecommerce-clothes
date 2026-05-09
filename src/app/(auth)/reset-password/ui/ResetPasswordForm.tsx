@@ -26,8 +26,8 @@ export default function ResetPasswordForm({ token }: { token: string }) {
       setTimeout(() => {
         router.push("/login");
       }, 2000);
-    } catch (err: any) {
-      setError(err.message || "Error al cambiar contraseña");
+    } catch (err: unknown) {
+      setError((err instanceof Error ? err.message : "Error") || "Error al cambiar contraseña");
     } finally {
       setLoading(false);
     }

@@ -83,6 +83,7 @@ export default async function EditProductPage({ params }: Props) {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         <ProductForm categories={categories} product={product as any} />
       </div>
     </div>

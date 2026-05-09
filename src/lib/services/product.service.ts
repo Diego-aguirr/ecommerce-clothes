@@ -78,6 +78,7 @@ export async function adjustProductStockService(
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createProductService(data: any) {
   const { images, colors, variants, ...productData } = data;
 

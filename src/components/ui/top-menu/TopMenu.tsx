@@ -9,7 +9,6 @@ import {
 } from "react-icons/io5";
 import { useCartStore, useUIStore } from "@/store";
 import { useSession } from "next-auth/react";
-import { logout } from "@/actions";
 import { SatoruLogo } from "@/components";
 
 export const TopMenu = () => {
@@ -73,10 +72,10 @@ export const TopMenu = () => {
             Mujer
           </Link>
           <Link
-            href="/gender/kid"
+            href="/gender/outfits"
             className="hover:text-brand-accent transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent rounded px-1"
           >
-            Niños
+            Outfits
           </Link>
           <Link
             href="/gender/unisex"

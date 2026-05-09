@@ -40,8 +40,8 @@ export async function updateDeliveryStatus(orderId: string, deliveryStatus: Deli
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${data.orderId}`);
     return { ok: true, order };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 
@@ -69,8 +69,8 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus): P
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${data.orderId}`);
     return { ok: true, order };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 
@@ -94,8 +94,8 @@ export async function updateOrderNotes(orderId: string, notes: string): Promise<
 
     revalidatePath(`/admin/orders/${data.orderId}`);
     return { ok: true, order };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 

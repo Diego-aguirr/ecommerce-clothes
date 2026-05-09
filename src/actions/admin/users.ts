@@ -41,8 +41,8 @@ export async function toggleUserBlock(userId: string, isBlocked: boolean): Promi
 
     revalidatePath("/admin/users");
     return { ok: true, user };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }
 
@@ -71,7 +71,7 @@ export async function updateUserRole(userId: string, role: Role): Promise<UserAc
 
     revalidatePath("/admin/users");
     return { ok: true, user };
-  } catch (error: any) {
-    return { ok: false, error: error.message };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
   }
 }

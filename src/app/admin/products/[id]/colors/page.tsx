@@ -135,7 +135,7 @@ export default async function ProductColorsPage({ params }: Props) {
                   {/* Preview de cómo se ve en la tienda */}
                   <div className="mt-4 pl-16 pt-4 border-t border-gray-100">
                     <p className="text-xs text-gray-400">
-                      Vista en tienda: Selector de color mostrará "{color.label}" con este color
+                      Vista en tienda: Selector de color mostrará &quot;{color.label}&quot; con este color
                     </p>
                   </div>
                 </div>

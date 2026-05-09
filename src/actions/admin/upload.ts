@@ -34,7 +34,7 @@ export async function uploadProductImage(formData: FormData): Promise<{ ok: bool
     });
 
     return { ok: true, url, publicId };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error crítico subiendo imagen:", error);
     return { ok: false, error: "Fallo temporal del servicio de alojamiento de imágenes. Intenta más tarde." };
   }
