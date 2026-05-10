@@ -68,7 +68,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
     }
     const verifyUrl = `${process.env.APP_URL}/api/auth/verify?token=${verificationToken}`;
 
-    // 4️⃣➕ Enviar email de confirmación
+    // 4️⃣➕ Enviar email de confirmación (no bloqueante)
     try {
       await sendEmail({
         to: email,
@@ -80,9 +80,9 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       });
       console.log('✅ Email de verificación enviado exitosamente');
     } catch (err) {
-      console.error('❌ Error enviando email de verificación:', err);
-      // Propagar el error para que el cliente reciba la falla
-      throw err;
+      // Log para monitoreo pero NO fallar el registro
+      // El usuario ya fue creado, el email es secundario
+      console.error('❌ Error enviando email de verificación (usuario creado igualmente):', err);
     }
 
     // 5️⃣ Login automático
