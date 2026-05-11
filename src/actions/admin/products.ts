@@ -5,6 +5,7 @@ import { logAdminAction } from "@/lib/admin/audit-logger";
 import { revalidatePath } from "next/cache";
 import { Product, StockMovement } from "@/generated/prisma/client";
 import { z } from "zod";
+import { handleActionError } from "@/lib/errors";
 import { ToggleProductStatusSchema, UpdateProductDetailsSchema, AdjustStockSchema } from "@/lib/validations";
 import { CreateProductSchema } from "@/lib/validations/product.schema";
 import {
@@ -45,7 +46,7 @@ export async function toggleProductStatus(productId: string, isActive: boolean):
     revalidatePath("/admin/products");
     return { ok: true, product };
   } catch (error: unknown) {
-    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
+    return handleActionError(error, "toggleProductStatus");
   }
 }
 
@@ -76,7 +77,7 @@ export async function updateProductDetails(
     revalidatePath("/admin/products");
     return { ok: true, product };
   } catch (error: unknown) {
-    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
+    return handleActionError(error, "updateProductDetails");
   }
 }
 
@@ -111,7 +112,7 @@ export async function adjustStock(
     revalidatePath("/admin/products");
     return { ok: true, movement };
   } catch (error: unknown) {
-    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
+    return handleActionError(error, "adjustStock");
   }
 }
 
@@ -125,18 +126,11 @@ export async function createProduct(payload: unknown): Promise<ProductActionResp
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { colors, variants, ...productData } = parsed.data as any;
-    
+
     // Validar server-side (el schema ya no exige .min(1))
     if (!colors || colors.length === 0) return { ok: false, error: "Debes agregar al menos un color" };
     if (!variants || variants.length === 0) return { ok: false, error: "Debes agregar al menos una variante (selecciona tallas)" };
-    
-    console.log("Creating product with data:", { 
-      productData: { title: productData.title, price: productData.price },
-      imagesCount: productData.images?.length,
-      colorsCount: colors?.length,
-      variantsCount: variants?.length
-    });
-    
+
     const product = await createProductService({ ...productData, colors, variants });
 
     await logAdminAction({
@@ -149,18 +143,11 @@ export async function createProduct(payload: unknown): Promise<ProductActionResp
     revalidatePath("/admin/products");
     return { ok: true, product };
   } catch (error: unknown) {
-    console.error("Error creating product:", error);
-    const err = error as { code?: string; meta?: unknown; stack?: string };
-    console.error("Error details:", {
-      message: (error instanceof Error ? error.message : "Error"),
-      code: err.code,
-      meta: err.meta,
-      stack: err.stack?.split('\n').slice(0, 5)
-    });
+    const err = error as { code?: string };
     if (err.code === "P2002") {
       return { ok: false, error: "Ya existe un producto con el mismo título/slug." };
     }
-    return { ok: false, error: `Error al crear el producto: ${(error instanceof Error ? error.message : "Error") || 'Error desconocido'}` };
+    return handleActionError(error, "createProduct");
   }
 }
 
@@ -199,11 +186,10 @@ export async function updateProduct(productId: string, payload: unknown): Promis
     revalidatePath(`/admin/products/${productId}`);
     return { ok: true, product };
   } catch (error: unknown) {
-    console.error("Error updating product:", error);
     const err = error as { code?: string };
     if (err.code === "P2002") {
       return { ok: false, error: "Ya existe un producto con el mismo título/slug." };
     }
-    return { ok: false, error: "Error al actualizar el producto." };
+    return handleActionError(error, "updateProduct");
   }
 }

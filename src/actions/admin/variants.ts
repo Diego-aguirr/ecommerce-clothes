@@ -3,6 +3,7 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { handleActionError } from "@/lib/errors";
 import {
   getProductVariants as getProductVariantsService,
   createProductVariant as createProductVariantService,
@@ -42,8 +43,7 @@ export async function getProductVariants(productId: string) {
   try {
     return await getProductVariantsService(productId);
   } catch (error) {
-    if (error instanceof z.ZodError) return { ok: false, message: error.issues[0].message };
-    return { ok: false, message: "Error al obtener variantes" };
+    return handleActionError(error, "getProductVariants");
   }
 }
 
@@ -54,8 +54,7 @@ export async function createVariant(input: CreateVariantInput) {
     if (result.ok) revalidatePath(`/admin/products/${input.productId}/variants`);
     return result;
   } catch (error) {
-    if (error instanceof z.ZodError) return { ok: false, message: error.issues[0].message };
-    return { ok: false, message: "Error al crear variante" };
+    return handleActionError(error, "createVariant");
   }
 }
 
@@ -66,8 +65,7 @@ export async function updateVariantStock(input: UpdateStockInput) {
     // El service no devuelve productId, revalidate genérico
     return result;
   } catch (error) {
-    if (error instanceof z.ZodError) return { ok: false, message: error.issues[0].message };
-    return { ok: false, message: "Error al actualizar stock" };
+    return handleActionError(error, "updateVariantStock");
   }
 }
 
@@ -81,7 +79,7 @@ export async function toggleVariantStatus(input: { variantId: string; isActive: 
     }
     return result;
   } catch (error) {
-    return { ok: false, message: "Error al cambiar estado" };
+    return handleActionError(error, "toggleVariantStatus");
   }
 }
 
@@ -97,6 +95,6 @@ export async function bulkUpdateStock(
     }
     return { ok: true, message: "Stock actualizado correctamente" };
   } catch (error) {
-    return { ok: false, message: "Error al actualizar stock" };
+    return handleActionError(error, "bulkUpdateStock");
   }
 }

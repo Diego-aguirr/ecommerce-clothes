@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin/auth-utils";
+import { handleActionError } from "@/lib/errors";
 import {
   getProductColors as getProductColorsService,
   createProductColor,
@@ -25,8 +26,7 @@ export async function getProductColors(productId: string) {
   try {
     return await getProductColorsService(productId);
   } catch (error) {
-    console.error("Error al obtener colores:", error);
-    return { ok: false, message: "Error al obtener colores" };
+    return handleActionError(error, "getProductColors");
   }
 }
 
@@ -42,11 +42,7 @@ export async function createColor(input: CreateColorInput) {
     }
     return result;
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { ok: false, message: error.issues[0].message };
-    }
-    console.error("Error al crear color:", error);
-    return { ok: false, message: "Error al crear color" };
+    return handleActionError(error, "createColor");
   }
 }
 
@@ -62,8 +58,7 @@ export async function deleteColor(colorId: string, productId: string) {
     }
     return result;
   } catch (error) {
-    console.error("Error al eliminar color:", error);
-    return { ok: false, message: "Error al eliminar color" };
+    return handleActionError(error, "deleteColor");
   }
 }
 
@@ -84,11 +79,7 @@ export async function addColorImage(input: AddImageInput) {
 
     return result;
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { ok: false, message: error.issues[0].message };
-    }
-    console.error("Error al agregar imagen:", error);
-    return { ok: false, message: "Error al agregar imagen" };
+    return handleActionError(error, "addColorImage");
   }
 }
 
@@ -104,8 +95,7 @@ export async function deleteColorImage(imageId: string, productId: string) {
     }
     return result;
   } catch (error) {
-    console.error("Error al eliminar imagen:", error);
-    return { ok: false, message: "Error al eliminar imagen" };
+    return handleActionError(error, "deleteColorImage");
   }
 }
 
@@ -129,7 +119,6 @@ export async function reorderColorImages(
 
     return result;
   } catch (error) {
-    console.error("Error al reordenar imágenes:", error);
-    return { ok: false, message: "Error al reordenar imágenes" };
+    return handleActionError(error, "reorderColorImages");
   }
 }
