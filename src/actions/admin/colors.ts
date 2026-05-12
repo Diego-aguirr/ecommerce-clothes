@@ -1,26 +1,22 @@
 "use server";
 
-import prisma from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/auth-utils";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireAdmin } from "@/lib/admin/auth-utils";
+import { handleActionError } from "@/lib/errors";
+import {
+  getProductColors as getProductColorsService,
+  createProductColor,
+  deleteProductColor,
+  addColorImage as addColorImageService,
+  deleteColorImage as deleteColorImageService,
+  reorderColorImages as reorderColorImagesService,
+  getColorById,
+  type CreateColorInput,
+  type AddImageInput,
+} from "@/services/color.service";
 
-// Esquema de validación para crear color
-const createColorSchema = z.object({
-  productId: z.string().uuid(),
-  color: z.string().min(1, "Nombre técnico del color es requerido"),
-  label: z.string().min(1, "Nombre mostrado es requerido"),
-  hexCode: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Formato de color inválido (ej: #FF0000)").optional(),
-});
-
-// Esquema para agregar imagen a color
-const addImageSchema = z.object({
-  productColorId: z.string().uuid(),
-  url: z.string().url("URL inválida"),
-  order: z.number().default(0),
-});
-
-export type CreateColorInput = z.infer<typeof createColorSchema>;
+export type { CreateColorInput };
 
 /**
  * Obtener todos los colores de un producto con sus imágenes
@@ -28,23 +24,9 @@ export type CreateColorInput = z.infer<typeof createColorSchema>;
 export async function getProductColors(productId: string) {
   await requireAdmin();
   try {
-    const colors = await prisma.productColor.findMany({
-      where: { productId },
-      include: {
-        images: {
-          orderBy: { order: "asc" },
-        },
-        _count: {
-          select: { images: true },
-        },
-      },
-      orderBy: { label: "asc" },
-    });
-
-    return { ok: true, colors };
+    return await getProductColorsService(productId);
   } catch (error) {
-    console.error("Error al obtener colores:", error);
-    return { ok: false, message: "Error al obtener colores" };
+    return handleActionError(error, "getProductColors");
   }
 }
 
@@ -54,35 +36,13 @@ export async function getProductColors(productId: string) {
 export async function createColor(input: CreateColorInput) {
   await requireAdmin();
   try {
-    const validated = createColorSchema.parse(input);
-
-    // Verificar que no exista un color con el mismo nombre técnico
-    const existing = await prisma.productColor.findFirst({
-      where: {
-        productId: validated.productId,
-        color: validated.color,
-      },
-    });
-
-    if (existing) {
-      return {
-        ok: false,
-        message: `Ya existe un color con el nombre '${validated.color}'`,
-      };
+    const result = await createProductColor(input);
+    if (result.ok) {
+      revalidatePath(`/admin/products/${input.productId}/colors`);
     }
-
-    const color = await prisma.productColor.create({
-      data: validated,
-    });
-
-    revalidatePath(`/admin/products/${validated.productId}/colors`);
-    return { ok: true, color };
+    return result;
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { ok: false, message: error.issues[0].message };
-    }
-    console.error("Error al crear color:", error);
-    return { ok: false, message: "Error al crear color" };
+    return handleActionError(error, "createColor");
   }
 }
 
@@ -92,61 +52,34 @@ export async function createColor(input: CreateColorInput) {
 export async function deleteColor(colorId: string, productId: string) {
   await requireAdmin();
   try {
-    // Verificar si hay variantes usando este color
-    const variantsCount = await prisma.productVariant.count({
-      where: { color: colorId },
-    });
-
-    if (variantsCount > 0) {
-      return {
-        ok: false,
-        message: `No se puede eliminar: hay ${variantsCount} variantes usando este color`,
-      };
+    const result = await deleteProductColor(colorId);
+    if (result.ok) {
+      revalidatePath(`/admin/products/${productId}/colors`);
     }
-
-    await prisma.productColor.delete({
-      where: { id: colorId },
-    });
-
-    revalidatePath(`/admin/products/${productId}/colors`);
-    return { ok: true };
+    return result;
   } catch (error) {
-    console.error("Error al eliminar color:", error);
-    return { ok: false, message: "Error al eliminar color" };
+    return handleActionError(error, "deleteColor");
   }
 }
 
 /**
  * Agregar imagen a un color
  */
-export async function addColorImage(input: {
-  productColorId: string;
-  url: string;
-  order?: number;
-}) {
+export async function addColorImage(input: AddImageInput) {
   await requireAdmin();
   try {
-    const validated = addImageSchema.parse(input);
+    const result = await addColorImageService(input);
 
-    const image = await prisma.productColorImage.create({
-      data: validated,
-    });
-
-    const color = await prisma.productColor.findUnique({
-      where: { id: validated.productColorId },
-    });
-
-    if (color) {
-      revalidatePath(`/admin/products/${color.productId}/colors`);
+    if (result.ok) {
+      const color = await getColorById(input.productColorId);
+      if (color) {
+        revalidatePath(`/admin/products/${color.productId}/colors`);
+      }
     }
 
-    return { ok: true, image };
+    return result;
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { ok: false, message: error.issues[0].message };
-    }
-    console.error("Error al agregar imagen:", error);
-    return { ok: false, message: "Error al agregar imagen" };
+    return handleActionError(error, "addColorImage");
   }
 }
 
@@ -156,15 +89,13 @@ export async function addColorImage(input: {
 export async function deleteColorImage(imageId: string, productId: string) {
   await requireAdmin();
   try {
-    await prisma.productColorImage.delete({
-      where: { id: imageId },
-    });
-
-    revalidatePath(`/admin/products/${productId}/colors`);
-    return { ok: true };
+    const result = await deleteColorImageService(imageId);
+    if (result.ok) {
+      revalidatePath(`/admin/products/${productId}/colors`);
+    }
+    return result;
   } catch (error) {
-    console.error("Error al eliminar imagen:", error);
-    return { ok: false, message: "Error al eliminar imagen" };
+    return handleActionError(error, "deleteColorImage");
   }
 }
 
@@ -177,26 +108,17 @@ export async function reorderColorImages(
 ) {
   await requireAdmin();
   try {
-    await Promise.all(
-      imageOrders.map((item) =>
-        prisma.productColorImage.update({
-          where: { id: item.id },
-          data: { order: item.order },
-        })
-      )
-    );
+    const result = await reorderColorImagesService(imageOrders);
 
-    const color = await prisma.productColor.findUnique({
-      where: { id: productColorId },
-    });
-
-    if (color) {
-      revalidatePath(`/admin/products/${color.productId}/colors`);
+    if (result.ok) {
+      const color = await getColorById(productColorId);
+      if (color) {
+        revalidatePath(`/admin/products/${color.productId}/colors`);
+      }
     }
 
-    return { ok: true };
+    return result;
   } catch (error) {
-    console.error("Error al reordenar imágenes:", error);
-    return { ok: false, message: "Error al reordenar imágenes" };
+    return handleActionError(error, "reorderColorImages");
   }
 }
