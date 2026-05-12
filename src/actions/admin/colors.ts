@@ -16,8 +16,6 @@ import {
   type AddImageInput,
 } from "@/services/color.service";
 
-export type { CreateColorInput };
-
 /**
  * Obtener todos los colores de un producto con sus imágenes
  */
