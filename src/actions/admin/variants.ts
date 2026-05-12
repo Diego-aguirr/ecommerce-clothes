@@ -34,8 +34,6 @@ const toggleVariantSchema = z.object({
   isActive: z.boolean(),
 });
 
-export type { CreateVariantInput, UpdateStockInput };
-
 // ── Actions (thin orchestrators) ──
 
 export async function getProductVariants(productId: string) {
