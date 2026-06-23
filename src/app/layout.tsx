@@ -6,11 +6,11 @@ import { Provider } from "@/components";
 
 export const metadata: Metadata = {
   title: {
-    default: "SATORU - Tienda Oficial",
-    template: "%s - SATORU",
+    default: "SAURON - Tienda Oficial",
+    template: "%s - SAURON",
   },
   description:
-    "La mejor tienda de ropa con diseños únicos. Explora la colección de SATORU.",
+    "La mejor tienda de ropa con diseños únicos. Explora la colección de SAURON.",
 };
 
 export default async function RootLayout({

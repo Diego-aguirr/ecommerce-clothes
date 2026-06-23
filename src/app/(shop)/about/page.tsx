@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Sobre Nosotros | SATORU",
-  description: "Conocé la historia detrás de SATORU, tu tienda de moda exclusiva.",
+  title: "Sobre Nosotros | SAURON",
+  description: "Conocé la historia detrás de SAURON, tu tienda de moda exclusiva.",
 };
 
 export default function AboutPage() {
@@ -12,7 +12,7 @@ export default function AboutPage() {
       
       <div className="prose prose-lg text-gray-600">
         <p className="mb-6">
-          ¡Bienvenidos a <strong>SATORU</strong>! Somos una pequeña empresa familiar nacida y criada con mucha pasión. Lo que empezó como una idea entre charlas, hoy es el espacio donde acercamos las mejores tendencias en moda masculina y femenina.
+          ¡Bienvenidos a <strong>SAURON</strong>! Somos una pequeña empresa familiar nacida y criada con mucha pasión. Lo que empezó como una idea entre charlas, hoy es el espacio donde acercamos las mejores tendencias en moda masculina y femenina.
         </p>
         
         <p className="mb-6">
@@ -20,13 +20,13 @@ export default function AboutPage() {
         </p>
 
         <p className="mb-6">
-          Nos podés encontrar en nuestro local físico ubicado en <strong>Don Orione 773, Barranqueras</strong>. Nos encanta recibir a nuestros clientes, asesorarlos y que se lleven no solo una prenda, sino una experiencia de compra cercana y cálida, como solo una familia sabe dar.
+          Nos podés encontrar en nuestro local físico ubicado en <strong>Av. Ejemplo 1234, Ciudad Autónoma</strong>. Nos encanta recibir a nuestros clientes, asesorarlos y que se lleven no solo una prenda, sino una experiencia de compra cercana y cálida, como solo una familia sabe dar.
         </p>
 
         <div className="bg-blue-50 border-l-4 border-blue-600 p-6 my-8 rounded-r-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">La Visión SATORU</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">La Visión SAURON</h2>
           <p className="text-gray-700 italic">
-            &quot;Queremos que cada persona que use SATORU sienta que lleva puesta una pieza exclusiva sin haber pagado de más.&quot;
+            &quot;Queremos que cada persona que use SAURON sienta que lleva puesta una pieza exclusiva sin haber pagado de más.&quot;
           </p>
         </div>
 

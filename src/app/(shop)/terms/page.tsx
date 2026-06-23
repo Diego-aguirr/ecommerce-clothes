@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Términos y Condiciones | SATORU",
-  description: "Términos y condiciones de uso y compra en SATORU.",
+  title: "Términos y Condiciones | SAURON",
+  description: "Términos y condiciones de uso y compra en SAURON.",
 };
 
 export default function TermsPage() {
@@ -11,7 +11,7 @@ export default function TermsPage() {
       </h1>
       
       <div className="prose prose-lg text-gray-600">
-        <p className="mb-4">Bienvenido a la tienda online de SATORU. Al navegar y comprar en nuestro sitio, aceptás los siguientes términos:</p>
+        <p className="mb-4">Bienvenido a la tienda online de SAURON. Al navegar y comprar en nuestro sitio, aceptás los siguientes términos:</p>
         
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Políticas de Cambio</h2>
         <p className="mb-4">
@@ -20,7 +20,7 @@ export default function TermsPage() {
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Envíos y Retiros</h2>
         <p className="mb-4">
-          Ofrecemos la opción de retiro en nuestro local ubicado en <strong>Don Orione 773, Barranqueras</strong>, o envíos a coordinar. Los tiempos de envío dependen del transporte seleccionado al momento de la compra.
+          Ofrecemos la opción de retiro en nuestro local ubicado en <strong>Av. Ejemplo 1234, Ciudad Autónoma</strong>, o envíos a coordinar. Los tiempos de envío dependen del transporte seleccionado al momento de la compra.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Disponibilidad de Stock</h2>
