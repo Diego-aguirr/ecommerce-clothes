@@ -18,7 +18,7 @@ export const FooterLinksColumn = ({ title, links, children }: Props) => {
       <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">
         {title}
       </h3>
-      <nav className="flex flex-col space-y-3 text-sm">
+      <nav className="flex flex-col space-y-3 text-sm" aria-label={title}>
         {links.map((link) => (
           <Link
             key={link.href}

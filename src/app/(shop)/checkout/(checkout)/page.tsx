@@ -121,7 +121,7 @@ export default async function PaymentPage() {
                     </p>
                     <p className="text-sm text-blue-700 mt-1">
                       Contactanos por WhatsApp o al email{" "}
-                      <span className="font-semibold">hola@satoru.com.ar</span>
+                      <span className="font-semibold">tuecommerce@email.com</span>
                     </p>
                   </div>
                 </div>

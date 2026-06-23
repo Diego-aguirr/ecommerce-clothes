@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { FiTruck, FiMapPin, FiBox } from "react-icons/fi";
 
 export const metadata = {
-  title: "Métodos de Envío | E-Commerce",
+  title: "Métodos de Envío | SAURON",
   description: "Información sobre nuestros métodos de envío, retiros y costos logísticos.",
 };
 
@@ -76,8 +77,18 @@ export default function EnviosPage() {
         {/* Nota Final */}
         <div className="mt-12 bg-blue-50 border border-blue-100 rounded-xl p-6 text-center">
           <p className="text-blue-800 font-medium">
-            ¿Tenés alguna duda sobre los envíos? <a href="/contact" className="underline font-bold hover:text-blue-900">Contactanos</a> y lo resolvemos.
+            ¿Tenés alguna duda sobre los envíos? <Link href="/contact" className="underline font-bold hover:text-blue-900">Contactanos</Link> y lo resolvemos.
           </p>
+        </div>
+
+        {/* Volver al inicio */}
+        <div className="mt-8 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
+          >
+            Ir a comprar →
+          </Link>
         </div>
       </div>
     </div>

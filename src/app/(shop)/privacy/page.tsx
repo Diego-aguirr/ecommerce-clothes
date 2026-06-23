@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Políticas de Privacidad | SATORU",
-  description: "Políticas de Privacidad de SATORU.",
+  title: "Políticas de Privacidad | SAURON",
+  description: "Políticas de Privacidad de SAURON.",
 };
 
 export default function PrivacyPage() {
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Recopilación de Información</h2>
         <p className="mb-4">
-          En SATORU respetamos tu privacidad. Solo recopilamos los datos estrictamente necesarios para procesar tus compras y realizar envíos (nombre, dirección, email, teléfono). 
+          En SAURON respetamos tu privacidad. Solo recopilamos los datos estrictamente necesarios para procesar tus compras y realizar envíos (nombre, dirección, email, teléfono). 
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Uso de los Datos</h2>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Protección de Información</h2>
         <p className="mb-4">
-          No compartimos, vendemos ni alquilamos tu información personal a terceros. Los pagos son procesados de forma encriptada a través de plataformas seguras (como Mercado Pago), por lo que SATORU no almacena en ningún momento los datos de tus tarjetas de crédito o débito.
+          No compartimos, vendemos ni alquilamos tu información personal a terceros. Los pagos son procesados de forma encriptada a través de plataformas seguras (como Mercado Pago), por lo que SAURON no almacena en ningún momento los datos de tus tarjetas de crédito o débito.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Consentimiento</h2>

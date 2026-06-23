@@ -71,7 +71,7 @@ export const AddressDetails = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <div>
-              <p className="font-semibold text-blue-900">Don Orione 773 Barranqueras 📌</p>
+              <p className="font-semibold text-blue-900">Av. Ejemplo 1234, Ciudad Autónoma 📌</p>
               <p className="text-sm text-blue-700 mt-1">
                 A nombre de: <span className="font-bold">{address.fullname || "El titular de la cuenta"}</span>
               </p>
