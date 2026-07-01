@@ -1,3 +1,15 @@
+/**
+ * Color Service
+ *
+ * Responsabilidad: CRUD de colores de producto y sus imágenes.
+ * Usado por: admin/colors actions.
+ *
+ * Reglas:
+ * - Validar datos con Zod antes de ejecutar queries
+ * - Usar "server-only" para evitar imports en client components
+ * - Mantener consistencia con variant.service.ts (color field)
+ */
+
 import prisma from "@/lib/prisma";
 import "server-only";
 import { z } from "zod";

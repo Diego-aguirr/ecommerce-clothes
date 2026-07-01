@@ -93,12 +93,25 @@ export async function adjustProductStockService(
   };
 }
 
+/** Input para crear un producto completo con imágenes, colores y variantes. */
+type CreateProductInput = {
+  title: string;
+  description: string;
+  price: number;
+  sizes: Size[];
+  tags: string[];
+  gender: Gender;
+  categoryId: string;
+  images: { url: string; publicId: string }[];
+  colors: { color: string; label: string; hexCode: string }[];
+  variants: { sku: string; size: Size; color: string; stock: number }[];
+};
+
 /**
  * Crea un producto completo: base + imágenes + colores + variantes + stock inicial.
  * Usa transacción Prisma para garantizar atomicidad.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createProductService(data: any) {
+export async function createProductService(data: CreateProductInput) {
   const { images, colors, variants, ...productData } = data;
 
   // Generar SLUG dinámico (por ejemplo "Remera Gris" -> "remera-gris")
@@ -108,7 +121,7 @@ export async function createProductService(data: any) {
     .replace(/(^-|-$)+/g, "");
 
   // Calcular stock total sumando todas las variantes
-  const totalStock = variants?.reduce((sum: number, v: { stock: number }) => sum + v.stock, 0) || 0;
+  const totalStock = variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
 
   // Crear producto con colores y variantes en una transacción
   return prisma.$transaction(async (tx) => {
@@ -118,7 +131,7 @@ export async function createProductService(data: any) {
         ...productData,
         slug: baseSlug,
         ProductImage: {
-          create: images.map((img: { url: string; publicId: string }) => ({
+          create: images.map((img) => ({
             url: img.url,
             publicId: img.publicId,
           })),
@@ -141,7 +154,7 @@ export async function createProductService(data: any) {
 
       // Crear imágenes para el color (usar las mismas imágenes del producto)
       await tx.productColorImage.createMany({
-        data: images.map((img: { url: string }, index: number) => ({
+        data: images.map((img, index) => ({
           productColorId: color.id,
           url: img.url,
           order: index,
@@ -378,19 +391,19 @@ export async function getVariantForQuickAddService(
   });
 
   if (!variant) {
-    const anyVariant = await prisma.productVariant.findFirst({
+    const fallbackVariant = await prisma.productVariant.findFirst({
       where: { productId, size, isActive: true },
     });
 
-    if (!anyVariant) return null;
+    if (!fallbackVariant) return null;
 
-    const colorInfo = await resolveColorInfo(productId, anyVariant.color);
+    const colorInfo = await resolveColorInfo(productId, fallbackVariant.color);
     return {
-      id: anyVariant.id,
-      sku: anyVariant.sku,
-      size: anyVariant.size,
-      stock: anyVariant.stock,
-      color: anyVariant.color,
+      id: fallbackVariant.id,
+      sku: fallbackVariant.sku,
+      size: fallbackVariant.size,
+      stock: fallbackVariant.stock,
+      color: fallbackVariant.color,
       ...colorInfo,
     };
   }
