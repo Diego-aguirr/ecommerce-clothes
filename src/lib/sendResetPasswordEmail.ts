@@ -1,7 +1,7 @@
 import { sendEmail } from "@/lib/mailer";
 
 export async function sendResetPasswordEmail({ to, token }: { to: string; token: string }) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+  const resetUrl = `${process.env.APP_URL}/reset-password?token=${token}`;
 
   const html = `
     <h2>Recuperación de contraseña</h2>

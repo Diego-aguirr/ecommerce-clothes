@@ -27,7 +27,7 @@ export async function createPreference(orderId: string) {
 
     // 4. Validar URL base
     const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      process.env.APP_URL || "http://localhost:3000";
     validateBaseUrl(baseUrl);
 
     // 5. Crear preferencia MP
