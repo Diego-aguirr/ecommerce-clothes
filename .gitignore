@@ -67,3 +67,6 @@ next-env.d.ts
 # ─── AI agent artifacts (no subir al repo) ───
 .agents/
 .gemini/
+
+# ─── Drafts & posts (no subir al repo) ───
+linkedin-post.txt
