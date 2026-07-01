@@ -24,6 +24,7 @@
 /coverage
 /coverage/
 *.lcov
+test-results/
 
 # ─── Next.js ───
 /.next/
@@ -90,3 +91,16 @@ scripts/
 
 # ─── Seed scripts (no subir al repo) ───
 src/seed/
+
+# ─── Docker (local volumes) ───
+postgres-data/
+
+# ─── Temp files ───
+*.tmp
+*.temp
+*.log
+
+# ─── Misc ───
+.vercel
+netlify.toml
+.firebase/
