@@ -2,34 +2,25 @@
 
 > **Skills Reference**: For detailed patterns, use these skills:
  > - [`typescript`](../skills/typescript/SKILL.md) - Const types, flat interfaces
-> - [`react-19`](../skills/react-19/SKILL.md) - No useMemo/useCallback, compiler
-> - [`nextjs-15`](../skills/nextjs-15/SKILL.md) - App Router, Server Actions
-> - [`tailwind-4`](../skills/tailwind-4/SKILL.md) - cn() utility, no var() in className
-> - [`zod-4`](../skills/zod-4/SKILL.md) - New API (z.email(), z.uuid())
-> - [`zustand-5`](../skills/zustand-5/SKILL.md) - Selectors, persist middleware
-  
+ > - [`react-19`](../skills/react-19/SKILL.md) - No useMemo/useCallback, compiler
+ > - [`nextjs-15`](../skills/nextjs-15/SKILL.md) - App Router, Server Actions
+ > - [`tailwind-4`](../skills/tailwind-4/SKILL.md) - cn() utility, no var() in className
+ > - [`zod-4`](../skills/zod-4/SKILL.md) - New API (z.email(), z.uuid())
+ > - [`zustand-5`](../skills/zustand-5/SKILL.md) - Selectors, persist middleware
+
 ### Auto-invoke Skills
 
 When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 | Action | Skill |
 |--------|-------|
-| Add changelog entry for a PR or feature | `prowler-changelog` |
 | App Router / Server Actions | `nextjs-15` |
 | Building AI chat features | `ai-sdk-5` |
-| Committing changes | `prowler-commit` |
-| Create PR that requires changelog entry | `prowler-changelog` |
 | Creating Zod schemas | `zod-4` |
-| Creating a git commit | `prowler-commit` |
-| Creating/modifying Prowler UI components | `prowler-ui` |
-| Review changelog format and conventions | `prowler-changelog` |
-| Update CHANGELOG.md in any component | `prowler-changelog` |
+| Creating/modifying services | `prisma-7` |
 | Using Zustand stores | `zustand-5` |
-| Working on Prowler UI structure (actions/adapters/types/hooks) | `prowler-ui` |
-| Working with Prowler UI test helpers/pages | `prowler-test-ui` |
 | Working with Tailwind classes | `tailwind-4` |
 | Writing Playwright E2E tests | `playwright` |
-| Writing Prowler UI E2E tests | `prowler-test-ui` |
 | Writing React components | `react-19` |
 | Writing TypeScript types/interfaces | `typescript` |
 
@@ -69,7 +60,82 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 ---
 
+## ARCHITECTURE — Service Layer Pattern
+
+```
+UI (Server Components)
+  │
+  ▼
+Actions (thin orchestrators)
+  • Auth (requireSession, requireAdmin)
+  • Zod validation
+  • Error handling → { ok, error, data }
+  • 0 Prisma queries direct
+  │
+  ▼
+Services (business logic)
+  • Business logic
+  • Prisma queries
+  • Throw errors (not return { ok: false })
+  • server-only enforced
+  │
+  ▼
+Prisma → PostgreSQL
+```
+
+### Action Pattern
+
+```typescript
+"use server";
+import { auth } from "@/auth";
+import { someService } from "@/services/some.service";
+
+export async function doSomething(data: FormData) {
+  const session = await auth();
+  if (!session) return { ok: false, error: "Unauthorized" };
+
+  const validated = schema.parse(Object.fromEntries(data));
+
+  try {
+    const result = await someService(validated);
+    return { ok: true, data: result };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+}
+```
+
+### Service Pattern
+
+```typescript
+import prisma from "@/lib/prisma";
+import "server-only";
+
+export async function someService(input: ValidatedInput) {
+  // Business logic here
+  const result = await prisma.model.findMany({ ... });
+
+  if (!result) throw new Error("Not found");
+
+  return result;
+}
+```
+
+---
+
 ## DECISION TREES
+
+### Code Location
+
+```
+Server action → actions/{domain}/{action}.ts
+Business logic → services/{domain}.service.ts
+Data transform → actions/{domain}/{domain}.adapter.ts
+Types (shared 2+) → types/{domain}.ts | Types (local 1) → {feature}/types.ts
+Utils (shared 2+) → lib/ | Utils (local 1) → {feature}/utils/
+Hooks (shared 2+) → hooks/ | Hooks (local 1) → {feature}/hooks.ts
+shadcn components → components/shadcn/
+```
 
 ### Component Placement
 
@@ -77,17 +143,6 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 New/Existing UI? → shadcn/ui + Tailwind (NEVER HeroUI for new code)
 Used 1 feature? → features/{feature}/components | Used 2+? → components/{domain}/
 Needs state/hooks? → "use client" | Server component? → No directive
-```
-
-### Code Location
-
-```
-Server action → actions/{feature}/{feature}.ts
-Data transform → actions/{feature}/{feature}.adapter.ts
-Types (shared 2+) → types/{domain}.ts | Types (local 1) → {feature}/types.ts
-Utils (shared 2+) → lib/ | Utils (local 1) → {feature}/utils/
-Hooks (shared 2+) → hooks/ | Hooks (local 1) → {feature}/hooks.ts
-shadcn components → components/shadcn/
 ```
 
 ---
@@ -103,14 +158,40 @@ export default async function Page() {
 }
 ```
 
-### Server Action
+### Server Action (Thin Orchestrator)
 
 ```typescript
 "use server";
-export async function updateProvider(formData: FormData) {
-  const validated = schema.parse(Object.fromEntries(formData));
-  await updateDB(validated);
-  revalidatePath("/path");
+import { auth } from "@/auth";
+import { createOrderService } from "@/services/order.service";
+
+export async function placeOrder(items: OrderItem[]) {
+  const session = await auth();
+  if (!session) return { ok: false, error: "Unauthorized" };
+
+  try {
+    const order = await createOrderService(items);
+    return { ok: true, data: order };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+}
+```
+
+### Service (Business Logic)
+
+```typescript
+import prisma from "@/lib/prisma";
+import "server-only";
+
+export async function createOrderService(items: OrderItem[]) {
+  const order = await prisma.order.create({
+    data: { /* ... */ },
+    include: { items: true },
+  });
+
+  if (!order) throw new Error("Failed to create order");
+  return order;
 }
 ```
 
@@ -143,29 +224,13 @@ const useStore = create(
 );
 ```
 
-### Playwright Test
-
-```typescript
-export class FeaturePage extends BasePage {
-  readonly submitBtn = this.page.getByRole("button", { name: "Submit" });
-  async goto() { await super.goto("/path"); }
-  async submit() { await this.submitBtn.click(); }
-}
-
-test("action works", { tag: ["@critical", "@feature"] }, async ({ page }) => {
-  const p = new FeaturePage(page);
-  await p.goto();
-  await p.submit();
-  await expect(page).toHaveURL("/expected");
-});
-```
-
 ---
 
 ## TECH STACK
 
-Next.js 15.5.9 | React 19.2.2 | Tailwind 4.1.13 | shadcn/ui
-Zod 4.1.11 | React Hook Form 7.62.0 | Zustand 5.0.8 | NextAuth 5.0.0-beta.30 | Recharts 2.15.4
+Next.js 15 | React 19 | TypeScript strict | Prisma 7 | PostgreSQL (Neon)
+Tailwind 4 | shadcn/ui | Zod 4 | React Hook Form | Zustand 5 | NextAuth v5
+MercadoPago (payments) | Cloudinary (images)
 
 > **Note**: HeroUI exists in `components/ui/` as legacy code. Do NOT add new components there.
 
@@ -175,31 +240,47 @@ Zod 4.1.11 | React Hook Form 7.62.0 | Zustand 5.0.8 | NextAuth 5.0.0-beta.30 | R
 
 ```
 src/
-    2 ├── actions/              - [Lógica de Servidor (Server Actions)]
-    3 │   ├── auth/             - [Lógica de Servidor]
-    4 │   └── product/          - [Lógica de Servidor]
-    5 ├── app/                  - [Páginas y Rutas]
-    6 │   ├── (auth)/           - [Grupo de Rutas]
-    7 │   ├── (shop)/           - [Grupo de Rutas]
-    8 │   └── api/              - [API Endpoints (Server)]
-    9 ├── components/           - [Componentes de UI (React)]
-   10 │   ├── product/          - [Componentes Específicos]
-   11 │   ├── products/         - [Componentes Específicos]
-   12 │   ├── provider/         - [Componentes de Contexto (cc)]
-   13 │   └── ui/               - [Componentes Genéricos]
-   14 ├── config/               - [Configuración]
-   15 ├── generated/            - [Código Autogenerado por Herramientas]
-   16 │   └── prisma/           - [Generado por Prisma]
-   17 ├── interfaces/           - [Utilidades (Tipos y Contratos de Datos)]
-   18 ├── lib/                  - [Servicios y Lógica Compartida (Server)]
-   19 │   └── api/              - [Utilidades de API (Server)]
-   20 ├── seed /                - [Utilidades (Scripts de Base de Datos)]
-   21 ├── store/                - [Manejo de Estado (Client-Side / cc)]
-   22 │   ├── cart/             - [Estado del Carrito (cc)]
-   23 │   └── ui/               - [Estado de la UI (cc)]
-   24 ├── types/                - [Utilidades (Tipos de Datos Globales)]
-   25 └── utils/                - [Utilidades (Funciones Generales)]
-       # Global CSS
+├── actions/              - [Server Actions (thin orchestrators)]
+│   ├── auth/             - [Auth: login, register, logout]
+│   ├── order/            - [Orders: place, get, list]
+│   ├── product/          - [Products: get, paginate]
+│   ├── address/          - [Addresses: get, set, delete]
+│   ├── provincies/       - [Provinces: ensure, get]
+│   ├── payment/          - [Payments: create preference]
+│   ├── admin/            - [Admin: CRUD all domains]
+│   └── index.ts          - [Re-exports]
+├── app/                  - [Pages and Routes]
+│   ├── (auth)/           - [Auth routes: login, register]
+│   ├── (shop)/           - [Shop routes: products, cart, checkout]
+│   └── api/              - [API Endpoints (Server)]
+├── components/           - [UI Components (React)]
+│   ├── product/          - [Product-specific components]
+│   ├── products/         - [Product list components]
+│   ├── provider/         - [Context Providers (client)]
+│   └── ui/               - [Generic components]
+├── config/               - [Configuration]
+├── generated/            - [Auto-generated code]
+│   └── prisma/           - [Generated by Prisma]
+├── interfaces/           - [Type contracts and data interfaces]
+├── lib/                  - [Shared utilities and Prisma client]
+│   └── api/              - [API utilities]
+├── services/             - [Business logic layer (server-only)]
+│   ├── address.service.ts
+│   ├── auth.service.ts
+│   ├── category.service.ts
+│   ├── color.service.ts
+│   ├── order.service.ts
+│   ├── payment.service.ts
+│   ├── product.service.ts
+│   ├── province.service.ts
+│   ├── upload.service.ts
+│   ├── user.service.ts
+│   └── variant.service.ts
+├── store/                - [Client-side state (Zustand)]
+│   ├── cart/             - [Cart state]
+│   └── ui/               - [UI state]
+├── types/                - [Global type definitions]
+└── utils/                - [General utilities]
 ```
 
 ---
@@ -207,23 +288,21 @@ src/
 ## COMMANDS
 
 ```bash
-pnpm install && pnpm run dev
-pnpm run typecheck
-pnpm run lint:fix
-pnpm run healthcheck
-pnpm run test:e2e
-pnpm run test:e2e:ui
+pnpm install && pnpm run dev      # Start dev server
+pnpm run build                     # Production build
+npx tsc --noEmit                   # TypeScript check
+pnpm run lint:fix                  # Fix lint issues
 ```
 
 ---
 
 ## QA CHECKLIST BEFORE COMMIT
 
-- [ ] `npm run typecheck` passes
-- [ ] `npm run lint:fix` passes
-- [ ] `npm run format:write` passes
-- [ ] Relevant E2E tests pass
+- [ ] `npx tsc --noEmit` passes
+- [ ] `pnpm run build` passes
 - [ ] All UI states handled (loading, error, empty)
 - [ ] No secrets in code (use `.env.local`)
 - [ ] Error messages sanitized
 - [ ] Server-side validation present
+- [ ] Services have `server-only`
+- [ ] Actions delegate to services (0 Prisma directo)

@@ -2,37 +2,74 @@
 
 Este archivo resume las arquitecturas, decisiones y reglas establecidas durante el proceso de mejora de la sección de administración del e-commerce.
 
-## 🏗️ Roles y Permisos
-- El sistema cuenta con dos roles principales a nivel base de datos (`user` y `admin`). 
+## Arquitectura de Capas
+
+```
+UI (Admin Pages)
+  │
+  ▼
+Actions (admin/*)
+  • Auth (requireAdmin, requireSuperAdmin)
+  • Zod validation
+  • Error handling
+  │
+  ▼
+Services (services/)
+  • Business logic
+  • Prisma queries
+  • server-only enforced
+  │
+  ▼
+Prisma → PostgreSQL
+```
+
+### Flujo de Control
+
+1. **UI** llama a Server Action (ej: `updateProduct()`)
+2. **Action** verifica auth → valida input → llama a service
+3. **Service** ejecuta lógica de negocio + queries Prisma
+4. **Action** retorna `{ ok: true, data }` o `{ ok: false, error }`
+5. **UI** muestra resultado
+
+## Roles y Permisos
+
+- El sistema cuenta con dos roles principales a nivel base de datos (`user` y `admin`).
 - Dentro de la configuración específica para la aplicación administrativa, se define la protección de `isSuperAdmin` mediante utilidades de autenticación (`requireAdmin`, `requireSuperAdmin`) ubicadas en `src/lib/admin/auth-utils.ts`.
 
-## 📦 Base de Datos y Prisma (Sección Admin)
-Durante esta sesión se mejoró la base de datos sin romper el modelo público de NextAuth, instaurando las siguientes características clave para los administradores:
+## Base de Datos y Prisma (Sección Admin)
 
-1. **Logística vs. Financiero**: 
+1. **Logística vs. Financiero**:
    - El estado de pago reside en `OrderStatus` (`pending`, `paid`, `cancelled`) y se asocia al checkout o confirmaciones de cobro de pasarela (ej. MercadoPago).
    - El estado de envío es totalmente independiente y reside en `DeliveryStatus` (`pending`, `shipped`, `delivered`).
-   - Las manipulaciones del estado de envío en el panel de control se deben referenciar usando la Server Action correspondiente: `updateDeliveryStatus`.
+   - Las manipulaciones del estado de envío se realizan desde `order.service.ts` → `updateDeliveryStatus`.
 
 2. **Control de Inventario (Stock Panel)**:
-   - Todo movimiento de stock ejecutado desde el CMS y el panel de administración usa la función `adjustStock()`.
-   - Estas actualizaciones del stock **obligatoriamente** crean un registro trazable en la tabla `StockMovement` (incluyendo `type`, `quantity` y `note`).
+   - Todo movimiento de stock usa `product.service.ts` → `adjustStock()`.
+   - Estas actualizaciones crean registros trazables en `StockMovement`.
 
 3. **Auditoría Estricta (Audit Panel)**:
-   - Existe un logger imperativo de acciones atado a `src/lib/admin/audit-logger.ts` llamado `logAdminAction`.
-   - El loger de auditoría ahora infiere la **entidad** (`entity`: "Order", "Product", "User", "System") dinámicamente según el nombre de la acción o se le puede pasar explícitamente en la metadata de `prisma.auditLog.create`.
-   - La tabla de `AuditLog` permite visualizar fácilmente a los SuperAdmin quién (adminId) modificó qué elemento (targetId).
+   - Logger de auditoría en `src/lib/admin/audit-logger.ts` → `logAdminAction`.
+   - La tabla `AuditLog` permite visualizar quién (adminId) modificó qué elemento (targetId).
 
-## 🚀 Server Actions vs. Client Components
-Siguiendo la arquitectura `Server-First`:
+## Server Actions vs. Client Components
+
+Siguiendo la arquitectura Server-First:
 - Se debe minimizar el uso de `'use client'` a la estricta necesidad interactiva.
-- Formularios en la sección `admin` están enlazados directamente a `Server Actions` nativas (ej. `action={markAsShipped}`).
+- Formularios enlazados directamente a Server Actions nativas.
+- Las Actions delegan a services/ para lógica de negocio.
 
-## 📌 Historial del Chat de esta sesión:
-- Implementación de balance Prisma guardando soporte de Checkout Invitado (`sessionId`) e integrando metodos transaccionales limpios de stock y logs.
-- Modificación directa a los archivos de Server Actions en lugar de mezclar lógica en los UI Components.
-- Implementación del refactor desde subcarpetas previas hacia el dominio centralizado de `/admin`.
+## Archivos Clave
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `actions/admin/*.ts` | Thin orchestrators (auth + validación + delegación) |
+| `services/order.service.ts` | Lógica de órdenes (createOrder, updateStatus, etc.) |
+| `services/product.service.ts` | Lógica de productos (CRUD, stock, paginación) |
+| `services/user.service.ts` | Lógica de usuarios (toggleBlock, updateRole) |
+| `services/category.service.ts` | Lógica de categorías (CRUD) |
+| `services/color.service.ts` | Lógica de colores (CRUD) |
+| `services/variant.service.ts` | Lógica de variantes (CRUD) |
 
 ---
 
-> **NOTA PARA FUTUROS AGENTES:** Siempre utilicen el enumerador `DeliveryStatus` para actualizaciones de fletes o logística, no extiendan el `OrderStatus`. Toda mutación importante en stock de recursos que requiera supervisión **debe** envolverse en un `logAdminAction()`.
+> **NOTA PARA FUTUROS AGENTES:** Siempre utilicen el enumerador `DeliveryStatus` para actualizaciones de fletes o logística, no extiendan el `OrderStatus`. Toda mutación importante debe delegarse a services/ que ejecuta queries Prisma.
