@@ -14,8 +14,8 @@ import {
   adjustProductStockService,
   createProductService,
   updateProductService,
-} from "@/lib/services/product.service";
-import { deleteImageService } from "@/lib/services/upload.service";
+} from "@/services/product.service";
+import { deleteImageService } from "@/services/upload.service";
 
 export type ProductActionResponse = {
   ok: boolean;
@@ -124,8 +124,7 @@ export async function createProduct(payload: unknown): Promise<ProductActionResp
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { colors, variants, ...productData } = parsed.data as any;
+    const { colors, variants, ...productData } = parsed.data;
 
     // Validar server-side (el schema ya no exige .min(1))
     if (!colors || colors.length === 0) return { ok: false, error: "Debes agregar al menos un color" };
@@ -164,8 +163,7 @@ export async function updateProduct(productId: string, payload: unknown): Promis
   if (!parsed.success)
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { imagesToDelete, colors, variants, ...productData } = parsed.data as any;
+  const { imagesToDelete, colors, variants, ...productData } = parsed.data;
 
   try {
     // Primero eliminar de Cloudinary las imágenes que el admin quitó

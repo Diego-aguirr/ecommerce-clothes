@@ -22,6 +22,9 @@
 
 # ─── Testing ───
 /coverage
+/coverage/
+*.lcov
+test-results/
 
 # ─── Next.js ───
 /.next/
@@ -66,4 +69,38 @@ next-env.d.ts
 
 # ─── AI agent artifacts (no subir al repo) ───
 .agents/
+.atl/
+.claude/
+.codex/
 .gemini/
+CLAUDE.md
+GEMINI.md
+GENTLE_AI_COMMANDS.md
+skills/
+skills-lock.json
+
+# ─── SDD artifacts (no subir al repo) ───
+openspec/
+
+# ─── Drafts & posts (no subir al repo) ───
+linkedin-post.txt
+arquitectura-auditoria.txt
+
+# ─── Helper scripts (no subir al repo) ───
+scripts/
+
+# ─── Seed scripts (no subir al repo) ───
+src/seed/
+
+# ─── Docker (local volumes) ───
+postgres-data/
+
+# ─── Temp files ───
+*.tmp
+*.temp
+*.log
+
+# ─── Misc ───
+.vercel
+netlify.toml
+.firebase/

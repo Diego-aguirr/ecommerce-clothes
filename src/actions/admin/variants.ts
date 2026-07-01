@@ -39,7 +39,8 @@ const toggleVariantSchema = z.object({
 export async function getProductVariants(productId: string) {
   await requireAdmin();
   try {
-    return await getProductVariantsService(productId);
+    const variants = await getProductVariantsService(productId);
+    return { ok: true, variants };
   } catch (error) {
     return handleActionError(error, "getProductVariants");
   }
@@ -48,9 +49,9 @@ export async function getProductVariants(productId: string) {
 export async function createVariant(input: CreateVariantInput) {
   await requireAdmin();
   try {
-    const result = await createProductVariantService(input);
-    if (result.ok) revalidatePath(`/admin/products/${input.productId}/variants`);
-    return result;
+    const variant = await createProductVariantService(input);
+    revalidatePath(`/admin/products/${input.productId}/variants`);
+    return { ok: true as const, variant };
   } catch (error) {
     return handleActionError(error, "createVariant");
   }
@@ -60,8 +61,7 @@ export async function updateVariantStock(input: UpdateStockInput) {
   await requireAdmin();
   try {
     const result = await updateVariantStockService(input);
-    // El service no devuelve productId, revalidate genérico
-    return result;
+    return { ok: true, ...result };
   } catch (error) {
     return handleActionError(error, "updateVariantStock");
   }
@@ -71,11 +71,9 @@ export async function toggleVariantStatus(input: { variantId: string; isActive: 
   await requireAdmin();
   try {
     const validated = toggleVariantSchema.parse(input);
-    const result = await toggleVariantStatusService(validated.variantId, validated.isActive);
-    if (result.ok && result.variant) {
-      revalidatePath(`/admin/products/${result.variant.productId}/variants`);
-    }
-    return result;
+    const variant = await toggleVariantStatusService(validated.variantId, validated.isActive);
+    revalidatePath(`/admin/products/${variant.productId}/variants`);
+    return { ok: true, variant };
   } catch (error) {
     return handleActionError(error, "toggleVariantStatus");
   }
@@ -86,11 +84,7 @@ export async function bulkUpdateStock(
 ) {
   await requireAdmin();
   try {
-    const results = await Promise.all(updates.map((u) => updateVariantStockService(u)));
-    const failed = results.filter((r) => !r.ok);
-    if (failed.length > 0) {
-      return { ok: false, message: `${failed.length} actualizaciones fallaron` };
-    }
+    await Promise.all(updates.map((u) => updateVariantStockService(u)));
     return { ok: true, message: "Stock actualizado correctamente" };
   } catch (error) {
     return handleActionError(error, "bulkUpdateStock");

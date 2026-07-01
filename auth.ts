@@ -42,6 +42,46 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 
   callbacks: {
+    async signIn({ user, account }) {
+      // Auto-link OAuth provider to existing user when email matches
+      if (account?.provider !== "google" || !user?.email) return true;
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+        include: { accounts: true },
+      });
+
+      // No existing user — let adapter create everything normally
+      if (!existingUser) return true;
+
+      // Already has Google linked — nothing to do
+      const hasGoogle = existingUser.accounts.some(
+        (a) => a.provider === "google"
+      );
+      if (hasGoogle) return true;
+
+      // Link Google account to existing user
+      await prisma.account.create({
+        data: {
+          userId: existingUser.id,
+          type: account.type,
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+          refresh_token: account.refresh_token ?? null,
+          access_token: account.access_token ?? null,
+          expires_at: account.expires_at ?? null,
+          token_type: account.token_type ?? null,
+          scope: account.scope ?? null,
+          id_token: account.id_token ?? null,
+          session_state: String(account.session_state ?? ""),
+        },
+      });
+
+      // Ensure JWT gets the correct user id
+      user.id = existingUser.id;
+      return true;
+    },
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

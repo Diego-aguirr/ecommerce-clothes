@@ -1,7 +1,7 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { auth } from "../../../auth";
+import { getUserAddressService } from "@/services/address.service";
 
 export const getUserAddress = async () => {
   try {
@@ -11,30 +11,10 @@ export const getUserAddress = async () => {
       return { ok: false, error: "Usuario no autenticado" };
     }
 
-    const address = await prisma.userAddress.findFirst({
-      where: { userId: session.user.id },
-    });
-
-    if (!address) {
-      return { ok: true, data: null };
-    }
-
-    const { id, userId, sessionId, createdAt, updatedAt, ...rest } = address;
-
-    return {
-      ok: true,
-      data: {
-        ...rest,
-        apartment: rest.apartment ?? undefined,
-        description: rest.description ?? undefined,
-      },
-    };
+    const data = await getUserAddressService(session.user.id);
+    return { ok: true, data };
   } catch (error) {
     console.error("Error obteniendo dirección:", error);
-
-    return {
-      ok: false,
-      error: "Error interno al obtener la dirección",
-    };
+    return { ok: false, error: "Error interno al obtener la dirección" };
   }
 };

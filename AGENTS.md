@@ -1,12 +1,12 @@
-# epository Guidelines
+# Repository Guidelines
 
 ## How to Use This Guide
 
 Start here for cross-project norms.
 
-This repository is a domain-driven ecommerce platform.
+This repository is a domain-driven ecommerce platform built as a **modular monolith** with a unified services layer.
 
-- Each component has an `AGENTS.md` file with specific guidelines (e.g., `api/AGENTS.md`, `new-ecommerce-java/AGENTS.md`).
+- Each component has an `AGENTS.md` file with specific guidelines (e.g., `api/AGENTS.md`, `src/AGENTS.md`).
 
 ## Available Skills
 
@@ -40,7 +40,6 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 | Working with payments, webhooks, or generating checkout links                         | `mercadopago`      |
 | Building or modifying UI components, styling layouts, or adding interactive elements  | `ui-a11y`          |
 | Building product pages, shopping carts, checkouts, or call-to-action buttons          | `ecommerce-cro`    |
-| Fill .github/pull_request_template.md (Context/Description/Steps to review/Checklist) | `prowler-pr`       |
 | Regenerate AGENTS.md Auto-invoke tables (sync.sh)                                     | `skill-sync`       |
 | Reviewing JSON:API compliance                                                         | `jsonapi`          |
 | Testing RLS tenant isolation                                                          | `prowler-test-api` |
@@ -59,336 +58,346 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 This repository is a production-grade ecommerce platform built with:
 
-Next.js 15 App Router
-
-React 19
-
-TypeScript strict mode
-
-Prisma ORM
-
-PostgreSQL
-
-NextAuth v5
-
-Tailwind v4
-
-Zustand v5
-
-Zod v4
+- Next.js 15 App Router
+- React 19
+- TypeScript strict mode
+- Prisma 7 ORM
+- PostgreSQL (Neon)
+- NextAuth v5
+- Tailwind v4
+- Zustand v5
+- Zod v4
+- MercadoPago (payments)
+- Cloudinary (image optimization)
 
 Agents must assume modern patterns and MUST NOT generate legacy code.
 
-Global Architectural Rule (Highest Priority)
+---
+
+## Architecture
+
+### Modular Monolith
+
+This project follows the **Modular Monolith** architectural pattern:
+- Single deployable unit (no microservices)
+- Domain-driven modules (auth, products, orders, etc.)
+- Unified services layer for business logic
+- Clear separation of concerns between layers
+- Each module has its own actions, services, and types
+
+### Layers (top → bottom)
+
+```
+┌─────────────────────────────────────────────────┐
+│  UI (Server Components)                         │
+│  pages/, components/                            │
+└──────────────────┬──────────────────────────────┘
+                   │ llama
+┌──────────────────▼──────────────────────────────┐
+│  Actions (thin orchestrators)                   │
+│  • Auth (requireSession, requireAdmin)          │
+│  • Validación Zod                               │
+│  • Manejo de errores → { ok, error, data }      │
+│  • 0 queries Prisma directo                     │
+└──────────────────┬──────────────────────────────┘
+                   │ delega
+┌──────────────────▼──────────────────────────────┐
+│  Services (business logic)                      │
+│  • Lógica de negocio                            │
+│  • Queries Prisma                               │
+│  • server-only (11/11)                          │
+└──────────────────┬──────────────────────────────┘
+                   │ consulta
+┌──────────────────▼──────────────────────────────┐
+│  Prisma → PostgreSQL (Neon)                     │
+└─────────────────────────────────────────────────┘
+```
+
+### Global Architectural Rule (Highest Priority)
 
 Server Components first.
 Client Components only when strictly necessary.
 
 Default assumptions:
 
-pages → server
-
-layouts → server
-
-data fetching → server
-
-mutations → server actions
+- pages → server
+- layouts → server
+- data fetching → server
+- mutations → server actions
 
 Client components allowed only if:
 
-user interaction required
-
-browser APIs required
-
-animations required
-
-Zustand store used
-
-form state required
+- user interaction required
+- browser APIs required
+- animations required
+- Zustand store used
+- form state required
 
 Never add "use client" without justification.
 
-Source of Truth Hierarchy
+### Source of Truth Hierarchy
 
 When rules conflict:
 
-This file
+1. This file
+2. Folder AGENTS.md
+3. TypeScript types
+4. Prisma schema
+5. ESLint rules
 
-Folder AGENTS.md
+---
 
-TypeScript types
+## Domain Architecture
 
-Prisma schema
-
-ESLint rules
-
-Domain Architecture
-
-Project is domain-driven, not layer-driven.
+Project is domain-driven with a unified services layer.
 
 Domains:
 
-auth
+- auth
+- products
+- cart
+- checkout
+- orders
+- admin
+- profile
+- ui
+- data
+- infra
 
-products
+### Flow Rules
 
-cart
+Action layer:
 
-checkout
+- Auth (requireSession, requireAdmin)
+- Zod validation
+- Error handling → { ok, error, data }
+- Delegate to service
+- 0 Prisma queries direct
 
-orders
+Service layer:
 
-admin
-
-profile
-
-ui
-
-data
-
-infra
+- Business logic
+- Prisma queries
+- Throw errors (not return { ok: false })
+- server-only enforced
 
 Agents must place code inside correct domain.
 Never create new architectural patterns.
 
-Coding Standards
-TypeScript
+---
 
-Always type returns
+## Coding Standards
 
-Never use any
+### TypeScript
 
-Prefer type over interface
+- Always type returns
+- Never use any
+- Prefer type over interface
+- Use discriminated unions
 
-Use discriminated unions
+### Data Access
 
-Data Access
+- All database access must go through Prisma.
+- All Prisma queries live in services/ (never in actions/)
+- Forbidden: raw SQL, duplicated queries, manual joins already modeled
 
-All database access must go through Prisma.
+### Validation
 
-Forbidden:
+- All external input must be validated with Zod.
+- Includes: request body, forms, params, API payloads
+- Never trust user input.
 
-raw SQL (unless requested)
+### State Management
 
-duplicated queries
+- Global state = Zustand only.
+- Rules: use slices, use selectors, never expose full store, never use Context API for global state
 
-manual joins already modeled
+### Forms
 
-Validation
+- Forms must use: react-hook-form + zodResolver
+- Never manage form state manually.
 
-All external input must be validated with Zod.
+### Styling
 
-Includes:
+- Styling must use Tailwind only.
+- Forbidden: CSS modules, styled-components, emotion, external UI frameworks
 
-request body
+### Authentication
 
-forms
+- Auth system = NextAuth v5.
+- Agents must: use server session helpers, never decode tokens manually, never store auth state client-side
 
-params
+---
 
-API payloads
+## File Placement Rules
 
-Never trust user input.
-
-State Management
-
-Global state = Zustand only.
-
-Rules:
-
-use slices
-
-use selectors
-
-never expose full store
-
-never use Context API for global state
-
-Forms
-
-Forms must use:
-
-react-hook-form + zodResolver
-
-Never manage form state manually.
-
-Styling
-
-Styling must use Tailwind only.
-
-Forbidden:
-
-CSS modules
-
-styled-components
-
-emotion
-
-external UI frameworks
-
-Authentication
-
-Auth system = NextAuth v5.
-
-Agents must:
-
-use server session helpers
-
-never decode tokens manually
-
-never store auth state client-side
-
-File Placement Rules
-Type Location
-UI Components components/
-Server Actions actions/
-DB logic lib/ or actions/
-Schemas lib/zod.ts or domain file
-Stores store/
-Types interfaces/ or types/
+| Type              | Location                     |
+| ----------------- | ---------------------------- |
+| UI Components     | components/{domain}/         |
+| Server Actions    | actions/{domain}/            |
+| Business Logic    | services/{domain}.service.ts |
+| DB Queries        | services/{domain}.service.ts |
+| Zod Schemas       | lib/validations/ or inline   |
+| Zustand Stores    | store/{domain}/              |
+| Types             | interfaces/ or types/        |
+| Prisma Types      | generated/prisma/ (never import directly in components) |
 
 Never mix responsibilities.
 
-Naming Conventions
+---
 
-files → kebab-case
-components → PascalCase
-functions → camelCase
-constants → UPPER_CASE
+## Naming Conventions
 
-Performance Rules
+- files → kebab-case (actions, utils, lib)
+- services → {domain}.service.ts (camelCase exports)
+- components → PascalCase
+- functions → camelCase
+- constants → UPPER_CASE
+- exports → named exports (never default)
+
+---
+
+## Performance Rules
 
 Always prefer:
 
-server fetching
-
-streaming
-
-partial rendering
+- server fetching
+- streaming
+- partial rendering
 
 Never optimize prematurely.
 
-Security Rules
+---
+
+## Security Rules
 
 Always assume production environment.
 
 Required:
 
-validate input
+- validate input
+- sanitize output
+- safe errors
+- no stack traces
+- never expose secrets
 
-sanitize output
+---
 
-safe errors
-
-no stack traces
-
-never expose secrets
-
-Dependency Policy
+## Dependency Policy
 
 Agents may only use installed dependencies.
 
 If new dependency is required:
 
-Agent must:
+- Agent must: justify why, explain size impact, wait approval
 
-justify why
+---
 
-explain size impact
-
-wait approval
-
-Forbidden Actions
+## Forbidden Actions
 
 Agents must NOT:
 
-refactor unrelated files
+- refactor unrelated files
+- rename folders globally
+- change configs silently
+- alter Prisma schema without instruction
+- introduce new architectures
+- downgrade libraries
+- put Prisma queries in actions/ (use services/)
+- import Prisma types directly in components (use interfaces/)
 
-rename folders globally
+---
 
-change configs silently
-
-alter Prisma schema without instruction
-
-introduce new architectures
-
-downgrade libraries
-
-Expected Agent Behavior
+## Expected Agent Behavior
 
 When implementing something:
 
-Agent must:
+- Agent must: locate domain, reuse patterns, respect types, validate inputs, return typed data, avoid client code unless required
+- Delegate to services/ for business logic
+- Actions are thin orchestrators only
 
-locate domain
+---
 
-reuse patterns
-
-respect types
-
-validate inputs
-
-return typed data
-
-avoid client code unless required
-
-Definition of Done
+## Definition of Done
 
 Before finishing a task:
 
-types compile
+- types compile
+- lint passes
+- imports valid
+- no unused code
+- no console logs
+- no TODO comments
+- architecture respected
+- services have server-only
 
-lint passes
+---
 
-imports valid
-
-no unused code
-
-no console logs
-
-no TODO comments
-
-architecture respected
-
-Instruction for All Agents
+## Instruction for All Agents
 
 If unsure where code belongs:
 
-STOP.
-Analyze project structure.
-Never guess.
+1. Check this file
+2. Check folder AGENTS.md
+3. STOP. Analyze project structure.
+4. Never guess.
 
-
+---
 
 ## PROJECT STRUCTURE
 
 ```
 src/
-    2 ├── actions/              - [Lógica de Servidor (Server Actions)]
-    3 │   ├── auth/             - [Lógica de Servidor]
-    4 │   └── product/          - [Lógica de Servidor]
-    5 ├── app/                  - [Páginas y Rutas]
-    6 │   ├── (auth)/           - [Grupo de Rutas]
-    7 │   ├── (shop)/           - [Grupo de Rutas]
-    8 │   └── api/              - [API Endpoints (Server)]
-    9 ├── components/           - [Componentes de UI (React)]
-   10 │   ├── product/          - [Componentes Específicos]
-   11 │   ├── products/         - [Componentes Específicos]
-   12 │   ├── provider/         - [Componentes de Contexto (cc)]
-   13 │   └── ui/               - [Componentes Genéricos]
-   14 ├── config/               - [Configuración]
-   15 ├── generated/            - [Código Autogenerado por Herramientas]
-   16 │   └── prisma/           - [Generado por Prisma]
-   17 ├── interfaces/           - [Utilidades (Tipos y Contratos de Datos)]
-   18 ├── lib/                  - [Servicios y Lógica Compartida (Server)]
-   19 │   └── api/              - [Utilidades de API (Server)]
-   20 ├── seed /                - [Utilidades (Scripts de Base de Datos)]
-   21 ├── store/                - [Manejo de Estado (Client-Side / cc)]
-   22 │   ├── cart/             - [Estado del Carrito (cc)]
-   23 │   └── ui/               - [Estado de la UI (cc)]
-   24 ├── types/                - [Utilidades (Tipos de Datos Globales)]
-   25 └── utils/                - [Utilidades (Funciones Generales)]
-       # Global CSS
+├── actions/              - [Server Actions (thin orchestrators)]
+│   ├── auth/             - [Auth actions: login, register, logout]
+│   ├── order/            - [Order actions: place, get, list]
+│   ├── product/          - [Product actions: get, paginate]
+│   ├── address/          - [Address actions: get, set, delete]
+│   ├── provincies/       - [Province actions: ensure, get]
+│   ├── payment/          - [Payment actions: create preference]
+│   ├── admin/            - [Admin actions: CRUD for all domains]
+│   └── index.ts          - [Re-exports]
+├── app/                  - [Pages and Routes]
+│   ├── (auth)/           - [Auth routes: login, register]
+│   ├── (shop)/           - [Shop routes: products, cart, checkout]
+│   └── api/              - [API Endpoints (Server)]
+├── components/           - [UI Components (React)]
+│   ├── product/          - [Product-specific components]
+│   ├── products/         - [Product list components]
+│   ├── provider/         - [Context Providers (client)]
+│   └── ui/               - [Generic components]
+├── config/               - [Configuration]
+├── generated/            - [Auto-generated code]
+│   └── prisma/           - [Generated by Prisma]
+├── interfaces/           - [Type contracts and data interfaces]
+├── lib/                  - [Shared utilities and Prisma client]
+│   └── api/              - [API utilities]
+├── services/             - [Business logic layer (server-only)]
+│   ├── address.service.ts
+│   ├── auth.service.ts
+│   ├── category.service.ts
+│   ├── color.service.ts
+│   ├── order.service.ts
+│   ├── payment.service.ts
+│   ├── product.service.ts
+│   ├── province.service.ts
+│   ├── upload.service.ts
+│   ├── user.service.ts
+│   └── variant.service.ts
+├── store/                - [Client-side state (Zustand)]
+│   ├── cart/             - [Cart state]
+│   └── ui/               - [UI state]
+├── types/                - [Global type definitions]
+└── utils/                - [General utilities]
 ```
 
 ---
+
+## COMMANDS
+
+```bash
+pnpm install && pnpm run dev      # Start dev server
+pnpm run build                     # Production build
+npx tsc --noEmit                   # TypeScript check
+pnpm run lint:fix                  # Fix lint issues
+```

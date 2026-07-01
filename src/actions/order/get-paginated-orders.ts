@@ -1,33 +1,20 @@
 "use server";
 
 import { auth } from "../../../auth";
-import prisma from "@/lib/prisma";
+import { getPaginatedOrdersService } from "@/services/order.service";
 
 export const getPaginatedOrders = async () => {
   const session = await auth();
 
   if (session?.user?.role !== "admin") {
-    return {
-      ok: false,
-      message: "Debe ser administrador",
-    };
+    return { ok: false, message: "Debe ser administrador" };
   }
 
-  const orders = await prisma.order.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      OrderAddress: {
-        select: {
-          fullname: true,
-        },
-      },
-    },
-  });
-
-  return {
-    ok: true,
-    orders: orders,
-  };
+  try {
+    const orders = await getPaginatedOrdersService();
+    return { ok: true, orders };
+  } catch (error) {
+    console.error("Error getPaginatedOrders:", error);
+    return { ok: false, message: "Error al obtener órdenes" };
+  }
 };

@@ -1,9 +1,9 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { auth } from "../../../auth";
 import { z } from "zod";
 import { setUserAddressSchema } from "@/lib/schemas/address.schema";
+import { setUserAddressService } from "@/services/address.service";
 
 export type SetUserAddressInput = z.infer<typeof setUserAddressSchema>;
 
@@ -17,11 +17,10 @@ export const setUserAddress = async (data: SetUserAddressInput) => {
     }
 
     const parsed = setUserAddressSchema.safeParse(data);
-
     if (!parsed.success) {
-      return { 
-        ok: false, 
-        error: parsed.error.issues[0]?.message || "Datos de dirección inválidos" 
+      return {
+        ok: false,
+        error: parsed.error.issues[0]?.message || "Datos de dirección inválidos",
       };
     }
 
@@ -37,35 +36,18 @@ export const setUserAddress = async (data: SetUserAddressInput) => {
       ...restData
     } = parsed.data;
 
-    const addressData = {
+    const result = await setUserAddressService(userId, {
       ...restData,
-      street: street ?? null,
-      zip: zip ?? null,
-      city: city ?? null,
-      provinceId: provinceId ?? null,
-      apartment: apartment ?? null,
-      description: description ?? null,
-      userId,
-    };
-
-    const existingAddress = await prisma.userAddress.findFirst({
-      where: { userId },
+      street,
+      zip,
+      city,
+      provinceId,
+      apartment,
+      description,
+      shippingMethod,
     });
 
-    if (existingAddress) {
-      const updatedAddress = await prisma.userAddress.update({
-        where: { id: existingAddress.id },
-        data: addressData,
-      });
-
-      return { ok: true, data: updatedAddress };
-    }
-
-    const newAddress = await prisma.userAddress.create({
-      data: addressData,
-    });
-
-    return { ok: true, data: newAddress };
+    return { ok: true, data: result };
   } catch (error) {
     return { ok: false, error: "Error interno al guardar la dirección" };
   }
