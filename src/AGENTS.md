@@ -60,7 +60,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 ---
 
-## ARCHITECTURE — Service Layer Pattern
+## ARCHITECTURE — Modular Monolith (Service Layer Pattern)
 
 ```
 UI (Server Components)

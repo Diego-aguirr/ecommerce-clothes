@@ -4,7 +4,7 @@
 
 Start here for cross-project norms.
 
-This repository is a domain-driven ecommerce platform with a unified services layer.
+This repository is a domain-driven ecommerce platform built as a **modular monolith** with a unified services layer.
 
 - Each component has an `AGENTS.md` file with specific guidelines (e.g., `api/AGENTS.md`, `src/AGENTS.md`).
 
@@ -75,6 +75,15 @@ Agents must assume modern patterns and MUST NOT generate legacy code.
 ---
 
 ## Architecture
+
+### Modular Monolith
+
+This project follows the **Modular Monolith** architectural pattern:
+- Single deployable unit (no microservices)
+- Domain-driven modules (auth, products, orders, etc.)
+- Unified services layer for business logic
+- Clear separation of concerns between layers
+- Each module has its own actions, services, and types
 
 ### Layers (top → bottom)
 
