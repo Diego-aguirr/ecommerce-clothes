@@ -1,7 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/lib/admin/auth-utils";
-import { uploadImageService, deleteImageService } from "@/lib/services/upload.service";
+import { uploadImageService, deleteImageService } from "@/services/upload.service";
 import { logAdminAction } from "@/lib/admin/audit-logger";
 
 export async function uploadProductImage(formData: FormData): Promise<{ ok: boolean; url?: string; publicId?: string; error?: string }> {

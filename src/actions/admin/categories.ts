@@ -1,20 +1,20 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import { revalidatePath } from "next/cache";
-import { CreateCategorySchema, DeleteCategorySchema } from "@/lib/validations/category.schema";
+import {
+  CreateCategorySchema,
+  DeleteCategorySchema,
+} from "@/lib/validations/category.schema";
+import {
+  getCategoriesService,
+  createCategoryService,
+  deleteCategoryService,
+} from "@/services/category.service";
 
 export async function getCategories() {
   try {
-    const categories = await prisma.category.findMany({
-      orderBy: { name: "asc" },
-      include: {
-        _count: {
-          select: { Product: true }
-        }
-      }
-    });
+    const categories = await getCategoriesService();
     return { ok: true, categories };
   } catch (error: unknown) {
     console.error("Error fetching categories:", error);
@@ -31,25 +31,16 @@ export async function createCategory(name: string) {
   }
 
   try {
-    // Verificar si ya existe (case-insensitive search opcional, pero Prisma lo hace con name en este caso exacto)
-    const existing = await prisma.category.findUnique({
-      where: { name: parsed.data.name }
-    });
-
-    if (existing) {
-      return { ok: false, error: "Ya existe una categoría con ese nombre" };
-    }
-
-    const category = await prisma.category.create({
-      data: { name: parsed.data.name }
-    });
-
+    const category = await createCategoryService(parsed.data.name);
     revalidatePath("/admin/categories");
     revalidatePath("/admin/products/new");
     return { ok: true, category };
   } catch (error: unknown) {
     console.error("Error creating category:", error);
-    return { ok: false, error: "Error al crear la categoría" };
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Error al crear la categoría",
+    };
   }
 }
 
@@ -62,32 +53,14 @@ export async function deleteCategory(id: string) {
   }
 
   try {
-    // Validar si tiene productos asociados
-    const category = await prisma.category.findUnique({
-      where: { id: parsed.data.categoryId },
-      include: {
-        _count: {
-          select: { Product: true }
-        }
-      }
-    });
-
-    if (!category) {
-      return { ok: false, error: "Categoría no encontrada" };
-    }
-
-    if (category._count.Product > 0) {
-      return { ok: false, error: `No se puede eliminar. Hay ${category._count.Product} productos usando esta categoría.` };
-    }
-
-    await prisma.category.delete({
-      where: { id: parsed.data.categoryId }
-    });
-
+    await deleteCategoryService(parsed.data.categoryId);
     revalidatePath("/admin/categories");
     return { ok: true };
   } catch (error: unknown) {
     console.error("Error deleting category:", error);
-    return { ok: false, error: "Error al eliminar la categoría" };
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Error al eliminar la categoría",
+    };
   }
 }

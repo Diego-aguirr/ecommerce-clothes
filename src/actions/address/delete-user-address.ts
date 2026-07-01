@@ -1,7 +1,7 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { auth } from "../../../auth";
+import { deleteUserAddressService } from "@/services/address.service";
 
 export const deleteUserAddress = async () => {
   try {
@@ -12,11 +12,7 @@ export const deleteUserAddress = async () => {
       return { ok: false, error: "Usuario no autenticado" };
     }
 
-    // Eliminamos todas las direcciones asociadas a este usuario
-    await prisma.userAddress.deleteMany({
-      where: { userId },
-    });
-
+    await deleteUserAddressService(userId);
     return { ok: true, message: "Dirección eliminada correctamente" };
   } catch (error) {
     console.error("Error eliminando dirección:", error);

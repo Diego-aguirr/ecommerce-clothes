@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { OrderStatus, DeliveryStatus, Order } from "@/generated/prisma/client";
 import { z } from "zod";
 import { UpdateDeliveryStatusSchema, UpdateOrderStatusSchema, UpdateOrderNotesSchema } from "@/lib/validations";
-import { updateOrderDeliveryStatusService, updateOrderPaymentStatusService, updateOrderNotesService } from "@/lib/services/order.service";
+import { updateOrderDeliveryStatusService, updateOrderPaymentStatusService, updateOrderNotesService } from "@/services/order.service";
 
 export type OrderActionResponse = {
   ok: boolean;

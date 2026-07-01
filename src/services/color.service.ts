@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import "server-only";
 import { z } from "zod";
 
 // ── Schemas ──

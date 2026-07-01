@@ -7,7 +7,7 @@ import { UserStatus, Role } from "@/generated/prisma/enums";
 import { User } from "@/generated/prisma/client";
 import { z } from "zod";
 import { ToggleUserBlockSchema, UpdateUserRoleSchema } from "@/lib/validations";
-import { toggleUserBlockService, updateUserRoleService } from "@/lib/services/user.service";
+import { toggleUserBlockService, updateUserRoleService } from "@/services/user.service";
 
 export type UserActionResponse = {
   ok: boolean;

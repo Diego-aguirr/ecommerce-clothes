@@ -14,8 +14,8 @@ import {
   adjustProductStockService,
   createProductService,
   updateProductService,
-} from "@/lib/services/product.service";
-import { deleteImageService } from "@/lib/services/upload.service";
+} from "@/services/product.service";
+import { deleteImageService } from "@/services/upload.service";
 
 export type ProductActionResponse = {
   ok: boolean;
