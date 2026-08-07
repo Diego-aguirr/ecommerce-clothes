@@ -69,6 +69,11 @@ Siguiendo la arquitectura Server-First:
 | `services/category.service.ts` | Lógica de categorías (CRUD) |
 | `services/color.service.ts` | Lógica de colores (CRUD) |
 | `services/variant.service.ts` | Lógica de variantes (CRUD) |
+| `components/admin/dashboard/` | Dashboard components |
+| `components/admin/products/` | Product management components |
+| `components/admin/ui/` | Admin-specific UI components |
+| `lib/admin/auth-utils.ts` | Guards requireAdmin() + requireSuperAdmin() |
+| `lib/admin/audit-logger.ts` | Logger de acciones admin (AuditLog) |
 
 ---
 

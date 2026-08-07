@@ -101,6 +101,17 @@ Nunca:
 
 Nunca mezclar responsabilidades.
 
+## API Routes
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/webhooks/mercadopago` | Webhook de pagos MercadoPago |
+| `POST` | `/api/checkout/start` | Iniciar checkout |
+| `POST` | `/api/auth/forgot-password` | Enviar email de recuperación |
+| `POST` | `/api/auth/reset-password` | Restablecer contraseña |
+| `GET` | `/api/auth/verify` | Verificar email |
+| `POST` | `/api/auth/resend-verification` | Reenviar verificación |
+
 ## Decision Tree — Endpoint
 
 ```

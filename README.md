@@ -1,85 +1,236 @@
 # Java Crew E-Commerce
 
-Plataforma de E-Commerce moderna construida con Next.js 15, React 19, TypeScript, Tailwind CSS v4, Prisma (PostgreSQL) y NextAuth v5.
+Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 15 App Router, React 19, TypeScript strict mode, Prisma 7, PostgreSQL y NextAuth v5.
 
 ---
 
-## 🚀 Guía de Instalación (Entorno de Desarrollo)
+## Stack
 
-Sigue esta guía paso a paso para configurar y levantar el proyecto en tu entorno local.
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | Next.js 15 (App Router) · React 19 · Tailwind CSS v4 |
+| State | Zustand v5 (carrito global) |
+| Forms | React Hook Form + Zod v4 |
+| Backend | TypeScript strict · Prisma 7 ORM |
+| Database | PostgreSQL 15 (Docker local / Neon producción) |
+| Auth | NextAuth v5 (Google OAuth + credenciales) |
+| Pagos | MercadoPago |
+| Imágenes | Cloudinary |
+| Testing | Vitest |
 
-### 1. Clonar el repositorio y preparar dependencias
+## Arquitectura
+
+```
+Server Components
+  └─ Server Actions (thin orchestrators)
+       └─ Services (lógica de negocio · Prisma)
+            └─ PostgreSQL
+```
+
+- **Server Components** por defecto. Client Components solo cuando es estrictamente necesario.
+- Actions son orquestadores delgados: auth, validación Zod, error handling → delegan a Services.
+- Services contienen toda la lógica de negocio y queries Prisma (`server-only`).
+
+---
+
+## Instalación (Desarrollo)
+
+### 1. Clonar e instalar dependencias
 
 ```bash
-# Clona el repositorio
 git clone <tu-repositorio>
 cd new-ecommerce-java
-
-# Instala todas las dependencias
 pnpm install
 ```
 
-### 2. Configurar Variables de Entorno
-
-Copia el archivo template para crear tus propias variables de entorno:
+### 2. Configurar variables de entorno
 
 ```bash
-cp .env.template .env
+cp .env.templete .env
 ```
 
-👉 _Recuerda abrir `.env` y asegurarte de rellenar todas las variables requeridas (URL de BD, claves secretas, NextAuth URL, etc)._
+Editá `.env` y completá todas las variables requeridas. Consultá el archivo `.env.templete` para el detalle de cada una.
 
-### 3. Base de Datos (PostgreSQL via Docker)
+> **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`.
 
-Sube el contenedor de la base de datos de forma desatendida (`-d`) utilizando Docker Compose:
+### 3. Levantar PostgreSQL con Docker
 
 ```bash
 docker-compose up -d
 ```
 
-### 4. Prisma: Migraciones y Semilla (Seed)
-
-Prepara el esquema de tu base de datos y llénala automáticamente con data inicial (productos, usuarios, etc) para empezar a desarrollar:
+### 4. Migraciones y seed
 
 ```bash
-# Aplica las migraciones a la BD recién levantada
 npx prisma migrate dev
-
-# Corre el script de semilla (Seed) para inyectar datos
 npx prisma db seed
 ```
 
-> **💡 Opcional - Explorar los datos:**
-> Para visualizar las tablas y registros fácilmente desde el navegador, puedes usar:
->
-> ```bash
-> npx prisma studio
-> ```
-
-### 5. Iniciar la Aplicación
-
-Levanta el entorno de desarrollo usando TurboPack:
+### 5. Iniciar el servidor de desarrollo
 
 ```bash
 pnpm run dev
 ```
 
-🌐 Abre tu navegador en [http://localhost:3000](http://localhost:3000).
+Abrí [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🔗 Integraciones de Webhooks (Ngrok)
+## Comandos
 
-Si estás trabajando con pasarelas de pagos de terceros (ej. Mercado Pago) y necesitas exponer tus endpoints locales a internet, usa Ngrok:
+```bash
+pnpm run dev          # Dev server (Turbopack)
+pnpm run build        # Build producción
+pnpm start            # Iniciar producción
+pnpm run lint         # Lint
+pnpm run test         # Vitest (watch)
+pnpm run test:run     # Vitest (una vez)
+npx tsc --noEmit      # Type check
+```
 
-1. Autentica tu CLI (solo requerido la primera vez):
+---
 
-   ```bash
-   npx ngrok config add-authtoken TU_TOKEN
-   ```
+## Estructura del Proyecto
 
-2. Crea el túnel público conectado a tu servidor Next.js:
-   ```bash
-   npx ngrok http 3000
-   ```
-   _(Utiliza la URL de destino final HTTPS proporcionada por Ngrok para configurar tus notificaciones y Webhooks de la pasarela)._
+```
+src/
+├── actions/            # Server Actions (thin orchestrators)
+│   ├── auth/           # Login, register, logout
+│   ├── order/          # Place, get, list
+│   ├── product/        # Get, paginate
+│   ├── address/        # CRUD direcciones
+│   ├── admin/          # CRUD dominios (admin)
+│   └── payment/        # Crear preferencia MercadoPago
+├── app/                # Pages y rutas (App Router)
+│   ├── (auth)/         # Login, register, forgot/reset password
+│   ├── (shop)/         # Productos, carrito, checkout, órdenes
+│   ├── admin/          # Panel de administración
+│   └── api/            # API endpoints y webhooks
+├── components/         # UI Components (React)
+│   ├── ui/             # Componentes genéricos
+│   ├── product/        # Componentes de producto
+│   └── provider/       # Context Providers (client)
+├── services/           # Business logic (server-only)
+├── store/              # Client-side state (Zustand)
+│   ├── cart/           # useCartStore
+│   └── ui/             # useUIStore
+├── lib/                # Utilidades compartidas
+├── interfaces/         # Type contracts
+├── hooks/              # Custom hooks
+├── seed/               # Seed scripts
+└── utils/              # Utilidades generales
+```
+
+---
+
+## Rutas Principales
+
+### Shop (público)
+
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Home con grid de productos |
+| `/product/[slug]` | Detalle de producto |
+| `/gender/[gender]` | Productos por género |
+| `/cart` | Carrito de compras |
+| `/checkout/address` | Formulario de dirección |
+| `/checkout` | Resumen y confirmación |
+| `/orders` | Órdenes del usuario |
+| `/orders/[id]` | Detalle de orden |
+
+### Auth
+
+| Ruta | Descripción |
+|------|-------------|
+| `/login` | Inicio de sesión |
+| `/new-account` | Registro |
+| `/forgot-password` | Recuperar contraseña |
+| `/reset-password` | Restablecer contraseña |
+
+### Admin (protegido)
+
+| Ruta | Descripción |
+|------|-------------|
+| `/admin` | Dashboard |
+| `/admin/products` | CRUD productos |
+| `/admin/products/[id]/variants` | Gestión de variantes |
+| `/admin/products/[id]/colors` | Gestión de colores |
+| `/admin/orders` | Gestión de órdenes |
+| `/admin/users` | Gestión de usuarios |
+| `/admin/categories` | Gestión de categorías |
+| `/admin/payments` | Pagos |
+| `/admin/audit` | Logs de auditoría |
+
+### API
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/webhooks/mercadopago` | Webhook de pagos |
+| `POST` | `/api/checkout/start` | Iniciar checkout |
+| `POST` | `/api/auth/forgot-password` | Enviar email de recuperación |
+| `POST` | `/api/auth/reset-password` | Restablecer contraseña |
+| `GET` | `/api/auth/verify` | Verificar email |
+| `POST` | `/api/auth/resend-verification` | Reenviar verificación |
+
+---
+
+## Dominios
+
+| # | Dominio | Estado |
+|---|---------|--------|
+| 01 | Auth | ✅ Funcional |
+| 02 | Products | ✅ Funcional |
+| 03 | Orders | ✅ Funcional |
+| 04 | Payments | ✅ Funcional |
+| 05 | Cart & Checkout | ✅ Funcional |
+| 06 | Admin | ✅ Funcional |
+| 07 | Addresses | ✅ Funcional |
+| 08 | Uploads | ✅ Funcional |
+| 09 | Database | ✅ Estable |
+
+---
+
+## Webhooks (Ngrok)
+
+Para exponer endpoints locales a internet (ej. MercadoPago webhooks):
+
+```bash
+# Autenticar (primera vez)
+npx ngrok config add-authtoken TU_TOKEN
+
+# Crear túnel
+npx ngrok http 3000
+```
+
+Usá la URL HTTPS de Ngrok para configurar los webhooks en tu pasarela de pagos.
+
+---
+
+## Variables de Entorno
+
+Ver [`.env.templete`](./.env.templete) para la lista completa y documentación de cada variable.
+
+---
+
+## Documentación
+
+La documentación detallada de cada dominio se encuentra en [`docs/`](./docs/):
+
+| Archivo | Contenido |
+|---------|-----------|
+| `01-auth.md` | Sistema de autenticación |
+| `02-products.md` | Catálogo de productos y variantes |
+| `03-orders.md` | Gestión de órdenes |
+| `04-payments.md` | Integración MercadoPago |
+| `05-cart-checkout.md` | Carrito y flujo de checkout |
+| `06-admin.md` | Panel de administración |
+| `07-addresses.md` | Direcciones y provincias |
+| `08-uploads.md` | Gestión de imágenes |
+| `09-database.md` | Schema y modelos de datos |
+| `mercadopago-webhook.md` | Detalle técnico del webhook |
+
+---
+
+## License
+
+Private — All rights reserved.
