@@ -139,7 +139,7 @@ Allowed storage:
 | `services/payment.service.ts` | MercadoPago SDK integration, preference creation |
 | `actions/payment/create-preference.ts` | Thin orchestrator for payment creation |
 | `components/mercadopago/MercadoPagoButton.tsx` | UI component for checkout |
-| `app/api/payments/webhook/route.ts` | Webhook handler for MercadoPago |
+| `app/api/webhooks/mercadopago/route.ts` | Webhook handler for MercadoPago |
 
 ## Flow
 
