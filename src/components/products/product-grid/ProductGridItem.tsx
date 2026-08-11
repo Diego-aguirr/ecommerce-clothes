@@ -28,16 +28,16 @@ export const ProductGridItem = ({ product }: Props) => {
   const currentSrc = hasError ? PLACEHOLDER : resolveImageSrc(displayImage);
 
   return (
-    <div className="rounded-md overflow-hidden fade-in relative group flex flex-col">
+    <div className="rounded-lg overflow-hidden fade-in relative group flex flex-col">
       <Link href={`/product/${product.slug}`}>
         <Image
           src={currentSrc}
           alt={product.title}
-          className="w-full aspect-square object-cover rounded transition-transform duration-500 group-hover:scale-105"
-          width={500}
+          className="w-full aspect-[4/5] object-cover rounded-lg transition-transform duration-500 group-hover:scale-105"
+          width={400}
           height={500}
           onMouseEnter={() => {
-            setHasError(false); // reset por si la segunda imagen sí carga
+            setHasError(false);
             setDisplayImage(product.images[1] ?? product.images[0]);
           }}
           onMouseLeave={() => {
@@ -49,16 +49,16 @@ export const ProductGridItem = ({ product }: Props) => {
         />
       </Link>
 
-      <div className="p-4 flex flex-col gap-1 flex-1 justify-between">
+      <div className="p-3 sm:p-4 flex flex-col gap-1 flex-1 justify-between">
         <div className="flex flex-col">
-          <Link className="font-medium text-gray-900 hover:text-[#111] transition-colors line-clamp-2" href={`/product/${product.slug}`}>
+          <Link className="font-medium text-sm sm:text-base text-gray-900 hover:text-[#111] transition-colors line-clamp-2" href={`/product/${product.slug}`}>
             {product.title}
           </Link>
-          <span className="font-bold text-lg mt-1">${product.price.toLocaleString("es-AR")}</span>
+          <span className="font-bold text-base sm:text-lg mt-1">${product.price.toLocaleString("es-AR")}</span>
         </div>
         
         {/* Quick Add CTA */}
-        <div className="mt-3">
+        <div className="mt-2 sm:mt-3">
           <QuickAddToCart product={product} />
         </div>
       </div>

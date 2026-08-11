@@ -21,6 +21,7 @@ export const initialData = {
   categories: ["remeras", "pantalones", "buzos", "camperas", "accesorios"],
 
   products: [
+    // ── 1 IMAGEN (SingleImageLayout) ──
     {
       title: "Remera Básica Algodón",
       description: "Remera básica de algodón 100%, perfecta para el día a día.",
@@ -36,23 +37,19 @@ export const initialData = {
           color: "negro",
           label: "Negro",
           hexCode: "#000000",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
-          ],
+          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
         },
         {
           color: "blanco",
           label: "Blanco",
           hexCode: "#FFFFFF",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-          ],
+          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg"],
         },
       ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
-      ],
+      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
     },
+
+    // ── 2 IMÁGENES (TwoImageLayout) ──
     {
       title: "Remera Oversized Streetwear",
       description: "Remera oversized con estampado frontal. Tendencia streetwear.",
@@ -70,13 +67,17 @@ export const initialData = {
           hexCode: "#1a1a2e",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
           ],
         },
       ],
       images: [
         "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
       ],
     },
+
+    // ── 3 IMÁGENES (MultiImageLayout) ──
     {
       title: "Jean Slim Fit Classic",
       description: "Jean corte slim fit, denim de alta calidad.",
@@ -94,6 +95,8 @@ export const initialData = {
           hexCode: "#6890c8",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
           ],
         },
         {
@@ -101,14 +104,20 @@ export const initialData = {
           label: "Azul Oscuro",
           hexCode: "#1a237e",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
           ],
         },
       ],
       images: [
         "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
       ],
     },
+
+    // ── 4 IMÁGENES (MultiImageLayout) ──
     {
       title: "Buzo Kangaroo Hoodie",
       description: "Buzo con capucha y canguro. Algodón francelés.",
@@ -126,6 +135,9 @@ export const initialData = {
           hexCode: "#000000",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
           ],
         },
         {
@@ -134,13 +146,21 @@ export const initialData = {
           hexCode: "#9e9e9e",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
           ],
         },
       ],
       images: [
         "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
       ],
     },
+
+    // ── 1 IMAGEN (SingleImageLayout) ──
     {
       title: "Campera Bomber Nylon",
       description: "Campera tipo bomber nylon. Forro interior malla.",
@@ -156,15 +176,13 @@ export const initialData = {
           color: "verde_militar",
           label: "Verde Militar",
           hexCode: "#2d4a22",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
-          ],
+          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
         },
       ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
-      ],
+      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
     },
+
+    // ── 2 IMÁGENES (TwoImageLayout) ──
     {
       title: "Pantalón Jogger Comfort",
       description: "Jogger deportivo con cierre en tobillo.",
@@ -182,13 +200,17 @@ export const initialData = {
           hexCode: "#000000",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
           ],
         },
       ],
       images: [
         "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
       ],
     },
+
+    // ── 1 IMAGEN (SingleImageLayout) ──
     {
       title: "Remera Kids Dino Print",
       description: "Remera infantil con estampado de dinosaurios.",
@@ -204,15 +226,13 @@ export const initialData = {
           color: "azul_celeste",
           label: "Azul Celeste",
           hexCode: "#87ceeb",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-          ],
+          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png"],
         },
       ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-      ],
+      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png"],
     },
+
+    // ── 3 IMÁGENES (MultiImageLayout) ──
     {
       title: "Buzo Full Zip Premium",
       description: "Buzo con cierre completo. Tejido franelado.",
@@ -230,6 +250,8 @@ export const initialData = {
           hexCode: "#ffb6c1",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
           ],
         },
         {
@@ -238,13 +260,19 @@ export const initialData = {
           hexCode: "#c8a2c8",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
           ],
         },
       ],
       images: [
         "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
       ],
     },
+
+    // ── 1 IMAGEN (SingleImageLayout) ──
     {
       title: "Gorra Trucker Classic",
       description: "Gorra tipo trucker con malla trasera.",
@@ -260,15 +288,13 @@ export const initialData = {
           color: "negro",
           label: "Negro",
           hexCode: "#000000",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
-          ],
+          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
         },
       ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/leather-jacket-gray.jpg",
-      ],
+      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
     },
+
+    // ── 4 IMÁGENES (MultiImageLayout) ──
     {
       title: "Campera Denim Classic",
       description: "Campera vaquera clásica. Denim lavado medio.",
@@ -286,10 +312,16 @@ export const initialData = {
           hexCode: "#4a7ab5",
           images: [
             "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
           ],
         },
       ],
       images: [
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
         "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
       ],
     },
