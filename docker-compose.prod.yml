@@ -1,0 +1,31 @@
+# ============================================
+# SAURON E-Commerce — Production Overrides
+# Optimized, secure, persistent
+# ============================================
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+
+services:
+  db:
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # Do NOT expose DB port in production
+    # ports: []
+
+  app:
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - COOKIE_SECURE=true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

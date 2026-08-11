@@ -1,0 +1,87 @@
+# ============================================
+# SAURON E-Commerce — .dockerignore
+# Exclude files not needed in Docker builds
+# ============================================
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+.next/
+out/
+build/
+
+# Environment files (provided via env_file at runtime)
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Git
+.git/
+.gitignore
+
+# Uploads (mounted as volume)
+uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+test-results/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed in image)
+*.md
+!README.md
+
+# Build artifacts
+*.tsbuildinfo
+next-env.d.ts
+.turbo/
+
+# Docker compose files (not needed in image)
+docker-compose*.yml
+Dockerfile*
+
+# Scripts (not needed in production image)
+scripts/
+
+# Seed data
+src/seed/
+
+# AI agent artifacts
+.agents/
+.atl/
+.claude/
+.codex/
+.gemini/
+CLAUDE.md
+GEMINI.md
+GENTLE_AI_COMMANDS.md
+skills/
+skills-lock.json
+
+# SDD artifacts
+openspec/
+
+# Drafts
+linkedin-post.txt
+arquitectura-auditoria.txt
+
+# Database data
+postgres-data/

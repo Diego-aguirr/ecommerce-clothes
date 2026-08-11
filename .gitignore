@@ -7,6 +7,7 @@
 .env.production.local
 .env.test
 .env.test.local
+.env.docker
 
 # ─── Dependencies ───
 /node_modules
@@ -86,9 +87,7 @@ arquitectura-auditoria.txt
 
 # ─── Helper scripts (no subir al repo) ───
 scripts/
-
-# ─── Seed scripts (no subir al repo) ───
-src/seed/
+docker.sh
 
 # ─── Temp files ───
 *.tmp
