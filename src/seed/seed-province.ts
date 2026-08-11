@@ -23,4 +23,4 @@ export const provinces = [
   { id: "22", name: "Santiago del Estero" },
   { id: "23", name: "Tierra del Fuego" },
   { id: "24", name: "Tucumán" },
-] as const;
+] as { id: string; name: string }[];
