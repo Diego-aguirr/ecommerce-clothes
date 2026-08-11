@@ -1,0 +1,29 @@
+# ============================================
+# SAURON E-Commerce — Development Overrides
+# Hot reload, debug ports, verbose logs
+# ============================================
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECURE=false
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: sh scripts/docker-dev-entrypoint.sh
+    depends_on:
+      db:
+        condition: service_healthy

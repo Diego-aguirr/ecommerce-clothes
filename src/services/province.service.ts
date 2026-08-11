@@ -6,7 +6,7 @@
  *
  * Reglas:
  * - Auto-seedear si la tabla está vacía
- * - Datos fuente: src/seed/seed-province.ts
+ * - Datos fuente: src/seed/provinces.ts
  * - Usar "server-only" para evitar imports en client components
  */
 

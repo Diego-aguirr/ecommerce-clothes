@@ -29,9 +29,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
   },
-  turbopack: {
-    root: "/home/clyde/Documentos/work/new-ecommerce-java",
-  },
+  // turbopack root is auto-detected, no need to set explicitly
 };
 
 export default nextConfig;

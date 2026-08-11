@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+## User Preferences (Permanent)
+
+- **Auto-open files**: Every file touched/edited MUST be opened in VS Code automatically with `code <filename>` after the edit. This applies to ALL file operations (read, write, edit). No exceptions.
+
 ## How to Use This Guide
 
 Start here for cross-project norms.
