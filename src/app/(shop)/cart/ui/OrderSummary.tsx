@@ -23,15 +23,9 @@ const OrderSummary = () => {
   const subTotal = cart.reduce((sum, p) => sum + p.price * p.quantity, 0);
 
   // 👇 IVA del 21%
-  const taxRate = 0.21;
-  const tax = subTotal * taxRate;
-
-  // 💡 Precios con IVA incluido (modelo B2C Argentina)
-  // El total que ve el cliente = precio de lista. El IVA se extrae para mostrarlo como info.
   const IVA_RATE = 0.21;
   const total = subTotal; // subTotal ya incluye IVA
   const ivaIncluido = total - total / (1 + IVA_RATE); // IVA extraído para mostrar
-  const shipping = 0;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 sticky top-6">

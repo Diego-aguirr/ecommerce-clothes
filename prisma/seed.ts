@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient, Size } from "@/generated/prisma/client";
 import { initialData } from "@/seed/seed";
 import { provinces } from "@/seed/seed-province";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -67,7 +67,7 @@ export async function seed() {
       data: {
         ...rest,
         categoryId: categoriesMap[type],
-        sizes: { set: sizes },
+        sizes: { set: sizes as Size[] },
       },
     });
 
@@ -78,7 +78,7 @@ export async function seed() {
 
     const createdColors = [];
     for (const colorData of productColors) {
-      const colorImages = colorData.images || images; // Usa imágenes del color o las principales
+      const colorImages = ("images" in colorData && colorData.images) || images;
       
       const dbColor = await prisma.productColor.create({
         data: {
@@ -91,7 +91,7 @@ export async function seed() {
 
       // ✅ NUEVO: Crear imágenes para este color
       await prisma.productColorImage.createMany({
-        data: colorImages.map((url, index) => ({
+        data: colorImages.map((url: string, index: number) => ({
           url,
           productColorId: dbColor.id,
           order: index,

@@ -8,7 +8,7 @@ interface Props {
   amount: number;
 }
 
-export const MercadoPagoButton = ({ orderId, amount }: Props) => {
+export const MercadoPagoButton = ({ orderId }: Props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

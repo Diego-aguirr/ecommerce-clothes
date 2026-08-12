@@ -118,6 +118,7 @@ export default async function ProductColorsPage({ params }: Props) {
                       <div className="flex gap-2 flex-wrap">
                         {color.images.map((img, idx) => (
                           <div key={img.id} className="relative group">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={img.url}
                               alt={`${color.label} ${idx + 1}`}

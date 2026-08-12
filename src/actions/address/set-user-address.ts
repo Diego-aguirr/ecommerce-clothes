@@ -25,7 +25,6 @@ export const setUserAddress = async (data: SetUserAddressInput) => {
     }
 
     const {
-      id,
       apartment,
       description,
       shippingMethod,
@@ -48,7 +47,8 @@ export const setUserAddress = async (data: SetUserAddressInput) => {
     });
 
     return { ok: true, data: result };
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_error) {
     return { ok: false, error: "Error interno al guardar la dirección" };
   }
 };

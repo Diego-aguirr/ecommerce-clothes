@@ -10,6 +10,7 @@ type Props = {
 
 export function ProductThumbnail({ src, alt = "Producto", className }: Props) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src || FALLBACK}
       alt={alt}

@@ -163,7 +163,7 @@ export async function updateProduct(productId: string, payload: unknown): Promis
   if (!parsed.success)
     return { ok: false, error: "Datos del producto incompletos o inválidos", issues: parsed.error.issues };
 
-  const { imagesToDelete, colors, variants, ...productData } = parsed.data;
+  const { imagesToDelete, ...productData } = parsed.data;
 
   try {
     // Primero eliminar de Cloudinary las imágenes que el admin quitó

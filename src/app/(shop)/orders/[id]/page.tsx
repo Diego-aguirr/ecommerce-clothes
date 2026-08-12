@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { IoCardOutline } from "react-icons/io5";
 
 import { getOrderById } from "@/actions";
-import { Title, MercadoPagoButton } from "@/components";
+import { MercadoPagoButton } from "@/components";
 import { currencyFormat } from "@/utils";
 
 interface Props {
