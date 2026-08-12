@@ -1,4 +1,3 @@
-import { titleFont } from "@/config/fonts";
 import { FormRegister } from "./ui/FormRegister";
 
 export default function newAccountPage() {

@@ -3,10 +3,8 @@
 import Link from "next/link";
 import { useAddressStore } from "@/store";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 export const AddressDetails = () => {
-  const router = useRouter();
   const address = useAddressStore((state) => state.address);
   const shippingMethod = useAddressStore((state) => state.shippingMethod);
   const [mounted, setMounted] = useState(false);

@@ -70,6 +70,7 @@ export function ProductForm({ categories, product }: Props) {
   });
 
   const selectedSizes = watch("sizes") ?? [];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const allImages = [...existingImages, ...newImages];
 
   // 🔄 Sincroniza React state → form state para que Zod vea los valores reales
@@ -320,6 +321,7 @@ export function ProductForm({ categories, product }: Props) {
         <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-3">
           {allImages.map((img, idx) => (
             <div key={img.publicId} className="relative aspect-square rounded-lg border overflow-hidden group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={img.url.startsWith("http") ? img.url : `/products/${img.url}`} alt="" className="w-full h-full object-cover" />
               <button
                 type="button"

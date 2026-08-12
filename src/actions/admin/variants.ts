@@ -13,22 +13,6 @@ import {
   type UpdateStockInput,
 } from "@/services/variant.service";
 
-// ── Schemas (contrato de entrada del action) ──
-
-const createVariantSchema = z.object({
-  productId: z.string().uuid(),
-  sku: z.string().min(1, "SKU es requerido"),
-  size: z.enum(["XS", "S", "M", "L", "XL", "XXL", "XXXL", "UNICO", "AJUSTABLE"]),
-  color: z.string().min(1, "Color es requerido"),
-  stock: z.number().min(0).default(0),
-});
-
-const updateStockSchema = z.object({
-  variantId: z.string().uuid(),
-  stock: z.number().min(0),
-  note: z.string().optional(),
-});
-
 const toggleVariantSchema = z.object({
   variantId: z.string().uuid(),
   isActive: z.boolean(),

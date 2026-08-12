@@ -1,10 +1,9 @@
 export const revalidate = 604800;
 
 import { notFound } from "next/navigation";
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 
 import { titleFont } from "@/config/fonts";
-import { StockLabel } from "@/components";
 import { getProductBySlug } from "@/actions";
 import { ProductPageClient } from "./ui/ProductPageClient";
 
@@ -14,7 +13,6 @@ interface Props {
 
 export async function generateMetadata(
   { params }: Props,
-  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);

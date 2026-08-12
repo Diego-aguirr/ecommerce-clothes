@@ -27,7 +27,7 @@ export default function AddressForm({
   const {
     register,
     handleSubmit,
-    formState: { isValid, errors },
+    formState: { isValid },
     reset,
     setValue,
     watch,
@@ -42,7 +42,7 @@ export default function AddressForm({
 
   const router = useRouter();
 
-  const { data: session } = useSession({
+  useSession({
     required: true,
   });
 

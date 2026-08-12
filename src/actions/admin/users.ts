@@ -3,7 +3,7 @@
 import { requireSuperAdmin } from "@/lib/admin/auth-utils";
 import { logAdminAction } from "@/lib/admin/audit-logger";
 import { revalidatePath } from "next/cache";
-import { UserStatus, Role } from "@/generated/prisma/enums";
+import { Role } from "@/generated/prisma/enums";
 import { User } from "@/generated/prisma/client";
 import { z } from "zod";
 import { ToggleUserBlockSchema, UpdateUserRoleSchema } from "@/lib/validations";

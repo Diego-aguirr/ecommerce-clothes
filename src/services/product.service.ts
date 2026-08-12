@@ -121,6 +121,7 @@ export async function createProductService(data: CreateProductInput) {
     .replace(/(^-|-$)+/g, "");
 
   // Calcular stock total sumando todas las variantes
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const totalStock = variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
 
   // Crear producto con colores y variantes en una transacción

@@ -1,7 +1,6 @@
 "use server";
 
 import { loginSchema } from "@/lib/zod";
-import { AuthError } from "next-auth";
 import { z } from "zod";
 import { signIn } from "../../../auth";
 
