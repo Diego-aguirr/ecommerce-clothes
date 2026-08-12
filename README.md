@@ -90,6 +90,70 @@ npx tsc --noEmit      # Type check
 
 ---
 
+## Aliases (para tu shell)
+
+Agregá estos alias en tu `~/.bashrc` o `~/.zshrc` para trabajar más rápido:
+
+### Docker
+
+```bash
+alias dup='docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d'
+alias ddown='docker compose -f docker-compose.yml -f docker-compose.dev.yml down'
+alias dlogs='docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f'
+alias dps='docker compose -f docker-compose.yml -f docker-compose.dev.yml ps'
+alias drebuild='docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build'
+alias dex='docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app'
+```
+
+### Database
+
+```bash
+alias dmigrate='npx prisma migrate dev'
+alias dstudio='npx prisma studio'
+alias dseed='npx tsx prisma/seed.ts'
+alias dreset='npx prisma migrate reset --force && npx tsx prisma/seed.ts'
+alias dpush='npx prisma db push'
+```
+
+### Development
+
+```bash
+alias dev='pnpm run dev'
+alias build='pnpm run build'
+alias lint='pnpm run lint'
+alias lint:fix='pnpm run lint:fix'
+alias test='pnpm run test'
+alias test:run='pnpm run test:run'
+alias tsc='npx tsc --noEmit'
+```
+
+### Git
+
+```bash`
+alias gs='git status'
+alias gd='git diff'
+alias gl='git log --oneline -10'
+alias gp='git push'
+alias gc='git commit -m'
+alias gco='git checkout'
+alias gb='git branch'
+```
+
+### Atajos combinados
+
+```bash
+# Levantar todo y ver logs
+alias up='dup && dlogs'
+
+# Reset completo de DB
+alias dbreset='ddown && dup && sleep 3 && dex npx prisma migrate deploy && dex npx tsx prisma/seed.ts'
+
+# Build limpio
+alias clean='rm -rf .next node_modules && pnpm install && pnpm run build'
+```
+
+---
+
 ## Estructura del Proyecto
 
 ```

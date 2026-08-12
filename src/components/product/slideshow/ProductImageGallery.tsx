@@ -96,43 +96,55 @@ function TwoImageLayout({ images, title }: { images: string[]; title: string }) 
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        {/* Main image */}
-        <div
-          className="relative w-full overflow-hidden cursor-zoom-in group rounded-2xl"
-          style={{ height: "clamp(350px, 50vh, 550px)" }}
-          onClick={() => setFullscreen(true)}
-        >
-          <GalleryImage
-            src={images[selectedIndex]}
-            alt={`${title} — vista ${selectedIndex + 1}`}
-            className="object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
-            sizes="(max-width: 768px) 100vw, 640px"
-            priority
-          />
-        </div>
-
-        {/* Thumbnail strip */}
-        <div className="flex gap-2">
+      <div className="grid grid-cols-[72px_1fr] lg:grid-cols-[80px_1fr] gap-3">
+        {/* Thumbnails */}
+        <div className="flex flex-col gap-2 overflow-y-auto py-1 scrollbar-hide">
           {images.map((img, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => setSelectedIndex(idx)}
+              onMouseEnter={() => setSelectedIndex(idx)}
+              aria-label={`Ver imagen ${idx + 1}`}
               className={[
-                "relative flex-1 aspect-square overflow-hidden rounded-xl border-2 transition-all",
+                "relative w-[72px] h-[72px] shrink-0 overflow-hidden rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111]",
                 selectedIndex === idx
-                  ? "border-gray-900 opacity-100"
-                  : "border-transparent opacity-50 hover:opacity-75",
+                  ? "border-[#111] opacity-100 shadow-sm"
+                  : "border-transparent opacity-50 hover:opacity-75 hover:border-gray-200",
               ].join(" ")}
             >
               <GalleryImage
                 src={img}
                 alt={`${title} miniatura ${idx + 1}`}
                 className="object-cover"
-                sizes="120px"
+                sizes="72px"
               />
             </button>
+          ))}
+        </div>
+
+        {/* Main image */}
+        <div
+          className="relative w-full overflow-hidden cursor-zoom-in group rounded-2xl"
+          style={{ height: "clamp(380px, 58vh, 640px)" }}
+          onClick={() => setFullscreen(true)}
+        >
+          {images.map((img, idx) => (
+            <div
+              key={idx}
+              className={[
+                "absolute inset-0 transition-opacity duration-500",
+                selectedIndex === idx ? "opacity-100 z-10" : "opacity-0 z-0",
+              ].join(" ")}
+            >
+              <GalleryImage
+                src={img}
+                alt={`${title} — vista ${idx + 1}`}
+                className="object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+                sizes="(max-width: 1024px) 100vw, 640px"
+                priority={idx === 0}
+              />
+            </div>
           ))}
         </div>
       </div>
