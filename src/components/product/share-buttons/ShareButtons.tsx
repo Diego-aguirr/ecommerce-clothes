@@ -1,6 +1,6 @@
 "use client";
 
-import { FaWhatsapp, FaFacebookF, FaXTwitter } from "react-icons/fa6";
+import { FaWhatsapp, FaFacebookF, FaInstagram } from "react-icons/fa6";
 import { IoShareOutline, IoLinkOutline } from "react-icons/io5";
 import { useState, useEffect } from "react";
 
@@ -87,15 +87,15 @@ export const ShareButtons = ({ title, slug, imageUrl }: Props) => {
         <FaFacebookF size={16} />
       </a>
 
-      {/* Twitter/X */}
+      {/* Instagram */}
       <a
-        href={`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`}
+        href={`https://www.instagram.com/`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center w-10 h-10 bg-black hover:bg-gray-800 text-white rounded-full transition-colors"
-        aria-label="Compartir por X"
+        className="flex items-center justify-center w-10 h-10 bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 hover:opacity-90 text-white rounded-full transition-colors"
+        aria-label="Compartir por Instagram"
       >
-        <FaXTwitter size={16} />
+        <FaInstagram size={16} />
       </a>
 
       {/* Copy Link */}
