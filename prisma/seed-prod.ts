@@ -1,5 +1,6 @@
 import { PrismaClient } from "@/generated/prisma/client";
 import { provinces } from "@/seed/seed-province";
+import { PRODUCTION_CATEGORIES } from "@/seed/seed-categories";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 /**
@@ -24,14 +25,6 @@ const adapter = new PrismaPg({
 });
 
 const prisma = new PrismaClient({ adapter });
-
-const PRODUCTION_CATEGORIES = [
-  "remeras",
-  "pantalones",
-  "buzos",
-  "camperas",
-  "accesorios",
-];
 
 async function seedProduction() {
   console.log("🌱 Production Seed — Solo datos base\n");

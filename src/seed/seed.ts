@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
+import { PRODUCTION_CATEGORIES } from "./seed-categories";
 
-// Password hasheado para testing: "password123"
+// Password hasheado para testing: "r"
 const TEST_PASSWORD_HASH = bcrypt.hashSync("r", 10);
 
 export const initialData = {
@@ -37,284 +38,245 @@ export const initialData = {
     },
   ],
 
-  categories: ["remeras", "pantalones", "buzos", "camperas", "accesorios"],
+  categories: [...PRODUCTION_CATEGORIES],
 
   products: [
-    // ── 1 IMAGEN (SingleImageLayout) ──
+    // ═══════════════════════════════════════════════════════════════
+    // 🏷️ REMERAS
+    // ═══════════════════════════════════════════════════════════════
     {
-      title: "Remera Básica Algodón",
-      description: "Remera básica de algodón 100%, perfecta para el día a día.",
-      price: 15000,
-      slug: "remera-basica-algodon",
+      title: "Remera Blanca Básica Hombre",
+      description:
+        "Remera blanca de algodón 100%, corte clásico. Ideal para el día a día.",
+      price: 12000,
+      slug: "remera-blanca-basica-hombre",
       gender: "men" as const,
       type: "remeras",
-      tags: ["básica", "algodón"],
+      tags: ["básica", "algodón", "blanca"],
       isActive: true,
       sizes: ["S", "M", "L", "XL"],
       colors: [
-        {
-          color: "negro",
-          label: "Negro",
-          hexCode: "#000000",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-          ],
-        },
         {
           color: "blanco",
           label: "Blanco",
           hexCode: "#FFFFFF",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "img/products/remera-blanca-hombre-producto.jpeg",
+            "img/products/remera-blanca-hombre-modelo.jpeg",
           ],
         },
       ],
       images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "img/products/remera-blanca-hombre-producto.jpeg",
+        "img/products/remera-blanca-hombre-modelo.jpeg",
       ],
     },
-
-    // ── 2 IMÁGENES (TwoImageLayout) ──
     {
-      title: "Remera Oversized Streetwear",
+      title: "Remera Blanca Básica Mujer",
       description:
-        "Remera oversized con estampado frontal. Tendencia streetwear.",
-      price: 22000,
-      slug: "remera-oversized-streetwear",
+        "Remera blanca femenina de algodón 100%, corte regular. Perfecta para combinar.",
+      price: 11000,
+      slug: "remera-blanca-basica-mujer",
       gender: "women" as const,
       type: "remeras",
-      tags: ["oversized", "streetwear"],
+      tags: ["básica", "algodón", "blanca"],
       isActive: true,
       sizes: ["XS", "S", "M", "L"],
       colors: [
         {
-          color: "azul_maron",
-          label: "Azul Marón",
-          hexCode: "#1a1a2e",
+          color: "blanco",
+          label: "Blanco",
+          hexCode: "#FFFFFF",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "img/products/remera-blanca-mujer-producto.jpeg",
+            "img/products/remera-blanca-mujer-modelo.jpeg",
           ],
         },
       ],
       images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "img/products/remera-blanca-mujer-producto.jpeg",
+        "img/products/remera-blanca-mujer-modelo.jpeg",
       ],
     },
-
-    // ── 3 IMÁGENES (MultiImageLayout) ──
     {
-      title: "Jean Slim Fit Classic",
-      description: "Jean corte slim fit, denim de alta calidad.",
-      price: 45000,
-      slug: "jean-slim-fit-classic",
+      title: "Musculina Blenda Lino",
+      description:
+        "Musculina premium de blend lino. Tejido liviano y transpirable, ideal para verano.",
+      price: 14000,
+      slug: "musculina-blenda-lino",
+      gender: "women" as const,
+      type: "remeras",
+      tags: ["musculina", "lino", "verano"],
+      isActive: true,
+      sizes: ["XS", "S", "M", "L"],
+      colors: [
+        {
+          color: "natural",
+          label: "Natural",
+          hexCode: "#E8DCC8",
+          images: [
+            "img/products/musculina-blenda-lino-shorts-jean-bolso-mujer-producto.jpeg",
+            "img/products/musculina-blenda-lino-shorts-jean-bolso-mujer-modelo.jpeg",
+          ],
+        },
+      ],
+      images: [
+        "img/products/musculina-blenda-lino-shorts-jean-bolso-mujer-producto.jpeg",
+        "img/products/musculina-blenda-lino-shorts-jean-bolso-mujer-modelo.jpeg",
+      ],
+    },
+    {
+      title: "Camisa Formal Algodón",
+      description:
+        "Camisa formal de algodón Premium. Corte clásico, ideal para oficina o eventos.",
+      price: 18000,
+      slug: "camisa-formal-algodon",
       gender: "men" as const,
-      type: "pantalones",
-      tags: ["jean", "slim"],
-      isActive: true,
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      colors: [
-        {
-          color: "azul_claro",
-          label: "Azul Claro",
-          hexCode: "#6890c8",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-          ],
-        },
-        {
-          color: "azul_oscuro",
-          label: "Azul Oscuro",
-          hexCode: "#1a237e",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-          ],
-        },
-      ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-      ],
-    },
-
-    // ── 4 IMÁGENES (MultiImageLayout) ──
-    {
-      title: "Buzo Kangaroo Hoodie",
-      description: "Buzo con capucha y canguro. Algodón francelés.",
-      price: 38000,
-      slug: "buzo-kangaroo-hoodie",
-      gender: "unisex" as const,
-      type: "buzos",
-      tags: ["buzo", "kangaroo", "hoodie"],
-      isActive: true,
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      colors: [
-        {
-          color: "negro",
-          label: "Negro",
-          hexCode: "#000000",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-          ],
-        },
-        {
-          color: "gris_melange",
-          label: "Gris Melange",
-          hexCode: "#9e9e9e",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-          ],
-        },
-      ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-      ],
-    },
-
-    // ── 1 IMAGEN (SingleImageLayout) ──
-    {
-      title: "Campera Bomber Nylon",
-      description: "Campera tipo bomber nylon. Forro interior malla.",
-      price: 65000,
-      slug: "campera-bomber-nylon",
-      gender: "men" as const,
-      type: "camperas",
-      tags: ["campera", "bomber"],
-      isActive: true,
-      sizes: ["M", "L", "XL"],
-      colors: [
-        {
-          color: "verde_militar",
-          label: "Verde Militar",
-          hexCode: "#2d4a22",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-          ],
-        },
-      ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-      ],
-    },
-
-    // ── 2 IMÁGENES (TwoImageLayout) ──
-    {
-      title: "Pantalón Jogger Comfort",
-      description: "Jogger deportivo con cierre en tobillo.",
-      price: 28000,
-      slug: "pantalon-jogger-comfort",
-      gender: "unisex" as const,
-      type: "pantalones",
-      tags: ["jogger", "deportivo"],
+      type: "remeras",
+      tags: ["camisa", "formal", "algodón"],
       isActive: true,
       sizes: ["S", "M", "L", "XL"],
       colors: [
         {
+          color: "blanco",
+          label: "Blanco",
+          hexCode: "#FFFFFF",
+          images: [
+            "img/products/camisa.jpeg",
+            "img/products/camisa2.jpeg",
+          ],
+        },
+      ],
+      images: [
+        "img/products/camisa.jpeg",
+        "img/products/camisa2.jpeg",
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🏷️ PANTALONES
+    // ═══════════════════════════════════════════════════════════════
+    {
+      title: "Jeans Denim Campo Dobladillo",
+      description:
+        "Jeans denim clásico con dobladillo. Corte recto, lavado medio. Denim de alta calidad.",
+      price: 35000,
+      slug: "jeans-denim-campo-dobladillo",
+      gender: "men" as const,
+      type: "pantalones",
+      tags: ["jeans", "denim", "clásico"],
+      isActive: true,
+      sizes: ["S", "M", "L", "XL", "XXL"],
+      colors: [
+        {
+          color: "azul_medio",
+          label: "Azul Medio",
+          hexCode: "#4A7AB5",
+          images: [
+            "img/products/jeans-denim-campo-dobladillo.jpeg",
+          ],
+        },
+      ],
+      images: [
+        "img/products/jeans-denim-campo-dobladillo.jpeg",
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🏷️ CAMPERAS
+    // ═══════════════════════════════════════════════════════════════
+    {
+      title: "Campera Cuero Negra Biker",
+      description:
+        "Campera de cuero negro estilo biker. Forro interior, cierre frontal y detalles con remaches.",
+      price: 85000,
+      slug: "campera-cuero-negra-biker",
+      gender: "men" as const,
+      type: "camperas",
+      tags: ["cuero", "biker", "negra"],
+      isActive: true,
+      sizes: ["M", "L", "XL"],
+      colors: [
+        {
           color: "negro",
           label: "Negro",
           hexCode: "#000000",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+            "img/products/campera-cuero-negra-biker-reloj-hombre-producto.jpeg",
+            "img/products/campera-cuero-negra-biker-reloj-hombre-modelo.jpeg",
           ],
         },
       ],
       images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+        "img/products/campera-cuero-negra-biker-reloj-hombre-producto.jpeg",
+        "img/products/campera-cuero-negra-biker-reloj-hombre-modelo.jpeg",
       ],
     },
-
-    // ── 1 IMAGEN (SingleImageLayout) ──
     {
-      title: "Remera Kids Dino Print",
-      description: "Remera infantil con estampado de dinosaurios.",
-      price: 12000,
-      slug: "remera-kids-dino-print",
-      gender: "kid" as const,
-      type: "remeras",
-      tags: ["niño", "dinosaurios"],
-      isActive: true,
-      sizes: ["XS", "S", "M"],
-      colors: [
-        {
-          color: "azul_celeste",
-          label: "Azul Celeste",
-          hexCode: "#87ceeb",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-          ],
-        },
-      ],
-      images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-      ],
-    },
-
-    // ── 3 IMÁGENES (MultiImageLayout) ──
-    {
-      title: "Buzo Full Zip Premium",
-      description: "Buzo con cierre completo. Tejido franelado.",
-      price: 42000,
-      slug: "buzo-full-zip-premium",
+      title: "Vestido Verde Lino con Bermuda",
+      description:
+        "Vestido de lino verde con bermuda. Look casual y fresco, ideal para primavera/verano.",
+      price: 28000,
+      slug: "vestido-verde-lino-bermuda",
       gender: "women" as const,
-      type: "buzos",
-      tags: ["buzo", "cierre"],
+      type: "camperas",
+      tags: ["vestido", "lino", "verde", "verano"],
       isActive: true,
       sizes: ["XS", "S", "M", "L"],
       colors: [
         {
-          color: "rosa",
-          label: "Rosa",
-          hexCode: "#ffb6c1",
+          color: "verde",
+          label: "Verde",
+          hexCode: "#4A7C59",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-          ],
-        },
-        {
-          color: "lila",
-          label: "Lila",
-          hexCode: "#c8a2c8",
-          images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "img/products/vestido-verde-lino-bermuda-bolso-mujer-producto.jpeg",
+            "img/products/vestido-verde-lino-bermuda-bolso-mujer-modelo.jpeg",
           ],
         },
       ],
       images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "img/products/vestido-verde-lino-bermuda-bolso-mujer-producto.jpeg",
+        "img/products/vestido-verde-lino-bermuda-bolso-mujer-modelo.jpeg",
       ],
     },
 
-    // ── 1 IMAGEN (SingleImageLayout) ──
+    // ═══════════════════════════════════════════════════════════════
+    // 🏷️ ACCESORIOS
+    // ═══════════════════════════════════════════════════════════════
     {
-      title: "Gorra Trucker Classic",
-      description: "Gorra tipo trucker con malla trasera.",
-      price: 8000,
-      slug: "gorra-trucker-classic",
+      title: "Billetera Piel con Llavero",
+      description:
+        "Billetera de piel genuina con llavero incluido. Diseño clásico y compacto.",
+      price: 15000,
+      slug: "billetera-piel-llavero",
       gender: "unisex" as const,
       type: "accesorios",
-      tags: ["gorra", "trucker"],
+      tags: ["billetera", "piel", "llavero"],
+      isActive: true,
+      sizes: ["UNICO"],
+      colors: [
+        {
+          color: "marron",
+          label: "Marrón",
+          hexCode: "#8B4513",
+          images: [
+            "img/products/billetera-piel-llavero-caps.jpeg",
+          ],
+        },
+      ],
+      images: [
+        "img/products/billetera-piel-llavero-caps.jpeg",
+      ],
+    },
+    {
+      title: "Reloj Negro Deportivo",
+      description:
+        "Reloj deportivo negro con correa de silicona. Resistente al agua y cronómetro integrado.",
+      price: 22000,
+      slug: "reloj-negro-deportivo",
+      gender: "unisex" as const,
+      type: "accesorios",
+      tags: ["reloj", "deportivo", "negro"],
       isActive: true,
       sizes: ["UNICO"],
       colors: [
@@ -323,44 +285,37 @@ export const initialData = {
           label: "Negro",
           hexCode: "#000000",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+            "img/products/reloj-negro-mochila-guantes-accesorios.jpeg",
           ],
         },
       ],
       images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+        "img/products/reloj-negro-mochila-guantes-accesorios.jpeg",
       ],
     },
-
-    // ── 4 IMÁGENES (MultiImageLayout) ──
     {
-      title: "Campera Denim Classic",
-      description: "Campera vaquera clásica. Denim lavado medio.",
-      price: 55000,
-      slug: "campera-denim-classic",
-      gender: "women" as const,
-      type: "camperas",
-      tags: ["campera", "denim"],
+      title: "Mochila Urbana",
+      description:
+        "Mochila urbana con múltiples compartimentos. Ideal para uso diario o viajes cortos.",
+      price: 18000,
+      slug: "mochila-urbana",
+      gender: "unisex" as const,
+      type: "accesorios",
+      tags: ["mochila", "urbana", "viaje"],
       isActive: true,
-      sizes: ["XS", "S", "M", "L"],
+      sizes: ["UNICO"],
       colors: [
         {
-          color: "azul_medio",
-          label: "Azul Medio",
-          hexCode: "#4a7ab5",
+          color: "negro",
+          label: "Negro",
+          hexCode: "#000000",
           images: [
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+            "img/products/mochila.jpeg",
           ],
         },
       ],
       images: [
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
-        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+        "img/products/mochila.jpeg",
       ],
     },
   ],
