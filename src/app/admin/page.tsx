@@ -1,24 +1,12 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
-import prisma from "@/lib/prisma";
+import { getDashboardStats } from "@/services/admin.service";
 import { FiDollarSign, FiShoppingCart, FiBox, FiClock } from "react-icons/fi";
 import { StatCard } from "@/components/admin/dashboard/stat-card";
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const [todayOrders, pendingOrders, productsCount] = await Promise.all([
-    prisma.order.count({ where: { createdAt: { gte: today } } }),
-    prisma.order.count({ where: { status: "pending" } }),
-    prisma.product.count(),
-  ]);
-
-  const revenueAggr = await prisma.order.aggregate({
-    _sum: { total: true },
-    where: { isPaid: true },
-  });
+  const stats = await getDashboardStats();
 
   return (
     <div>
@@ -34,25 +22,25 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Ingresos Totales (Pagados)"
-          value={`$${revenueAggr._sum.total?.toFixed(2) || "0.00"}`}
+          value={`$${stats.totalRevenue.toFixed(2)}`}
           icon={<FiDollarSign size={24} />}
           color="bg-emerald-100 text-emerald-600"
         />
         <StatCard
           title="Órdenes Creadas Hoy"
-          value={todayOrders.toString()}
+          value={stats.todayOrders.toString()}
           icon={<FiShoppingCart size={24} />}
           color="bg-blue-100 text-blue-600"
         />
         <StatCard
           title="Órdenes Pendientes"
-          value={pendingOrders.toString()}
+          value={stats.pendingOrders.toString()}
           icon={<FiClock size={24} />}
           color="bg-amber-100 text-amber-600"
         />
         <StatCard
           title="Catálogo de Productos"
-          value={productsCount.toString()}
+          value={stats.productsCount.toString()}
           icon={<FiBox size={24} />}
           color="bg-indigo-100 text-indigo-600"
         />

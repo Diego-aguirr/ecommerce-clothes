@@ -1,11 +1,28 @@
+import bcrypt from "bcryptjs";
+
+// Password hasheado para testing: "password123"
+const TEST_PASSWORD_HASH = bcrypt.hashSync("r", 10);
+
 export const initialData = {
   users: [
+    {
+      id: "usr_superadmin_001",
+      name: "Super Admin",
+      email: "superadmin@test.com",
+      emailVerified: new Date(),
+      password: TEST_PASSWORD_HASH,
+      role: "admin" as const,
+      isSuperAdmin: true,
+      status: "ACTIVE" as const,
+    },
     {
       id: "usr_admin_001",
       name: "Admin Test",
       email: "admin@test.com",
       emailVerified: new Date(),
+      password: TEST_PASSWORD_HASH,
       role: "admin" as const,
+      isSuperAdmin: false,
       status: "ACTIVE" as const,
     },
     {
@@ -13,7 +30,9 @@ export const initialData = {
       name: "Usuario Test",
       email: "user@test.com",
       emailVerified: new Date(),
+      password: TEST_PASSWORD_HASH,
       role: "user" as const,
+      isSuperAdmin: false,
       status: "ACTIVE" as const,
     },
   ],
@@ -37,22 +56,29 @@ export const initialData = {
           color: "negro",
           label: "Negro",
           hexCode: "#000000",
-          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
+          images: [
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+          ],
         },
         {
           color: "blanco",
           label: "Blanco",
           hexCode: "#FFFFFF",
-          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg"],
+          images: [
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/car-interior-design.jpg",
+          ],
         },
       ],
-      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
+      images: [
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+      ],
     },
 
     // ── 2 IMÁGENES (TwoImageLayout) ──
     {
       title: "Remera Oversized Streetwear",
-      description: "Remera oversized con estampado frontal. Tendencia streetwear.",
+      description:
+        "Remera oversized con estampado frontal. Tendencia streetwear.",
       price: 22000,
       slug: "remera-oversized-streetwear",
       gender: "women" as const,
@@ -176,10 +202,14 @@ export const initialData = {
           color: "verde_militar",
           label: "Verde Militar",
           hexCode: "#2d4a22",
-          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
+          images: [
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+          ],
         },
       ],
-      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
+      images: [
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+      ],
     },
 
     // ── 2 IMÁGENES (TwoImageLayout) ──
@@ -226,10 +256,14 @@ export const initialData = {
           color: "azul_celeste",
           label: "Azul Celeste",
           hexCode: "#87ceeb",
-          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png"],
+          images: [
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+          ],
         },
       ],
-      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png"],
+      images: [
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/shoes.png",
+      ],
     },
 
     // ── 3 IMÁGENES (MultiImageLayout) ──
@@ -288,10 +322,14 @@ export const initialData = {
           color: "negro",
           label: "Negro",
           hexCode: "#000000",
-          images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
+          images: [
+            "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+          ],
         },
       ],
-      images: ["https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg"],
+      images: [
+        "https://res.cloudinary.com/demo/image/upload/v1/samples/ecommerce/accessories-bag.jpg",
+      ],
     },
 
     // ── 4 IMÁGENES (MultiImageLayout) ──

@@ -1,5 +1,5 @@
 import { requireSuperAdmin } from "@/lib/admin/auth-utils";
-import prisma from "@/lib/prisma";
+import { getPaginatedAuditLogs } from "@/services/admin.service";
 import { Pagination } from "@/components/admin/ui/pagination";
 
 export const metadata = { title: "SuperAdmin | Auditoría" };
@@ -13,32 +13,11 @@ export default async function AdminAuditPage({ searchParams }: Props) {
 
   const { page } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
-  const skip = (currentPage - 1) * PAGE_SIZE;
 
-  const [rawLogs, total] = await Promise.all([
-    prisma.auditLog.findMany({
-      skip,
-      take: PAGE_SIZE,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.auditLog.count(),
-  ]);
-
-  // Resolver nombres de admins en batch (eficiente, sin N+1)
-  const adminIds = [...new Set(rawLogs.map((l) => l.adminId))];
-  const users = await prisma.user.findMany({
-    where: { id: { in: adminIds } },
-    select: { id: true, name: true, email: true },
-  });
-  const userMap = users.reduce((acc, u) => {
-    acc[u.id] = u.name || u.email || u.id;
-    return acc;
-  }, {} as Record<string, string>);
-
-  const logs = rawLogs.map((log) => ({
-    ...log,
-    adminName: userMap[log.adminId] || "Usuario Eliminado/Desconocido",
-  }));
+  const { data: logs, total } = await getPaginatedAuditLogs(
+    currentPage,
+    PAGE_SIZE
+  );
 
   return (
     <div>

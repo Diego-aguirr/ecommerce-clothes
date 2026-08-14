@@ -1,42 +1,36 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
-import prisma from "@/lib/prisma";
+import { getPaginatedOrdersAdmin } from "@/services/admin.service";
 import Link from "next/link";
 import { FiEye } from "react-icons/fi";
 import { Pagination } from "@/components/admin/ui/pagination";
+import { SearchInput } from "@/components/admin/ui/search-input";
 
 export const metadata = { title: "Admin | Órdenes" };
 
 const PAGE_SIZE = 15;
 
-type Props = { searchParams: Promise<{ page?: string }> };
+type Props = { searchParams: Promise<{ page?: string; q?: string }> };
 
 export default async function AdminOrdersPage({ searchParams }: Props) {
   await requireAdmin();
 
-  const { page } = await searchParams;
+  const { page, q } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
-  const skip = (currentPage - 1) * PAGE_SIZE;
+  const search = q?.trim() || undefined;
 
-  const [orders, total] = await Promise.all([
-    prisma.order.findMany({
-      skip,
-      take: PAGE_SIZE,
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: { select: { name: true, email: true } },
-        payments: {
-          orderBy: { createdAt: "desc" },
-          take: 1, // Traemos solo el último intento de pago para saber el estado real
-        },
-      },
-    }),
-    prisma.order.count(),
-  ]);
+  const { data: orders, total } = await getPaginatedOrdersAdmin(
+    currentPage,
+    PAGE_SIZE,
+    search
+  );
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Órdenes</h1>
+        <div className="w-full sm:w-64">
+          <SearchInput placeholder="Buscar por cliente, email o ID..." />
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

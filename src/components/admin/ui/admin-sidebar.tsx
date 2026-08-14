@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   FiHome,
   FiBox,
@@ -10,6 +11,8 @@ import {
   FiFileText,
   FiDollarSign,
   FiList,
+  FiMenu,
+  FiX,
 } from "react-icons/fi";
 
 export function AdminSidebar({
@@ -20,6 +23,24 @@ export function AdminSidebar({
   isSuperAdmin: boolean;
 }) {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Close sidebar on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const links = [
     { name: "Dashboard", href: "/admin", icon: <FiHome />, exact: true },
@@ -39,18 +60,28 @@ export function AdminSidebar({
     return pathname.startsWith(href) && href !== "/admin";
   };
 
-  return (
-    <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 shadow-sm flex-col justify-between shrink-0">
+  const sidebarContent = (
+    <>
       <div>
         <div className="p-6 border-b border-gray-100">
-          <Link
-            href="/"
-            className="inline-block transition-transform hover:scale-105 px-2"
-          >
-            <h2 className="text-2xl font-black tracking-tighter text-gray-900">
-              STORE<span className="text-blue-600">.</span>
-            </h2>
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link
+              href="/"
+              className="inline-block transition-transform hover:scale-105 px-2"
+            >
+              <h2 className="text-2xl font-black tracking-tighter text-gray-900">
+                STORE<span className="text-blue-600">.</span>
+              </h2>
+            </Link>
+            {/* Close button - mobile only */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Cerrar menú"
+            >
+              <FiX size={20} className="text-gray-500" />
+            </button>
+          </div>
           <div className="mt-6 flex items-center gap-3 px-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700 font-bold text-xs uppercase border border-blue-100">
               {userRole.substring(0, 2)}
@@ -133,6 +164,40 @@ export function AdminSidebar({
           </Link>
         </p>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Hamburger button - mobile only */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+        aria-label="Abrir menú"
+      >
+        <FiMenu size={20} className="text-gray-700" />
+      </button>
+
+      {/* Desktop sidebar - always visible */}
+      <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 shadow-sm flex-col justify-between shrink-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile sidebar - slide in/out */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-40">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/50 transition-opacity"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Sidebar panel */}
+          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl flex flex-col">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

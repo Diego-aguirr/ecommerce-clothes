@@ -1,34 +1,34 @@
 import { requireSuperAdmin } from "@/lib/admin/auth-utils";
-import prisma from "@/lib/prisma";
+import { getPaginatedPaymentsAdmin } from "@/services/admin.service";
 import { Pagination } from "@/components/admin/ui/pagination";
+import { SearchInput } from "@/components/admin/ui/search-input";
 
 export const metadata = { title: "SuperAdmin | Pagos Registrados" };
 
 const PAGE_SIZE = 15;
 
-type Props = { searchParams: Promise<{ page?: string }> };
+type Props = { searchParams: Promise<{ page?: string; q?: string }> };
 
 export default async function AdminPaymentsPage({ searchParams }: Props) {
   await requireSuperAdmin();
 
-  const { page } = await searchParams;
+  const { page, q } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
-  const skip = (currentPage - 1) * PAGE_SIZE;
+  const search = q?.trim() || undefined;
 
-  const [payments, total] = await Promise.all([
-    prisma.payment.findMany({
-      skip,
-      take: PAGE_SIZE,
-      orderBy: { createdAt: "desc" },
-      include: { order: { select: { id: true, user: { select: { email: true } } } } },
-    }),
-    prisma.payment.count(),
-  ]);
+  const { data: payments, total } = await getPaginatedPaymentsAdmin(
+    currentPage,
+    PAGE_SIZE,
+    search
+  );
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold text-red-700">Pagos en el Sistema (SuperAdmin)</h1>
+        <div className="w-full sm:w-64">
+          <SearchInput placeholder="Buscar por proveedor, ID o email..." />
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
