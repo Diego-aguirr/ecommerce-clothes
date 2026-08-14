@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { ProductForm } from "@/components/admin/products/product-form";
+import { ProductWizard } from "@/components/admin/products/product-wizard";
 
 export const metadata = { title: "Admin | Nuevo Producto" };
 
@@ -27,9 +27,7 @@ export default async function NewProductPage() {
         </h1>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <ProductForm categories={categories} />
-      </div>
+      <ProductWizard categories={categories} />
     </div>
   );
 }
