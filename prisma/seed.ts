@@ -10,6 +10,14 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 export async function seed() {
+  // 🛡️ Doble verificación de seguridad
+  if (process.env.NODE_ENV === "production" || isProductionDatabase()) {
+    throw new Error(
+      "⛔ seed() no puede ejecutarse en producción. " +
+      "Usá un script separado para datos base."
+    );
+  }
+
   console.log("🌱 Seeding...");
 
   // 🧹 ORDEN CORRECTO (muy importante)
@@ -261,7 +269,39 @@ export async function seed() {
   console.log("🌱 Seed terminado correctamente");
 }
 
+function isProductionDatabase(): boolean {
+  const url = process.env.DATABASE_URL || "";
+  // Detect production indicators in the database URL
+  return (
+    url.includes("neon.tech") || // Neon PostgreSQL
+    url.includes("railway.app") || // Railway
+    url.includes("render.com") || // Render
+    url.includes("supabase.co") || // Supabase
+    url.includes("amazonaws.com") || // AWS RDS
+    url.includes("cloud.sql") || // Google Cloud SQL
+    url.includes("heroku.com") || // Heroku
+    url.includes("prod") || // Generic production marker
+    url.includes("production")
+  );
+}
+
 (() => {
-  if (process.env.NODE_ENV === "production") return;
+  const env = process.env.NODE_ENV;
+  const isProd = env === "production" || isProductionDatabase();
+
+  if (isProd) {
+    console.error(
+      "\n🛑 SEED BLOQUEADO: No se puede ejecutar en producción.\n" +
+        `   NODE_ENV="${env}"\n` +
+        `   DATABASE_URL="${process.env.DATABASE_URL?.substring(0, 40)}..."\n\n` +
+        "   Para sembrar en producción, usá un script separado que solo inserte\n" +
+        "   categorías y provincias (sin usuarios de test ni productos dummy).\n"
+    );
+    process.exit(1);
+  }
+
+  console.log(`\n⚠️  SEED EN MODO: ${env || "development"}`);
+  console.log(`   DATABASE: ${process.env.DATABASE_URL?.substring(0, 50)}...\n`);
+
   seed();
 })();
