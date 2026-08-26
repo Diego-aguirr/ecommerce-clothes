@@ -1,5 +1,3 @@
-"use server";
-
 import { NextResponse, type NextRequest } from "next/server";
 import crypto from "crypto";
 import prisma from "@/lib/prisma";

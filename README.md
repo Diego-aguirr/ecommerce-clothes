@@ -53,39 +53,51 @@ Editá `.env` y completá todas las variables requeridas. Consultá el archivo `
 
 > **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`.
 
-### 3. Levantar PostgreSQL con Docker
+### 3. Levantar el entorno completo
+
+El proyecto está dockerizado. Docker levanta la app + PostgreSQL con hot reload:
 
 ```bash
-docker-compose up -d
+./docker.sh up
 ```
 
-### 4. Migraciones y seed
+O con el alias (ver [Aliases](#aliases-para-tu-shell)):
 
 ```bash
-npx prisma migrate dev
-npx prisma db seed
-```
-
-### 5. Iniciar el servidor de desarrollo
-
-```bash
-pnpm run dev
+sup
 ```
 
 Abrí [http://localhost:3000](http://localhost:3000).
+
+> **Nota:** La primera vez tarda en buildear. Las siguientes es instantáneo por los volumes.
 
 ---
 
 ## Comandos
 
+### Docker (desarrollo)
+
 ```bash
-pnpm run dev          # Dev server (Turbopack)
-pnpm run build        # Build producción
-pnpm start            # Iniciar producción
-pnpm run lint         # Lint
-pnpm run test         # Vitest (watch)
-pnpm run test:run     # Vitest (una vez)
-npx tsc --noEmit      # Type check
+./docker.sh up          # Levantar todo (app + db)
+./docker.sh down        # Detener
+./docker.sh restart     # Reiniciar
+./docker.sh logs        # Ver logs
+./docker.sh status      # Estado de contenedores
+./docker.sh shell       # Entrar al contenedor de la app
+./docker.sh db-shell    # Consola PostgreSQL
+./docker.sh clean       # Limpiar todo (contenedores + volúmenes + imágenes)
+```
+
+### Desarrollo local
+
+```bash
+pnpm run dev            # Dev server (Turbopack)
+pnpm run build          # Build producción
+pnpm start              # Iniciar producción
+pnpm run lint           # Lint
+pnpm run test           # Vitest (watch)
+pnpm run test:run       # Vitest (una vez)
+npx tsc --noEmit        # Type check
 ```
 
 ---
@@ -94,42 +106,43 @@ npx tsc --noEmit      # Type check
 
 Agregá estos alias en tu `~/.bashrc` o `~/.zshrc` para trabajar más rápido:
 
-### Docker
+### Docker (base)
 
 ```bash
-alias dup='docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d'
-alias ddown='docker compose -f docker-compose.yml -f docker-compose.dev.yml down'
-alias dlogs='docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f'
-alias dps='docker compose -f docker-compose.yml -f docker-compose.dev.yml ps'
-alias drebuild='docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build'
-alias dex='docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app'
+alias dcdev='docker compose -f docker-compose.yml -f docker-compose.dev.yml'
+alias dcprod='docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod'
 ```
 
-### Database
+### SAURON Dev
 
 ```bash
-alias dmigrate='npx prisma migrate dev'
-alias dstudio='npx prisma studio'
-alias dseed='npx tsx prisma/seed.ts'
-alias dreset='npx prisma migrate reset --force && npx tsx prisma/seed.ts'
-alias dpush='npx prisma db push'
+alias sup='dcdev up --build'
+alias supd='dcdev up --build -d'
+alias sdown='dcdev down'
+alias sdownv='dcdev down -v'
+alias srestart='dcdev restart'
+alias slogs='dcdev logs -f'
+alias slogsa='dcdev logs -f app'
+alias slogsdb='dcdev logs -f db'
+alias sexec='dcdev exec app sh'
+alias sdb='dcdev exec db psql -U sauron -d sauron_db'
+alias sstatus='dcdev ps'
+alias sbuild='dcdev build --no-cache'
+alias sclean='dcdev down -v --rmi local'
 ```
 
-### Development
+### SAURON Prod
 
 ```bash
-alias dev='pnpm run dev'
-alias build='pnpm run build'
-alias lint='pnpm run lint'
-alias lint:fix='pnpm run lint:fix'
-alias test='pnpm run test'
-alias test:run='pnpm run test:run'
-alias tsc='npx tsc --noEmit'
+alias pup='dcprod up --build -d'
+alias pdown='dcprod down'
+alias plogs='dcprod logs -f'
+alias pstatus='dcprod ps'
 ```
 
 ### Git
 
-```bash`
+```bash
 alias gs='git status'
 alias gd='git diff'
 alias gl='git log --oneline -10'
@@ -137,21 +150,17 @@ alias gp='git push'
 alias gc='git commit -m'
 alias gco='git checkout'
 alias gb='git branch'
-
-````
+```
 
 ### Atajos combinados
 
 ```bash
-# Levantar todo y ver logs
-alias up='dup && dlogs'
-
 # Reset completo de DB
-alias dbreset='ddown && dup && sleep 3 && dex npx prisma migrate deploy && dex npx tsx prisma/seed.ts'
+alias dbreset='sdown && sup && sleep 3 && sexec npx prisma migrate deploy && sexec npx tsx prisma/seed.ts'
 
 # Build limpio
 alias clean='rm -rf .next node_modules && pnpm install && pnpm run build'
-````
+```
 
 ---
 
