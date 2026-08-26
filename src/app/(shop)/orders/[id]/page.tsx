@@ -12,6 +12,9 @@ interface Props {
   params: Promise<{
     id: string;
   }>;
+  searchParams: Promise<{
+    status?: string;
+  }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -22,8 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function OrderPage({ params }: Props) {
+export default async function OrderPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { status } = await searchParams;
 
   // 🛡️ Validar que el ID sea un UUID válido antes de llamar al servidor
   const isUuid =
@@ -49,9 +53,62 @@ export default async function OrderPage({ params }: Props) {
     notFound();
   }
 
+  const isSuccess = status === "success";
+  const isPending = status === "pending";
+  const isFailure = status === "failure";
+
   return (
     <div className="flex justify-center items-center mb-40 px-5 sm:px-0">
       <div className="flex flex-col w-full max-w-[1000px]">
+        {/* Feedback Banner */}
+        {isSuccess && !order.isPaid && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-blue-900">Pago procesado</p>
+              <p className="text-sm text-blue-700 mt-0.5">Estamos confirmando tu pago. Esta página se actualizará automáticamente.</p>
+            </div>
+          </div>
+        )}
+
+        {isSuccess && order.isPaid && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-green-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-green-900">¡Pago confirmado!</p>
+              <p className="text-sm text-green-700 mt-0.5">Tu orden fue pagada exitosamente. Recibirás un email con los detalles.</p>
+            </div>
+          </div>
+        )}
+
+        {isPending && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-yellow-900">Pago pendiente</p>
+              <p className="text-sm text-yellow-700 mt-0.5">Tu pago está siendo procesado. Te notificaremos cuando se confirme.</p>
+            </div>
+          </div>
+        )}
+
+        {isFailure && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-red-900">Pago no completado</p>
+              <p className="text-sm text-red-700 mt-0.5">Hubo un problema con tu pago. Podés intentarlo nuevamente.</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-6 mb-8 gap-4">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 antialiased">
             Orden #{id.split("-").at(-1)}
