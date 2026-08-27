@@ -61,6 +61,7 @@ This repository is a production-grade ecommerce platform built with:
 - Zustand v5
 - Zod v4
 - MercadoPago (payments)
+- Cash/Transfer (manual payments)
 - Cloudinary (image optimization)
 
 Agents must assume modern patterns and MUST NOT generate legacy code.

@@ -169,7 +169,7 @@ src/
 │   ├── product/        # Get, paginate
 │   ├── address/        # CRUD direcciones
 │   ├── admin/          # CRUD dominios (admin)
-│   └── payment/        # Crear preferencia MercadoPago
+│   └── payment/        # Payment actions: MP preference, admin approval
 ├── app/                # Pages y rutas (App Router)
 │   ├── (auth)/         # Login, register, forgot/reset password
 │   ├── (shop)/         # Productos, carrito, checkout, órdenes
@@ -240,6 +240,34 @@ src/
 | `POST` | `/api/auth/reset-password`      | Restablecer contraseña       |
 | `GET`  | `/api/auth/verify`              | Verificar email              |
 | `POST` | `/api/auth/resend-verification` | Reenviar verificación        |
+
+---
+
+## Flujo de Checkout
+
+```
+Carrito → Dirección → Checkout → Confirmar → Pago
+```
+
+### Métodos de pago soportados
+
+| Método | Flujo | Confirmación |
+|--------|-------|-------------|
+| **MercadoPago** | Redirect automático a MP checkout | Webhook MP → automática |
+| **Efectivo/Transferencia** | Orden creada con instrucciones | Admin aprueba manualmente |
+
+### MercadoPago
+1. Usuario selecciona "MercadoPago" en checkout
+2. Clic "Finalizar Compra" → crea orden → redirect a MP
+3. Usuario paga en MP
+4. Webhook confirma → orden pagada + stock descontado
+
+### Efectivo / Transferencia
+1. Usuario selecciona "Efectivo/Transferencia" en checkout
+2. Clic "Finalizar Compra" → crea orden → muestra instrucciones
+3. Usuario paga (transferencia o efectivo al retirar)
+4. Admin entra al panel → órdenes → "Confirmar pago recibido"
+5. Orden pagada + stock descontado
 
 ---
 
