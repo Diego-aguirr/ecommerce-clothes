@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCartStore, useAddressStore } from "@/store";
-import { placeOrder } from "@/actions";
+import { placeOrder, createPreference } from "@/actions";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
@@ -12,6 +12,7 @@ export const PlaceOrder = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [idempotencyToken, setIdempotencyToken] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"mercadopago" | "cash">("mercadopago");
 
   const address = useAddressStore((state) => state.address);
   const shippingMethod = useAddressStore((state) => state.shippingMethod);
@@ -75,6 +76,7 @@ export const PlaceOrder = () => {
         address,
         shippingMethod,
         idempotencyToken,
+        paymentMethod,
       );
 
       if (!resp.ok) {
@@ -89,8 +91,26 @@ export const PlaceOrder = () => {
       // 🧹 Limpiar Carrito
       clearCart();
 
-      // Redirigir a la página de la orden creada
-      router.replace(`/orders/${resp.order!.id}`);
+      if (paymentMethod === "mercadopago") {
+        // Crear preferencia MP y redirigir directamente
+        const preferenceResp = await createPreference(resp.order!.id);
+        if (!preferenceResp.ok) {
+          setIsPlacingOrder(false);
+          setErrorMessage(
+            preferenceResp.message ?? "No se pudo generar el link de pago de Mercado Pago"
+          );
+          return;
+        }
+        if (!preferenceResp.init_point) {
+          setIsPlacingOrder(false);
+          setErrorMessage("No se recibió el link de pago de Mercado Pago");
+          return;
+        }
+        window.location.href = preferenceResp.init_point;
+      } else {
+        // Efectivo/Transferencia: redirigir a la página de la orden
+        router.replace(`/orders/${resp.order!.id}`);
+      }
     } catch (error) {
       setIsPlacingOrder(false);
       setErrorMessage("Ocurrió un error inesperado. Intente de nuevo.");
@@ -133,6 +153,80 @@ export const PlaceOrder = () => {
           <p className="text-sm text-gray-500 mt-1">
             IVA e impuestos incluidos
           </p>
+        </div>
+      </div>
+
+      {/* Selector de método de pago */}
+      <div className="mb-6">
+        <p className="text-sm font-semibold text-gray-900 mb-3">
+          Método de pago
+        </p>
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("mercadopago")}
+            className={clsx(
+              "w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
+              {
+                "border-blue-500 bg-blue-50 ring-1 ring-blue-500": paymentMethod === "mercadopago",
+                "border-gray-200 hover:border-gray-300": paymentMethod !== "mercadopago",
+              }
+            )}
+          >
+            <div
+              className={clsx(
+                "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
+                {
+                  "border-blue-500": paymentMethod === "mercadopago",
+                  "border-gray-300": paymentMethod !== "mercadopago",
+                }
+              )}
+            >
+              {paymentMethod === "mercadopago" && (
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">MercadoPago</p>
+              <p className="text-xs text-gray-500">
+                Tarjeta de crédito, débito, dinero en cuenta
+              </p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("cash")}
+            className={clsx(
+              "w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
+              {
+                "border-blue-500 bg-blue-50 ring-1 ring-blue-500": paymentMethod === "cash",
+                "border-gray-200 hover:border-gray-300": paymentMethod !== "cash",
+              }
+            )}
+          >
+            <div
+              className={clsx(
+                "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
+                {
+                  "border-blue-500": paymentMethod === "cash",
+                  "border-gray-300": paymentMethod !== "cash",
+                }
+              )}
+            >
+              {paymentMethod === "cash" && (
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                Efectivo / Transferencia
+              </p>
+              <p className="text-xs text-gray-500">
+                Pagás al retirar o mediante transferencia bancaria
+              </p>
+            </div>
+          </button>
         </div>
       </div>
 

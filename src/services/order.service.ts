@@ -46,6 +46,7 @@ export type CreateOrderInput = {
   address: OrderAddressInput;
   shippingMethod: "delivery" | "pickup";
   idempotencyToken?: string;
+  paymentProvider?: "mercadopago" | "cash";
 };
 
 // ── Business Logic ──
@@ -215,7 +216,7 @@ async function createOrderTransaction(
         amount: totals.total,
         currency: "ARS",
         status: "CREATED",
-        provider: "mercadopago",
+        provider: input.paymentProvider || "mercadopago",
       },
     });
 
@@ -372,6 +373,14 @@ export async function getOrderByIdService(orderId: string) {
               },
             },
           },
+        },
+      },
+      payments: {
+        select: {
+          id: true,
+          provider: true,
+          status: true,
+          amount: true,
         },
       },
     },

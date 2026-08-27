@@ -49,9 +49,47 @@ export default async function OrderPage({ params }: Props) {
     notFound();
   }
 
+  const cashPayment = order.payments?.find(
+    (p) => p.provider === "cash" && p.status === "CREATED"
+  );
+
   return (
     <div className="flex justify-center items-center mb-40 px-5 sm:px-0">
       <div className="flex flex-col w-full max-w-[1000px]">
+        {/* Banner de instrucciones para pago en efectivo/transferencia */}
+        {cashPayment && (
+          <div className="mt-6 mb-2 bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <h3 className="text-base font-bold text-amber-900 mb-2">
+              Instrucciones de pago
+            </h3>
+            <p className="text-sm text-amber-800 mb-3">
+              Para completar tu compra, realizá una transferencia bancaria o
+              aboná en efectivo al momento de retirar.
+            </p>
+            <div className="text-sm text-amber-900 space-y-1 bg-white/60 rounded-lg p-3">
+              <p>
+                <span className="font-semibold">Orden:</span> #{id.split("-").at(-1)}
+              </p>
+              <p>
+                <span className="font-semibold">Total a abonar:</span>{" "}
+                {currencyFormat(order.total)}
+              </p>
+              <p>
+                <span className="font-semibold">CBU:</span>{" "}
+                <span className="font-mono">0000000000000000000000</span>
+              </p>
+              <p>
+                <span className="font-semibold">Alias:</span>{" "}
+                <span className="font-mono">ALIAS.EJEMPLO</span>
+              </p>
+            </div>
+            <p className="text-xs text-amber-700 mt-3">
+              Una vez realizada la transferencia, envianos el comprobante por
+              WhatsApp para acelerar la preparación de tu pedido.
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-6 mb-8 gap-4">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 antialiased">
             Orden #{id.split("-").at(-1)}
@@ -226,6 +264,11 @@ export default async function OrderPage({ params }: Props) {
                 <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-white bg-green-600 shadow-sm">
                   <IoCardOutline size={22} className="mr-2" />
                   <span>Transacción completada</span>
+                </div>
+              ) : cashPayment ? (
+                <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-amber-800 bg-amber-100 border border-amber-200 shadow-sm">
+                  <IoCardOutline size={22} className="mr-2" />
+                  <span>Pago pendiente — Efectivo / Transferencia</span>
                 </div>
               ) : (
                 <div className="w-full pt-2">

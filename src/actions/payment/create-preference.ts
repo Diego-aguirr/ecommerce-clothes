@@ -8,7 +8,11 @@ import {
   createMercadoPagoPreference,
 } from "@/services/payment.service";
 
-export async function createPreference(orderId: string) {
+type CreatePreferenceResult =
+  | { ok: false; message: string }
+  | { ok: true; init_point: string | undefined; preferenceId: string | undefined };
+
+export async function createPreference(orderId: string): Promise<CreatePreferenceResult> {
   try {
     // 1. Validar sesión
     const session = await auth();
