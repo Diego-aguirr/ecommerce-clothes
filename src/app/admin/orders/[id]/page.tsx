@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
 import prisma from "@/lib/prisma";
-import { markAsShippedFormAction, markAsDeliveredFormAction, saveNotesFormAction } from "@/actions/admin/orders";
+import { markAsShippedFormAction, markAsDeliveredFormAction, saveNotesFormAction, approvePaymentFormAction } from "@/actions/admin/orders";
 import { notFound } from "next/navigation";
 import { FiPackage, FiTruck, FiCheckCircle } from "react-icons/fi";
 
@@ -29,6 +29,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const markAsShipped = markAsShippedFormAction.bind(null, order.id);
   const markAsDelivered = markAsDeliveredFormAction.bind(null, order.id, order.trackingCode || "");
   const saveNotes = saveNotesFormAction.bind(null, order.id);
+  const approvePayment = approvePaymentFormAction.bind(null, order.id);
+
+  const cashPayment = order.payments.find(p => p.provider === 'cash' && (p.status === 'CREATED' || p.status === 'PENDING'));
 
   return (
     <div className="space-y-6">
@@ -108,6 +111,24 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                   </div>
                 ))}
               </div>
+            )}
+
+            {cashPayment && (
+              <form action={approvePayment} className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-amber-900">Pago en Efectivo / Transferencia</p>
+                    <p className="text-xs text-amber-700">${Number(cashPayment.amount).toFixed(2)} — Pendiente de confirmación</p>
+                  </div>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                  >
+                    <FiCheckCircle size={16} />
+                    Confirmar pago recibido
+                  </button>
+                </div>
+              </form>
             )}
           </div>
 

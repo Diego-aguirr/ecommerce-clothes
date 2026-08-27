@@ -16,6 +16,7 @@
 import prisma from "@/lib/prisma";
 import "server-only";
 import { OrderStatus, DeliveryStatus, Size } from "@/generated/prisma/client";
+import type { Prisma } from "@/generated/prisma/client";
 import { provinces } from "@/seed/seed-province";
 
 // ── Types ──
@@ -318,6 +319,88 @@ export async function updateOrderNotesService(orderId: string, notes: string) {
   return prisma.order.update({
     where: { id: orderId },
     data: { notes },
+  });
+}
+
+// ── Payment Confirmation (shared between webhook and admin) ──
+
+/**
+ * Confirma el pago de una orden y decrementa el stock.
+ * Usado por: webhook de MP y aprobación manual de admin.
+ * Es idempotente: si la orden ya está pagada, no hace nada.
+ */
+export async function confirmPaymentAndUpdateStock(
+  tx: Prisma.TransactionClient,
+  orderId: string,
+) {
+  const order = await tx.order.findUnique({
+    where: { id: orderId },
+    include: { OrderItem: true },
+  });
+
+  if (!order) throw new Error("Order not found");
+  if (order.isPaid) return order; // idempotencia
+
+  // decremento atómico seguro usando variantes
+  for (const item of order.OrderItem) {
+    if (item.variantId) {
+      const variant = await tx.productVariant.findUnique({
+        where: { id: item.variantId },
+      });
+
+      if (!variant || variant.stock < item.quantity) {
+        throw new Error(`Stock insuficiente para la variante ${item.variantId}`);
+      }
+
+      await tx.productVariant.update({
+        where: { id: item.variantId },
+        data: { stock: { decrement: item.quantity } },
+      });
+
+      await tx.stockMovement.create({
+        data: {
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: -item.quantity,
+          type: "sale",
+          note: `Venta por Orden ${orderId}`,
+        },
+      });
+    }
+  }
+
+  return await tx.order.update({
+    where: { id: orderId },
+    data: {
+      isPaid: true,
+      paidAt: new Date(),
+      status: "paid",
+    },
+  });
+}
+
+/**
+ * Aprueba un pago manual (cash/transferencia) y confirma la orden.
+ * Lanza error si no es cash o ya está pagada.
+ */
+export async function approveCashPaymentService(orderId: string) {
+  return prisma.$transaction(async (tx) => {
+    const payment = await tx.payment.findFirst({
+      where: { orderId, provider: "cash" },
+      include: { order: true },
+    });
+
+    if (!payment) throw new Error("No se encontró un pago en efectivo para esta orden");
+    if (payment.status === "APPROVED" || payment.order.isPaid) {
+      throw new Error("Esta orden ya está pagada");
+    }
+
+    await tx.payment.update({
+      where: { id: payment.id },
+      data: { status: "APPROVED" },
+    });
+
+    return await confirmPaymentAndUpdateStock(tx, orderId);
   });
 }
 

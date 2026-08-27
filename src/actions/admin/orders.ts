@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { OrderStatus, DeliveryStatus, Order } from "@/generated/prisma/client";
 import { z } from "zod";
 import { UpdateDeliveryStatusSchema, UpdateOrderStatusSchema, UpdateOrderNotesSchema } from "@/lib/validations";
-import { updateOrderDeliveryStatusService, updateOrderPaymentStatusService, updateOrderNotesService } from "@/services/order.service";
+import { updateOrderDeliveryStatusService, updateOrderPaymentStatusService, updateOrderNotesService, approveCashPaymentService } from "@/services/order.service";
 
 export type OrderActionResponse = {
   ok: boolean;
@@ -99,6 +99,28 @@ export async function updateOrderNotes(orderId: string, notes: string): Promise<
   }
 }
 
+export async function approveManualPayment(orderId: string): Promise<OrderActionResponse> {
+  const admin = await requireAdmin();
+
+  try {
+    const order = await approveCashPaymentService(orderId);
+
+    await logAdminAction({
+      adminId: admin.id,
+      action: "APPROVE_MANUAL_PAYMENT",
+      targetId: orderId,
+      metadata: { method: "cash" }
+    });
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${orderId}`);
+    revalidatePath(`/orders/${orderId}`);
+    return { ok: true, order };
+  } catch (error: unknown) {
+    return { ok: false, error: (error instanceof Error ? error.message : "Error") };
+  }
+}
+
 // UI Form Wrappers
 export async function markAsShippedFormAction(orderId: string, formData: FormData) {
   const trackingCode = formData.get("trackingCode")?.toString() || "";
@@ -112,4 +134,8 @@ export async function markAsDeliveredFormAction(orderId: string, trackingCode: s
 export async function saveNotesFormAction(orderId: string, formData: FormData) {
   const notes = formData.get("notes")?.toString() || "";
   await updateOrderNotes(orderId, notes);
+}
+
+export async function approvePaymentFormAction(orderId: string) {
+  await approveManualPayment(orderId);
 }
