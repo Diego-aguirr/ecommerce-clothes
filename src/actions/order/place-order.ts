@@ -21,7 +21,8 @@ export const placeOrder = async (
   productsToOrderInput: ProductsToOrderInput,
   addressInput: AddressInput,
   shippingMethodInput: "delivery" | "pickup" = "delivery",
-  idempotencyTokenInput?: string
+  idempotencyTokenInput?: string,
+  paymentProviderInput?: "mercadopago" | "cash"
 ): Promise<PlaceOrderResult> => {
   try {
     // 1. Verificar sesión
@@ -49,6 +50,7 @@ export const placeOrder = async (
       address: parsed.data.address,
       shippingMethod: parsed.data.shippingMethod,
       idempotencyToken: parsed.data.idempotencyToken,
+      paymentProvider: paymentProviderInput ?? "mercadopago",
     });
 
     return { ok: true, ...result };

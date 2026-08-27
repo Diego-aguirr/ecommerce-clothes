@@ -8,6 +8,7 @@ Includes:
 - payment intents
 - transaction validation
 - gateway communication (MercadoPago)
+- manual payment handling (cash/transfer)
 - webhook handling
 - payment verification
 - reconciliation
@@ -18,44 +19,79 @@ Does NOT include:
 - order creation (→ `order.service.ts`)
 - cart logic (→ `store/cart/`)
 - UI payment forms (→ `components/mercadopago/`)
+- admin payment approval (→ `actions/admin/orders.ts`)
 
 ## Architecture
 
 ```
-UI (MercadoPagoButton)
+UI (Checkout Page)
   │
   ▼
-Action (create-preference.ts)
+Action (place-order.ts)
   • Auth (requireSession)
   • Zod validation
+  • paymentProvider selection ("mercadopago" | "cash")
   │
   ▼
-Service (payment.service.ts)
-  • MercadoPago SDK integration
-  • Preference creation
+Service (order.service.ts)
+  • Order + Payment creation
   • server-only enforced
   │
-  ▼
-MercadoPago API
+  ├─ [if MP] ───────────────────┐
+  │                              ▼
+  │                    Action (create-preference.ts)
+  │                              │
+  │                              ▼
+  │                    Service (payment.service.ts)
+  │                              │
+  │                              ▼
+  │                    MercadoPago API
+  │                              │
+  │                              ▼
+  │                    Webhook (route.ts)
+  │                              │
+  │                              ▼
+  │                    confirmPaymentAndUpdateStock (order.service.ts)
+  │                              │
+  │                              ▼
+  │                    Order confirmed + stock decremented
+  │
+  └─ [if Cash] ─────────────────┐
+                                ▼
+                    Order created with status "pending"
+                                │
+                                ▼
+                    Admin Action (approveManualPayment)
+                                │
+                                ▼
+                    approveCashPaymentService (order.service.ts)
+                                │
+                                ▼
+                    confirmPaymentAndUpdateStock (order.service.ts)
+                                │
+                                ▼
+                    Order confirmed + stock decremented
 ```
 
 ## Core Principle
 
-Payments are confirmed only by provider, never by client.
+Payments are confirmed only by trusted sources, never by client.
 
 Client success page ≠ successful payment.
 
-Only trusted sources:
-1. webhook confirmation
-2. provider API verification
+Trusted sources:
+1. provider webhook (MP)
+2. admin manual approval (cash/transfer)
+3. provider API verification
 
 ## Trust Hierarchy
 
 Always trust in this order:
-1. provider webhook
-2. provider API verification
-3. internal DB record
-4. client request
+1. provider webhook (MP)
+2. admin manual approval (cash/transfer)
+3. provider API verification
+4. internal DB record
+5. client request
 
 Client input is never authoritative.
 
@@ -137,14 +173,26 @@ Allowed storage:
 | File | Description |
 |------|-------------|
 | `services/payment.service.ts` | MercadoPago SDK integration, preference creation |
+| `services/order.service.ts` | `confirmPaymentAndUpdateStock()` shared function for MP webhook and admin approval |
 | `actions/payment/create-preference.ts` | Thin orchestrator for payment creation |
+| `actions/order/place-order.ts` | Creates order with paymentProvider selection |
+| `actions/admin/orders.ts` | `approveManualPayment()` for cash/transfer approval |
 | `components/mercadopago/MercadoPagoButton.tsx` | UI component for checkout |
 | `app/api/webhooks/mercadopago/route.ts` | Webhook handler for MercadoPago |
+| `app/(shop)/checkout/(checkout)/ui/PlaceOrder.tsx` | Checkout UI with payment method selector |
 
 ## Flow
 
+### MercadoPago (Automatic)
+
 ```
-checkout → payment preference → MercadoPago → webhook → order confirmation
+checkout → place order → create preference → MercadoPago → webhook → confirmPaymentAndUpdateStock → order confirmed
+```
+
+### Cash/Transfer (Manual)
+
+```
+checkout → place order (provider: "cash") → instructions shown → admin approval → confirmPaymentAndUpdateStock → order confirmed
 ```
 
 ## Failure Handling
@@ -154,6 +202,11 @@ If payment fails:
 - inventory must release
 - user must be notified
 - retry must be allowed
+
+If admin rejects manual payment:
+- order must not activate
+- stock is not decremented
+- user must be notified
 
 Agents must never activate order after failed payment.
 

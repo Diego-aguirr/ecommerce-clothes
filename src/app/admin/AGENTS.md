@@ -39,12 +39,14 @@ Prisma → PostgreSQL
 ## Base de Datos y Prisma (Sección Admin)
 
 1. **Logística vs. Financiero**:
-   - El estado de pago reside en `OrderStatus` (`pending`, `paid`, `cancelled`) y se asocia al checkout o confirmaciones de cobro de pasarela (ej. MercadoPago).
+   - El estado de pago reside en `OrderStatus` (`pending`, `paid`, `cancelled`) y se asocia al checkout o confirmaciones de cobro de pasarela (ej. MercadoPago) o aprobación manual de admin (efectivo/transferencia).
+   - Para pagos manuales (cash/transfer), el admin aprueba mediante `actions/admin/orders.ts` → `approveManualPayment()`, que llama a `order.service.ts` → `approveCashPaymentService()`.
    - El estado de envío es totalmente independiente y reside en `DeliveryStatus` (`pending`, `shipped`, `delivered`).
    - Las manipulaciones del estado de envío se realizan desde `order.service.ts` → `updateDeliveryStatus`.
 
 2. **Control de Inventario (Stock Panel)**:
    - Todo movimiento de stock usa `product.service.ts` → `adjustStock()`.
+   - Las ventas confirmadas (MP webhook o admin approval) usan `order.service.ts` → `confirmPaymentAndUpdateStock()`.
    - Estas actualizaciones crean registros trazables en `StockMovement`.
 
 3. **Auditoría Estricta (Audit Panel)**:

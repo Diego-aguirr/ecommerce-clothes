@@ -21,8 +21,13 @@ export const MercadoPagoButton = ({ orderId }: Props) => {
       const result = await createPreference(orderId);
       console.log("Respuesta de createPreference:", result);
 
-      if (!result.ok || !("init_point" in result) || !result.init_point) {
+      if (!result.ok) {
         setError(result.message || "No se pudo generar el enlace de pago");
+        return;
+      }
+
+      if (!result.init_point) {
+        setError("No se recibió el link de pago");
         return;
       }
 

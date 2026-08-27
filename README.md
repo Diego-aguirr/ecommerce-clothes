@@ -58,13 +58,7 @@ Editá `.env` y completá todas las variables requeridas. Consultá el archivo `
 El proyecto está dockerizado. Docker levanta la app + PostgreSQL con hot reload:
 
 ```bash
-./docker.sh up
-```
-
-O con el alias (ver [Aliases](#aliases-para-tu-shell)):
-
-```bash
-sup
+sup          # o: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
 Abrí [http://localhost:3000](http://localhost:3000).
@@ -78,17 +72,18 @@ Abrí [http://localhost:3000](http://localhost:3000).
 ### Docker (desarrollo)
 
 ```bash
-./docker.sh up          # Levantar todo (app + db)
-./docker.sh down        # Detener
-./docker.sh restart     # Reiniciar
-./docker.sh logs        # Ver logs
-./docker.sh status      # Estado de contenedores
-./docker.sh shell       # Entrar al contenedor de la app
-./docker.sh db-shell    # Consola PostgreSQL
-./docker.sh clean       # Limpiar todo (contenedores + volúmenes + imágenes)
+sup            # Levantar todo (app + db) con logs
+supd           # Levantar todo en background
+sdown          # Detener
+srestart       # Reiniciar
+slogs          # Ver logs en tiempo real
+sstatus        # Estado de contenedores
+sexec          # Entrar al contenedor de la app
+sdb            # Consola PostgreSQL
+sclean         # Limpiar todo (contenedores + volúmenes + imágenes)
 ```
 
-### Desarrollo local
+### Desarrollo local (sin Docker)
 
 ```bash
 pnpm run dev            # Dev server (Turbopack)
@@ -116,19 +111,19 @@ alias dcprod='docker compose -f docker-compose.yml -f docker-compose.prod.yml --
 ### SAURON Dev
 
 ```bash
-alias sup='dcdev up --build'
-alias supd='dcdev up --build -d'
-alias sdown='dcdev down'
-alias sdownv='dcdev down -v'
-alias srestart='dcdev restart'
-alias slogs='dcdev logs -f'
-alias slogsa='dcdev logs -f app'
-alias slogsdb='dcdev logs -f db'
-alias sexec='dcdev exec app sh'
-alias sdb='dcdev exec db psql -U sauron -d sauron_db'
-alias sstatus='dcdev ps'
-alias sbuild='dcdev build --no-cache'
-alias sclean='dcdev down -v --rmi local'
+alias sup='dcdev up --build'              # Levantar todo (con logs)
+alias supd='dcdev up --build -d'          # Levantar todo (background)
+alias sdown='dcdev down'                  # Detener
+alias sdownv='dcdev down -v'              # Detener y borrar volúmenes
+alias srestart='dcdev restart'            # Reiniciar
+alias slogs='dcdev logs -f'               # Logs de todo
+alias slogsa='dcdev logs -f app'          # Logs solo app
+alias slogsdb='dcdev logs -f db'          # Logs solo DB
+alias sexec='dcdev exec app sh'           # Entrar al contenedor
+alias sdb='dcdev exec db psql -U sauron -d sauron_db'  # PostgreSQL
+alias sstatus='dcdev ps'                  # Estado de contenedores
+alias sbuild='dcdev build --no-cache'     # Rebuild limpio
+alias sclean='dcdev down -v --rmi local'  # Limpiar TODO
 ```
 
 ### SAURON Prod
@@ -158,7 +153,7 @@ alias gb='git branch'
 # Reset completo de DB
 alias dbreset='sdown && sup && sleep 3 && sexec npx prisma migrate deploy && sexec npx tsx prisma/seed.ts'
 
-# Build limpio
+# Build limpio local
 alias clean='rm -rf .next node_modules && pnpm install && pnpm run build'
 ```
 
@@ -174,7 +169,7 @@ src/
 │   ├── product/        # Get, paginate
 │   ├── address/        # CRUD direcciones
 │   ├── admin/          # CRUD dominios (admin)
-│   └── payment/        # Crear preferencia MercadoPago
+│   └── payment/        # Payment actions: MP preference, admin approval
 ├── app/                # Pages y rutas (App Router)
 │   ├── (auth)/         # Login, register, forgot/reset password
 │   ├── (shop)/         # Productos, carrito, checkout, órdenes
@@ -245,6 +240,34 @@ src/
 | `POST` | `/api/auth/reset-password`      | Restablecer contraseña       |
 | `GET`  | `/api/auth/verify`              | Verificar email              |
 | `POST` | `/api/auth/resend-verification` | Reenviar verificación        |
+
+---
+
+## Flujo de Checkout
+
+```
+Carrito → Dirección → Checkout → Confirmar → Pago
+```
+
+### Métodos de pago soportados
+
+| Método | Flujo | Confirmación |
+|--------|-------|-------------|
+| **MercadoPago** | Redirect automático a MP checkout | Webhook MP → automática |
+| **Efectivo/Transferencia** | Orden creada con instrucciones | Admin aprueba manualmente |
+
+### MercadoPago
+1. Usuario selecciona "MercadoPago" en checkout
+2. Clic "Finalizar Compra" → crea orden → redirect a MP
+3. Usuario paga en MP
+4. Webhook confirma → orden pagada + stock descontado
+
+### Efectivo / Transferencia
+1. Usuario selecciona "Efectivo/Transferencia" en checkout
+2. Clic "Finalizar Compra" → crea orden → muestra instrucciones
+3. Usuario paga (transferencia o efectivo al retirar)
+4. Admin entra al panel → órdenes → "Confirmar pago recibido"
+5. Orden pagada + stock descontado
 
 ---
 

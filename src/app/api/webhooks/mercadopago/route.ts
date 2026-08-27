@@ -6,7 +6,7 @@ import { mpClient } from "@/lib/mercadopago";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
-import type { Prisma } from "@/generated/prisma/client";
+import { confirmPaymentAndUpdateStock } from "@/services/order.service";
 
 // ---------------------------------------------------------------------------
 // 🔐 Verify MP signature (HMAC SHA256)
@@ -27,62 +27,6 @@ function verifySignature(request: NextRequest, body: string): boolean {
   if (sigBuf.length !== expBuf.length) return false;
 
   return crypto.timingSafeEqual(sigBuf, expBuf);
-}
-
-// ---------------------------------------------------------------------------
-// 🧱 Confirm payment + decrement stock (ATÓMICO sin anidar tx)
-// ---------------------------------------------------------------------------
-async function confirmPaymentAndUpdateStock(
-  tx: Prisma.TransactionClient,
-  orderId: string,
-) {
-  const order = await tx.order.findUnique({
-    where: { id: orderId },
-    include: { OrderItem: true },
-  });
-
-  if (!order) throw new Error("Order not found");
-  if (order.isPaid) return order; // idempotencia
-
-  // 🔥 decremento atómico seguro usando variantes
-  for (const item of order.OrderItem) {
-    // Si tiene variantId, actualizar stock de la variante
-    if (item.variantId) {
-      const variant = await tx.productVariant.findUnique({
-        where: { id: item.variantId },
-      });
-
-      if (!variant || variant.stock < item.quantity) {
-        throw new Error(`Stock insuficiente para la variante ${item.variantId}`);
-      }
-
-      await tx.productVariant.update({
-        where: { id: item.variantId },
-        data: { stock: { decrement: item.quantity } },
-      });
-
-      // Registrar movimiento de stock
-      await tx.stockMovement.create({
-        data: {
-          productId: item.productId,
-          variantId: item.variantId,
-          quantity: -item.quantity,
-          type: "sale",
-          note: `Venta por Orden ${orderId}`,
-        },
-      });
-    }
-  }
-
-  // marcar orden como pagada
-  return await tx.order.update({
-    where: { id: orderId },
-    data: {
-      isPaid: true,
-      paidAt: new Date(),
-      status: "paid", // Status de order
-    },
-  });
 }
 
 // ---------------------------------------------------------------------------
