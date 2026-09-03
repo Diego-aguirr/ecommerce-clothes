@@ -1,13 +1,34 @@
 import { Resend } from "resend";
 
-// Initialize Resend client with API key from environment
-const resend = new Resend(process.env.RESEND_API_KEY as string);
+let resend: Resend | null = null;
 
 /**
- * Sends an email using Resend.
- * @param to - Recipient email address (or array of addresses)
- * @param subject - Email subject line
- * @param html - HTML content of the email
+ * Obtiene o crea el cliente de Resend de forma lazy.
+ * En desarrollo sin API key, retorna null y loguea advertencia.
+ */
+function getResend(): Resend | null {
+  if (resend) return resend;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn(
+      "⚠️  RESEND_API_KEY no está configurada. Los emails se loguearán en consola en lugar de enviarse."
+    );
+    return null;
+  }
+
+  resend = new Resend(apiKey);
+  return resend;
+}
+
+/**
+ * Envía un email usando Resend.
+ * En modo desarrollo sin API key configurada, loguea el email en consola
+ * en lugar de enviarlo, permitiendo que la app funcione localmente.
+ *
+ * @param to - Dirección de email del destinatario (o array)
+ * @param subject - Asunto del email
+ * @param html - Contenido HTML del email
  */
 export async function sendEmail({
   to,
@@ -18,7 +39,18 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
-  const { data, error } = await resend.emails.send({
+  const client = getResend();
+
+  // Modo desarrollo: loguear en consola sin enviar
+  if (!client) {
+    console.log("📧 [DEV EMAIL - No enviado]");
+    console.log("   Para:", to);
+    console.log("   Asunto:", subject);
+    console.log("   Preview:", html.slice(0, 200).replace(/\n/g, " ") + "...");
+    return { id: "dev-mode" };
+  }
+
+  const { data, error } = await client.emails.send({
     from: process.env.MAIL_FROM as string,
     to,
     subject,

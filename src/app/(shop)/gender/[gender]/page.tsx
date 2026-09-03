@@ -1,6 +1,6 @@
 export const revalidate = 60;
 
-import { getPaginatedProductsWithImages } from "@/actions";
+import { getPaginatedProductsWithImages } from "@/actions/product/product-pagination";
 import { Pagination, ProductGrid, Title } from "@/components";
 import { Gender } from "@/generated/prisma/enums";
 import { notFound, redirect } from "next/navigation";

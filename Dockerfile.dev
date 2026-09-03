@@ -5,7 +5,7 @@
 
 FROM node:20-alpine
 
-RUN apk add --no-cache openssl openssl-dev
+RUN apk add --no-cache openssl openssl-dev netcat-openbsd
 RUN corepack enable
 RUN corepack prepare pnpm@10.26.2 --activate
 

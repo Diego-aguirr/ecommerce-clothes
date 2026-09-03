@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { IoCardOutline } from "react-icons/io5";
 import clsx from "clsx";
 
-import { getOrdersByUser } from "@/actions";
+import { getOrdersByUser } from "@/actions/order/get-orders-by-user";
 
 export default async function OrdersPage() {
   const { ok, orders = [] } = await getOrdersByUser();

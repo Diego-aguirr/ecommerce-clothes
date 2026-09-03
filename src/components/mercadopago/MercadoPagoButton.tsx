@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createPreference } from "@/actions";
+import { createPreference } from "@/actions/payment/create-preference";
 
 interface Props {
   orderId: string;

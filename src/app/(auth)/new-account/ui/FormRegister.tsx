@@ -9,7 +9,8 @@ import { z } from "zod";
 
 import { registerSchema } from "@/lib/zod";
 import { useRouter } from "next/navigation";
-import { registerAction, signInWithGoogle } from "@/actions";
+import { registerAction } from "@/actions/auth/register";
+import { signInWithGoogle } from "@/actions/auth/google";
 
 type FormInputs = z.infer<typeof registerSchema>;
 

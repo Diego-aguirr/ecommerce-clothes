@@ -45,11 +45,23 @@ pnpm install
 
 ### 2. Configurar variables de entorno
 
+#### Con Docker (recomendado)
+
+```bash
+cp .env.templete .env.docker
+```
+
+Editá `.env.docker` y completá todas las variables requeridas. El archivo ya viene con la `DATABASE_URL` apuntando al servicio `db` de Docker, así que no necesitás cambiarla.
+
+> **Requeridas:** `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`.
+
+#### Sin Docker
+
 ```bash
 cp .env.templete .env
 ```
 
-Editá `.env` y completá todas las variables requeridas. Consultá el archivo `.env.templete` para el detalle de cada una.
+Editá `.env` y completá todas las variables requeridas, incluyendo `DATABASE_URL` con tu PostgreSQL local.
 
 > **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`.
 
@@ -64,6 +76,7 @@ sup          # o: docker compose -f docker-compose.yml -f docker-compose.dev.yml
 Abrí [http://localhost:3000](http://localhost:3000).
 
 > **Nota:** La primera vez tarda en buildear. Las siguientes es instantáneo por los volumes.
+> **Migraciones:** El entrypoint de desarrollo aplica `prisma migrate deploy` automáticamente al iniciar.
 
 ---
 
