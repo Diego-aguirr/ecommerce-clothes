@@ -50,14 +50,14 @@ export default async function EditProductPage({ params }: Props) {
         </h1>
       </div>
 
-      {/* eslint-disable @typescript-eslint/no-explicit-any */}
+      { }
       <EditProductForm
         product={product as any}
         categories={categories}
         existingColors={colors as any}
         existingVariants={variants as any}
       />
-      {/* eslint-enable @typescript-eslint/no-explicit-any */}
+      { }
     </div>
   );
 }

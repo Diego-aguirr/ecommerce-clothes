@@ -2,7 +2,7 @@
 import { QuantitySelector } from "@/components";
 import { useCartStore } from "@/store/cart/cart-store";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export const ProductIncard = () => {
@@ -10,12 +10,9 @@ export const ProductIncard = () => {
   const updateProductQuantity = useCartStore(
     (state) => state.updateProductQuantity,
   );
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
 
   const productIncart = useCartStore((state) => state.cart);
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
 
   if (!loaded) {
     return <div>Loading...</div>;

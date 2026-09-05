@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { resendVerificationEmail } from "@/lib/api/auth";
 
 type Props = {
@@ -8,14 +8,10 @@ type Props = {
 };
 
 export default function EmailBanner({ reason }: Props) {
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(true);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) return null;
 

@@ -43,7 +43,7 @@ type ExistingVariant = {
 
 type Tab = "datos" | "imagenes" | "colores" | "stock";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 type EditProductTabsProps = {
   product: ExistingProduct;
   categories: { id: string; name: string }[];
@@ -54,7 +54,7 @@ type EditProductTabsProps = {
   setValue: UseFormSetValue<any>;
   watch: any;
 };
-/* eslint-enable @typescript-eslint/no-explicit-any */
+ 
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "datos", label: "Datos" },

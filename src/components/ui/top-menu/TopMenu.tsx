@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   IoCartOutline,
@@ -16,13 +16,9 @@ export const TopMenu = () => {
   const cart = useCartStore((state) => state.cart);
   const { data: session } = useSession();
 
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
 
   // Closes the user menu when clicking outside
   useEffect(() => {

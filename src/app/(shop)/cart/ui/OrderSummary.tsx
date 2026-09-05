@@ -1,20 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCartStore } from "@/store";
 import { IoArrowBack, IoCard, IoShieldCheckmark } from "react-icons/io5";
 import { currencyFormat } from "@/utils";
 
 const OrderSummary = () => {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
 
   // 👇 leemos estado directamente
   const cart = useCartStore((state) => state.cart);
-
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
 
   if (!loaded) return <p>Cargando...</p>;
 

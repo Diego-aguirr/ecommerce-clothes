@@ -84,7 +84,7 @@ export function ProductWizard({ categories, product }: Props) {
   ]);
   const [variants, setVariants] = useState<VariantEntry[]>([]);
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+   
   const {
     register,
     handleSubmit,
@@ -106,7 +106,7 @@ export function ProductWizard({ categories, product }: Props) {
       variants: [],
     },
   });
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+   
 
   const selectedSizes: string[] = watch("sizes") ?? [];
   const title: string = watch("title") ?? "";

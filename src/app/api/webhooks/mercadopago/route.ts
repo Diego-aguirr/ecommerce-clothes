@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
         data: {
           provider: "mercadopago",
           event: "mp_fetch_error",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           rawData: payload as any,
         },
       });
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
         data: {
           provider: "mercadopago",
           event: payload.action,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           rawData: payload as any,
         },
       });
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
           paymentId: payment.id,
           provider: "mercadopago",
           event: "amount_mismatch",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           rawData: { mp: mpResponse, db: payment } as any,
         },
       });
@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
         rawData: {
           webhook: payload,
           mp: mpResponse,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         } as any,
       },
     });

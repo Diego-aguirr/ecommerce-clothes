@@ -43,7 +43,7 @@ export async function uploadImageService(file: File, folder: string = "ecommerce
 /** Elimina una imagen de Cloudinary por su publicId. */
 export async function deleteImageService(publicId: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     cloudinary.uploader.destroy(publicId, (error, result) => {
       if (error) reject(error);
       else resolve();

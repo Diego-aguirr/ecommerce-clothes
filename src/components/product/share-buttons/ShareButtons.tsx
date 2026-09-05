@@ -2,7 +2,7 @@
 
 import { FaWhatsapp, FaFacebookF, FaInstagram } from "react-icons/fa6";
 import { IoShareOutline, IoLinkOutline } from "react-icons/io5";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface Props {
   title: string;
@@ -12,11 +12,9 @@ interface Props {
 
 export const ShareButtons = ({ title, slug, imageUrl }: Props) => {
   const [copied, setCopied] = useState(false);
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    setUrl(`${window.location.origin}/product/${slug}`);
-  }, [slug]);
+  const [url] = useState(() =>
+    typeof window !== "undefined" ? `${window.location.origin}/product/${slug}` : ""
+  );
 
   const text = `${title} — Mira este producto`;
   const encodedUrl = encodeURIComponent(url);
