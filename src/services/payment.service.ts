@@ -15,7 +15,7 @@
 import prisma from "@/lib/prisma";
 import "server-only";
 import { Preference } from "mercadopago";
-import { mpClient } from "@/lib/mercadopago";
+import { getMpClient } from "@/lib/mercadopago";
 
 /**
  * Obtiene una orden con sus items, producto y pago pendiente.
@@ -94,7 +94,14 @@ export async function createMercadoPagoPreference(
   orderId: string,
   baseUrl: string
 ) {
-  const preference = new Preference(mpClient);
+  const client = getMpClient();
+  if (!client) {
+    throw new Error(
+      "MercadoPago no está configurado. Configurá MERCADOPAGO_ACCESS_TOKEN en .env.docker o usá el método de pago en efectivo/transferencia."
+    );
+  }
+
+  const preference = new Preference(client);
 
   const result = await preference.create({
     body: {

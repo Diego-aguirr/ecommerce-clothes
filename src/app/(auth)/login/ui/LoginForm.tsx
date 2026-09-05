@@ -4,7 +4,8 @@ import { loginSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { authenticate, signInWithGoogle } from "@/actions";
+import { authenticate } from "@/actions/auth/login";
+import { signInWithGoogle } from "@/actions/auth/google";
 import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import Link from "next/link";

@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import clsx from "clsx";
 import { IoCardOutline } from "react-icons/io5";
 
-import { getOrderById } from "@/actions";
+import { getOrderById } from "@/actions/order/get-order-by-id";
 import { MercadoPagoButton } from "@/components";
 import { currencyFormat } from "@/utils";
 

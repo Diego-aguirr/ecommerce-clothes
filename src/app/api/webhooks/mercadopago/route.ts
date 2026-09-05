@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { Payment } from "mercadopago";
-import { mpClient } from "@/lib/mercadopago";
+import { getMpClient } from "@/lib/mercadopago";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
@@ -65,7 +65,13 @@ export async function POST(req: NextRequest) {
   // 💳 TRANSACCIÓN PRINCIPAL (ÚNICA)
   // -----------------------------------------------------------------------
   const result = await prisma.$transaction(async (tx) => {
-    const paymentClient = new Payment(mpClient);
+    const client = getMpClient();
+    if (!client) {
+      console.error("❌ MercadoPago no está configurado. Webhook ignorado.");
+      return { ok: false, message: "MercadoPago not configured" };
+    }
+
+    const paymentClient = new Payment(client);
 
     let mpResponse;
 

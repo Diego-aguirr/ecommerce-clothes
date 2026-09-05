@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useCartStore, useAddressStore } from "@/store";
-import { placeOrder, createPreference } from "@/actions";
+import { placeOrder } from "@/actions/order/place-order";
+import { createPreference } from "@/actions/payment/create-preference";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 

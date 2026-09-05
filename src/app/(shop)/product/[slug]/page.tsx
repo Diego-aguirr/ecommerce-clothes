@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
 import { titleFont } from "@/config/fonts";
-import { getProductBySlug } from "@/actions";
+import { getProductBySlug } from "@/actions/product/get-product-by-slug";
 import { ProductPageClient } from "./ui/ProductPageClient";
 
 interface Props {

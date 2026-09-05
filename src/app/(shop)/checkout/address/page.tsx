@@ -4,7 +4,8 @@ import { auth } from "../../../../../auth";
 import { redirect } from "next/dist/client/components/navigation";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
-import { getProvincies, getUserAddress } from "@/actions";
+import { getProvincies } from "@/actions/provincies/get-provincies";
+import { getUserAddress } from "@/actions/address/get-user-address";
 import { FaInfoCircle } from "react-icons/fa";
 
 export default async function AddressPage() {
