@@ -1,20 +1,25 @@
-import { redirect } from "next/navigation";
+import { forbidden, unauthorized } from "next/navigation";
 import { auth } from "../../../auth";
 
 export async function requireAdmin() {
   const session = await auth();
-  if (!session?.user || session.user.role !== "admin") {
-    redirect("/"); // Or better, redirect to a not-authorized page
+  if (!session?.user) {
+    unauthorized(); // 401 — no autenticado
+  }
+  if (session.user.role !== "admin") {
+    forbidden(); // 403 — no autorizado (rol insuficiente)
   }
   return session.user;
 }
 
 export async function requireSuperAdmin() {
   const session = await auth();
-  // Casting for type safety since we know the field is there
-  const user = session?.user as { role: string; isSuperAdmin?: boolean; id: string } | undefined;
-  if (!user || user.role !== "admin" || !user.isSuperAdmin) {
-    redirect("/");
+  if (!session?.user) {
+    unauthorized(); // 401 — no autenticado
+  }
+  const user = session.user as { role: string; isSuperAdmin?: boolean; id: string };
+  if (user.role !== "admin" || !user.isSuperAdmin) {
+    forbidden(); // 403 — no autorizado (superadmin requerido)
   }
   return user;
 }

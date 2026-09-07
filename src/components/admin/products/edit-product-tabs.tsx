@@ -7,6 +7,8 @@ import { StepImages } from "./step-images";
 import { StepColors } from "./step-colors";
 import { StepVariants } from "./step-variants";
 import { UseFormRegister, FieldErrors, UseFormSetValue } from "react-hook-form";
+import { z } from "zod";
+import { CreateProductSchema } from "@/lib/validations/product.schema";
 
 type ImageEntry = { url: string; publicId: string };
 type ColorEntry = { color: string; label: string; hexCode: string };
@@ -44,15 +46,20 @@ type ExistingVariant = {
 type Tab = "datos" | "imagenes" | "colores" | "stock";
 
  
+// FIXME(Phase 6): Replace any with z.input<typeof CreateProductSchema> after form refactor
 type EditProductTabsProps = {
   product: ExistingProduct;
   categories: { id: string; name: string }[];
   existingColors: ExistingColor[];
   existingVariants: ExistingVariant[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errors: FieldErrors<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: UseFormSetValue<any>;
-  watch: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  watch: (name: string) => any;
 };
  
 

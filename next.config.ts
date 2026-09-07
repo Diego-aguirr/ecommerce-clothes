@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -26,8 +27,10 @@ const nextConfig: NextConfig = {
     ],
     formats: ["image/webp", "image/avif"], // Formatos modernos
   },
+  reactCompiler: true,
   experimental: {
     optimizeCss: true,
+    // cacheComponents: true, // TODO: Migrate revalidate to 'use cache' first
   },
   // turbopack root is auto-detected, no need to set explicitly
 };

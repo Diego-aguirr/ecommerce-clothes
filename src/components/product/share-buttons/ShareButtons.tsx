@@ -8,27 +8,25 @@ interface Props {
   title: string;
   slug: string;
   imageUrl?: string;
+  productUrl: string;
 }
 
-export const ShareButtons = ({ title, slug, imageUrl }: Props) => {
+export const ShareButtons = ({ title, slug, imageUrl, productUrl }: Props) => {
   const [copied, setCopied] = useState(false);
-  const [url] = useState(() =>
-    typeof window !== "undefined" ? `${window.location.origin}/product/${slug}` : ""
-  );
 
   const text = `${title} — Mira este producto`;
-  const encodedUrl = encodeURIComponent(url);
+  const encodedUrl = encodeURIComponent(productUrl);
   const encodedText = encodeURIComponent(text);
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(productUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for older browsers
       const textArea = document.createElement("textarea");
-      textArea.value = url;
+      textArea.value = productUrl;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand("copy");
@@ -43,7 +41,7 @@ export const ShareButtons = ({ title, slug, imageUrl }: Props) => {
       navigator.share({
         title,
         text,
-        url,
+        url: productUrl,
         ...(imageUrl ? { image: imageUrl } : {}),
       });
     }

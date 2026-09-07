@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import { FaShieldAlt, FaLock, FaCheckCircle } from "react-icons/fa";
 
 import { AddressFormValues, Province } from "@/interfaces";

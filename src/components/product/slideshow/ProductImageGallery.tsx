@@ -317,7 +317,7 @@ function FullscreenModal({
           src={images[currentIndex]}
           alt={`${title} — pantalla completa`}
           className="object-contain"
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 896px"
           priority
         />
       </div>

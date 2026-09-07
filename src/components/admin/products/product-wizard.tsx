@@ -91,6 +91,8 @@ export function ProductWizard({ categories, product }: Props) {
     setValue,
     watch,
     formState: { errors },
+  // FIXME(Phase 6): Type with z.input<typeof CreateProductSchema> after form refactor
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useForm<any>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 import type { VariantsByColor, Size } from "@/interfaces/product.interface";
 
 interface UseProductVariantReturn {
@@ -13,18 +13,18 @@ interface UseProductVariantReturn {
     stock: number;
     sku: string;
   } | undefined;
-  
+
   // Datos derivados
   availableColors: { color: string; label: string; hexCode?: string }[];
   availableSizes: Size[];
   availableSizesForColor: Size[];
   disabledSizes: Size[];
   currentStock: number;
-  
+
   // Acciones
   handleColorChange: (color: string) => void;
   handleSizeChange: (size: Size) => void;
-  
+
   // Validación
   canAddToCart: boolean;
   isOutOfStock: boolean;
@@ -37,52 +37,41 @@ export const useProductVariant = (
   const [selectedColor, setSelectedColor] = useState<string>(
     variantsByColor[0]?.color || "default"
   );
-  
+
   const [selectedSize, setSelectedSize] = useState<Size | undefined>(undefined);
 
   // Colores disponibles
-  const availableColors = useMemo(() => {
-    return variantsByColor.map((vc) => ({
-      color: vc.color,
-      label: vc.label,
-      hexCode: vc.hexCode,
-    }));
-  }, [variantsByColor]);
+  const availableColors = variantsByColor.map((vc) => ({
+    color: vc.color,
+    label: vc.label,
+    hexCode: vc.hexCode,
+  }));
 
   // Variantes del color seleccionado
-  const variantsForSelectedColor = useMemo(() => {
-    const colorGroup = variantsByColor.find((vc) => vc.color === selectedColor);
-    return colorGroup?.variants || [];
-  }, [variantsByColor, selectedColor]);
+  const variantsForSelectedColor =
+    variantsByColor.find((vc) => vc.color === selectedColor)?.variants || [];
 
   // Todas las tallas disponibles (de todos los colores)
-  const availableSizes = useMemo(() => {
-    const sizes = new Set<Size>();
-    variantsByColor.forEach((vc) => {
-      vc.variants.forEach((v) => sizes.add(v.size));
-    });
-    return Array.from(sizes).sort();
-  }, [variantsByColor]);
+  const allSizes = new Set<Size>();
+  variantsByColor.forEach((vc) => {
+    vc.variants.forEach((v) => allSizes.add(v.size));
+  });
+  const availableSizes = Array.from(allSizes).sort();
 
   // Tallas disponibles para el color seleccionado
-  const availableSizesForColor = useMemo(() => {
-    return variantsForSelectedColor
-      .filter((v) => v.stock > 0)
-      .map((v) => v.size);
-  }, [variantsForSelectedColor]);
+  const availableSizesForColor = variantsForSelectedColor
+    .filter((v) => v.stock > 0)
+    .map((v) => v.size);
 
   // Tallas deshabilitadas (sin stock para el color seleccionado)
-  const disabledSizes = useMemo(() => {
-    return variantsForSelectedColor
-      .filter((v) => v.stock === 0)
-      .map((v) => v.size);
-  }, [variantsForSelectedColor]);
+  const disabledSizes = variantsForSelectedColor
+    .filter((v) => v.stock === 0)
+    .map((v) => v.size);
 
   // Variante seleccionada (color + talla)
-  const selectedVariant = useMemo(() => {
-    if (!selectedSize) return undefined;
-    return variantsForSelectedColor.find((v) => v.size === selectedSize);
-  }, [variantsForSelectedColor, selectedSize]);
+  const selectedVariant = selectedSize
+    ? variantsForSelectedColor.find((v) => v.size === selectedSize)
+    : undefined;
 
   // Stock actual de la variante seleccionada
   const currentStock = selectedVariant?.stock || 0;
@@ -94,21 +83,15 @@ export const useProductVariant = (
   const isOutOfStock = variantsForSelectedColor.every((v) => v.stock === 0);
 
   // Handlers
-  const handleColorChange = useCallback(
-    (color: string) => {
-      setSelectedColor(color);
-      // Resetear talla seleccionada al cambiar de color
-      setSelectedSize(undefined);
-    },
-    []
-  );
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+    // Resetear talla seleccionada al cambiar de color
+    setSelectedSize(undefined);
+  };
 
-  const handleSizeChange = useCallback(
-    (size: Size) => {
-      setSelectedSize(size);
-    },
-    []
-  );
+  const handleSizeChange = (size: Size) => {
+    setSelectedSize(size);
+  };
 
   return {
     selectedColor,

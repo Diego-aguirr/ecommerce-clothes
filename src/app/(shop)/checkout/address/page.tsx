@@ -1,7 +1,7 @@
 import { Title } from "@/components";
 import AddressForm from "./ui/AddressForm";
 import { auth } from "../../../../../auth";
-import { redirect } from "next/dist/client/components/navigation";
+import { redirect } from "next/navigation";
 import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
 import { getProvincies } from "@/actions/provincies/get-provincies";

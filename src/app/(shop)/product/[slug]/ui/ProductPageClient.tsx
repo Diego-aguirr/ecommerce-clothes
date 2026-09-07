@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { NextFont } from "next/dist/compiled/@next/font";
-import { StockLabel } from "@/components";
+import { titleFont } from "@/config/fonts";
 import ProductImageGallery from "@/components/product/slideshow/ProductImageGallery";
 import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
 import { AddToCart } from "./AddToCart";
@@ -11,10 +10,12 @@ import type { ProductWithVariants } from "@/actions/product/get-product-by-slug"
 
 interface Props {
   product: ProductWithVariants;
-  titleFont: NextFont;
+  titleFont: { className: string };
+  initialStock: number;
+  productUrl: string;
 }
 
-export const ProductPageClient = ({ product, titleFont }: Props) => {
+export const ProductPageClient = ({ product, titleFont, initialStock, productUrl }: Props) => {
   // Estado para el color seleccionado (afecta las imágenes)
   const [selectedColor, setSelectedColor] = useState<string>(
     product.variantsByColor[0]?.color || "default",
@@ -42,7 +43,9 @@ export const ProductPageClient = ({ product, titleFont }: Props) => {
         {/* Col 2 — Info y compra */}
         <div className="flex flex-col gap-6 py-2">
           <div>
-            <StockLabel slug={product.slug} />
+            <p className="text-sm text-gray-600 mb-1">
+              Stock disponible: {initialStock} unidades
+            </p>
             <h1
               className={`${titleFont.className} antialiased font-bold text-2xl lg:text-3xl text-gray-900 leading-tight mt-2`}
             >
@@ -78,6 +81,7 @@ export const ProductPageClient = ({ product, titleFont }: Props) => {
               title={product.title}
               slug={product.slug}
               imageUrl={colorImages[0]}
+              productUrl={productUrl}
             />
           </div>
         </div>
@@ -89,7 +93,9 @@ export const ProductPageClient = ({ product, titleFont }: Props) => {
 
         <div className="flex flex-col gap-6 px-1">
           <div>
-            <StockLabel slug={product.slug} />
+            <p className="text-sm text-gray-600 mb-1">
+              Stock disponible: {initialStock} unidades
+            </p>
             <h1
               className={`${titleFont.className} antialiased font-bold text-2xl text-gray-900 leading-tight mt-2`}
             >
@@ -124,6 +130,7 @@ export const ProductPageClient = ({ product, titleFont }: Props) => {
               title={product.title}
               slug={product.slug}
               imageUrl={colorImages[0]}
+              productUrl={productUrl}
             />
           </div>
         </div>
