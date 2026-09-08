@@ -27,6 +27,9 @@ type ExistingProduct = {
   ProductImage: ImageEntry[];
 };
 
+const INPUT_CLASS =
+  "w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition";
+
 type Props = {
   categories: { id: string; name: string }[];
   product?: ExistingProduct;
@@ -277,27 +280,27 @@ export function ProductForm({ categories, product }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
-          <input {...register("title")} className="input" placeholder="Ej: Remera Negra" />
+          <input {...register("title")} className={INPUT_CLASS} placeholder="Ej: Remera Negra" />
           {errors.title && <span className="text-red-500 text-xs">{errors.title.message}</span>}
         </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Precio ($) *</label>
-          <input type="number" step="0.01" {...register("price", { valueAsNumber: true })} className="input" />
+          <input type="number" step="0.01" {...register("price", { valueAsNumber: true })} className={INPUT_CLASS} />
           {errors.price && <span className="text-red-500 text-xs">{errors.price.message}</span>}
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
-        <textarea {...register("description")} rows={3} className="input" placeholder="Describe el producto..." />
+        <textarea {...register("description")} rows={3} className={INPUT_CLASS} placeholder="Describe el producto..." />
         {errors.description && <span className="text-red-500 text-xs">{errors.description.message}</span>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
-          <select {...register("categoryId")} className="input">
+          <select {...register("categoryId")} className={INPUT_CLASS}>
             <option value="">Selecciona...</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -306,7 +309,7 @@ export function ProductForm({ categories, product }: Props) {
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Género *</label>
-          <select {...register("gender")} className="input">
+          <select {...register("gender")} className={INPUT_CLASS}>
             <option value="">Selecciona...</option>
             {ALL_GENDERS.map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
@@ -508,11 +511,6 @@ export function ProductForm({ categories, product }: Props) {
         </button>
       </div>
 
-      <style jsx>{`
-        .input {
-          @apply w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition;
-        }
-      `}</style>
     </form>
   );
 }

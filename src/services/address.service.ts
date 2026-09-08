@@ -39,7 +39,7 @@ export async function getUserAddressService(userId: string) {
   if (!address) return null;
 
   // Excluir campos internos
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const { id, userId: _addressUserId, sessionId, createdAt, updatedAt, ...rest } = address;
   return {
     ...rest,

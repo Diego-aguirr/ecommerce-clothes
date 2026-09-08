@@ -45,7 +45,6 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
         subject: "Confirmá tu correo electrónico",
         html: verifyEmailTemplate({ name, verifyUrl }),
       });
-      console.log("✅ Email de verificación enviado exitosamente");
     } catch (err) {
       console.error(
         "❌ Error enviando email de verificación (usuario creado igualmente):",

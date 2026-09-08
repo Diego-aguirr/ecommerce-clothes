@@ -84,13 +84,15 @@ export function ProductWizard({ categories, product }: Props) {
   ]);
   const [variants, setVariants] = useState<VariantEntry[]>([]);
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+   
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     formState: { errors },
+  // FIXME(Phase 6): Type with z.input<typeof CreateProductSchema> after form refactor
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useForm<any>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
@@ -106,7 +108,7 @@ export function ProductWizard({ categories, product }: Props) {
       variants: [],
     },
   });
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+   
 
   const selectedSizes: string[] = watch("sizes") ?? [];
   const title: string = watch("title") ?? "";

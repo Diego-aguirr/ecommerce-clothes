@@ -3,15 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const OrderItems = () => {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
   const productsInCart = useCartStore((state) => state.cart);
-
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
 
   if (!loaded) {
     return <p className="animate-pulse">Cargando carrito...</p>;

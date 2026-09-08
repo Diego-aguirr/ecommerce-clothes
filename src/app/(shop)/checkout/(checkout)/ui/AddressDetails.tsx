@@ -2,16 +2,12 @@
 
 import Link from "next/link";
 import { useAddressStore } from "@/store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const AddressDetails = () => {
   const address = useAddressStore((state) => state.address);
   const shippingMethod = useAddressStore((state) => state.shippingMethod);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [mounted, setMounted] = useState(true);
 
   if (!mounted) {
     return (

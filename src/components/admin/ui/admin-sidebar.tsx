@@ -25,11 +25,6 @@ export function AdminSidebar({
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Close sidebar on route change
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
-
   // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
     if (isOpen) {
@@ -67,6 +62,7 @@ export function AdminSidebar({
           <div className="flex items-center justify-between">
             <Link
               href="/"
+              onClick={() => setIsOpen(false)}
               className="inline-block transition-transform hover:scale-105 px-2"
             >
               <h2 className="text-2xl font-black tracking-tighter text-gray-900">
@@ -106,6 +102,7 @@ export function AdminSidebar({
               <Link
                 key={link.name}
                 href={link.href}
+                onClick={() => setIsOpen(false)}
                 aria-current={isActive ? "page" : undefined}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
                   isActive
@@ -133,6 +130,7 @@ export function AdminSidebar({
                     <Link
                       key={link.name}
                       href={link.href}
+                      onClick={() => setIsOpen(false)}
                       aria-current={isActive ? "page" : undefined}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 ${
                         isActive
@@ -159,7 +157,7 @@ export function AdminSidebar({
       <div className="p-4 border-t border-gray-100 text-center">
         <p className="text-xs text-gray-400 font-medium">
           Salir a la{" "}
-          <Link href="/" className="text-blue-600 hover:underline">
+          <Link href="/" onClick={() => setIsOpen(false)} className="text-blue-600 hover:underline">
             tienda virtual
           </Link>
         </p>

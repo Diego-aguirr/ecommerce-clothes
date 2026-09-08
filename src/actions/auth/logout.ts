@@ -3,5 +3,11 @@
 import { signOut } from "../../../auth";
 
 export async function logout() {
-  await signOut();
+  try {
+    await signOut();
+    return { ok: true };
+  } catch (error) {
+    console.error("Logout error:", error);
+    return { ok: false, error: "Error al cerrar sesión" };
+  }
 }

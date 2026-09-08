@@ -50,14 +50,35 @@ export default async function EditProductPage({ params }: Props) {
         </h1>
       </div>
 
-      {/* eslint-disable @typescript-eslint/no-explicit-any */}
       <EditProductForm
-        product={product as any}
+        product={{
+          id: product.id,
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          sizes: product.sizes,
+          tags: product.tags,
+          gender: product.gender,
+          categoryId: product.categoryId,
+          ProductImage: product.ProductImage,
+        }}
         categories={categories}
-        existingColors={colors as any}
-        existingVariants={variants as any}
+        existingColors={colors.map((c) => ({
+          id: c.id,
+          color: c.color,
+          label: c.label,
+          hexCode: c.hexCode,
+          images: c.images,
+        }))}
+        existingVariants={variants.map((v) => ({
+          id: v.id,
+          sku: v.sku,
+          size: v.size,
+          color: v.color,
+          stock: v.stock,
+          isActive: v.isActive,
+        }))}
       />
-      {/* eslint-enable @typescript-eslint/no-explicit-any */}
     </div>
   );
 }

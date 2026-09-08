@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { FiCheckCircle, FiAlertCircle, FiX } from "react-icons/fi";
 
 type ToastType = "success" | "error";
@@ -26,14 +26,14 @@ export function useToast() {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const toast = useCallback((message: string, type: ToastType = "success") => {
+  const toast = (message: string, type: ToastType = "success") => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3000);
-  }, []);
+  };
 
   const dismiss = (id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));

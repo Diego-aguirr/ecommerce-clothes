@@ -5,7 +5,12 @@ export const PageNotFound = () => {
   return (
     <div className="flex flex-col min-h-screen w-full justify-center items-center align-middle relative overflow-hidden bg-black text-white">
       {/* Background Radial Glow mimicking the old logo's blue aura */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-40 select-none pointer-events-none overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/30 via-black to-black">
+      <div
+        className="absolute inset-0 flex items-center justify-center opacity-40 select-none pointer-events-none overflow-hidden"
+        style={{
+          background: "radial-gradient(ellipse at center, rgba(30,58,138,0.3) 0%, #000 70%)",
+        }}
+      >
       </div>
 
       {/* SAURON Massive Watermark */}

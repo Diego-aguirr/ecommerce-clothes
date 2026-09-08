@@ -1,5 +1,3 @@
-"use client";
-
 import OrderSummary from "./ui/OrderSummary";
 import { ProductIncard } from "./ui/ProductIncard";
 
@@ -13,7 +11,7 @@ export default function CartPage() {
             Tu Carrito de Compra
           </h1>
           <p className="text-gray-600 text-sm sm:text-base">
-            producto 3 en tu carrito
+            Revisá tus productos antes de continuar
           </p>
         </div>
 

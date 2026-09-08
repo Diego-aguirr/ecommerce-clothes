@@ -1,4 +1,4 @@
-import React from "react";
+
 import { FaTruck, FaShieldAlt } from "react-icons/fa";
 
 export const AnnouncementBar = () => {

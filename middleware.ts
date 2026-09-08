@@ -4,18 +4,25 @@ import { authConfig } from "./auth.config";
 
 const { auth } = NextAuth(authConfig);
 
-// Rutas públicas
-const publicRoutes = ["/"];
+// Rutas públicas exactas o con prefijo
+const publicRoutes = [
+  "/",
+  "/gender",
+  "/product",
+  "/cart",
+  "/empty",
+  "/login",
+  "/new-account",
+  "/forgot-password",
+  "/reset-password",
+  "/api/webhooks",
+];
 
 // Rutas de auth
 const authRoutes = ["/login", "/new-account"];
 
 // Rutas privadas
-const protectedRoutes = [
-  "/dashboard",
-  "/admin",
-  "/checkout",
-];
+const protectedRoutes = ["/admin", "/checkout"];
 
 const apiAuthPrefix = "/api/auth";
 
@@ -29,18 +36,18 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  // Públicas
+  // Públicas (exact match o prefijo + "/")
   const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route),
+    pathname === route || pathname.startsWith(route + "/"),
   );
 
   if (isPublicRoute) {
     return NextResponse.next();
   }
 
-  // Logueado entrando a login/register
+  // Logueado entrando a login/register → home
   if (isLoggedIn && authRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl));
+    return NextResponse.redirect(new URL("/", nextUrl));
   }
 
   // Protegidas

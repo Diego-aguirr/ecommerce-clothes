@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCartStore, useAddressStore } from "@/store";
 import { placeOrder } from "@/actions/order/place-order";
 import { createPreference } from "@/actions/payment/create-preference";
@@ -9,10 +9,10 @@ import clsx from "clsx";
 
 export const PlaceOrder = () => {
   const router = useRouter();
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [idempotencyToken, setIdempotencyToken] = useState("");
+  const [idempotencyToken, setIdempotencyToken] = useState(() => crypto.randomUUID());
   const [paymentMethod, setPaymentMethod] = useState<"mercadopago" | "cash">("mercadopago");
 
   const address = useAddressStore((state) => state.address);
@@ -27,12 +27,6 @@ export const PlaceOrder = () => {
   );
 
   const { subTotal, tax, total, itemsInCart } = getSummaryInformation();
-
-  useEffect(() => {
-    setLoaded(true);
-    // Generar un token de idempotencia único para esta sesión de confirmación
-    setIdempotencyToken(crypto.randomUUID());
-  }, []);
 
   if (!loaded) {
     return <p className="animate-pulse">Cargando...</p>;

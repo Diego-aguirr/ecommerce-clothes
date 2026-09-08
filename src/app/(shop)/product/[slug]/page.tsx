@@ -5,6 +5,7 @@ import { Metadata } from "next";
 
 import { titleFont } from "@/config/fonts";
 import { getProductBySlug } from "@/actions/product/get-product-by-slug";
+import { getStockBySlug } from "@/actions/product/get-stock-by-slug";
 import { ProductPageClient } from "./ui/ProductPageClient";
 
 interface Props {
@@ -44,12 +45,18 @@ export default async function Page({ params }: Props) {
   
   if (!product) notFound();
 
+  const stock = await getStockBySlug(slug);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://shop.builtbyaguirre.com";
+  const productUrl = `${baseUrl}/product/${slug}`;
+
   // ✅ Producto ya viene con variantsByColor desde getProductBySlug
   return (
     <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-10">
       <ProductPageClient 
         product={product}
         titleFont={titleFont}
+        initialStock={stock}
+        productUrl={productUrl}
       />
     </main>
   );

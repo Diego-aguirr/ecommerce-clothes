@@ -9,7 +9,7 @@ import type { WebhookPayload } from "@/interfaces";
 import { confirmPaymentAndUpdateStock } from "@/services/order.service";
 
 // ---------------------------------------------------------------------------
-// 🔐 Verify MP signature (HMAC SHA256)
+// Verify MP signature (HMAC SHA256)
 // ---------------------------------------------------------------------------
 function verifySignature(request: NextRequest, body: string): boolean {
   const signature = request.headers.get("x-signature") ?? "";
@@ -30,26 +30,23 @@ function verifySignature(request: NextRequest, body: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// 🚀 MAIN WEBHOOK
+// MAIN WEBHOOK
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
-  console.log("🔔 Webhook MP:", rawBody);
 
-  // 🔐 Verificación de firma
+  // Verificación de firma
   const isValidSignature = verifySignature(req, rawBody);
 
   if (!isValidSignature) {
     if (process.env.NODE_ENV === "production") {
-      // Producción: Tolerancia cero. Bloquear y expulsar.
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     } else {
-      // Desarrollo: Avisar fuerte en la consola, pero dejar fluir la prueba.
-      console.warn("⚠️ [DEV MODE] Firma de Mercado Pago inválida, pero dejando pasar el Webhook para simulación local...");
+      console.warn("[DEV MODE] Firma de Mercado Pago inválida, pero dejando pasar el Webhook para simulación local...");
     }
   }
 
-  // 🧪 validar payload
+  // Validar payload
   let payload: WebhookPayload;
   try {
     payload = webhookSchema.parse(JSON.parse(rawBody));
@@ -62,12 +59,12 @@ export async function POST(req: NextRequest) {
   }
 
   // -----------------------------------------------------------------------
-  // 💳 TRANSACCIÓN PRINCIPAL (ÚNICA)
+  // TRANSACCIÓN PRINCIPAL (ÚNICA)
   // -----------------------------------------------------------------------
   const result = await prisma.$transaction(async (tx) => {
     const client = getMpClient();
     if (!client) {
-      console.error("❌ MercadoPago no está configurado. Webhook ignorado.");
+      console.error("MercadoPago no está configurado. Webhook ignorado.");
       return { ok: false, message: "MercadoPago not configured" };
     }
 
@@ -75,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     let mpResponse;
 
-    // 🔁 fallback seguro (MP puede fallar)
+    // fallback seguro (MP puede fallar)
     try {
       mpResponse = await paymentClient.get({ id: payload.data.id });
     } catch {
@@ -83,8 +80,7 @@ export async function POST(req: NextRequest) {
         data: {
           provider: "mercadopago",
           event: "mp_fetch_error",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          rawData: payload as any,
+          rawData: payload,
         },
       });
 
@@ -103,7 +99,7 @@ export async function POST(req: NextRequest) {
       return { ok: false, message: "Missing external_reference" };
     }
 
-    // 🔗 buscar payment interno
+    // buscar payment interno
     const payment = await tx.payment.findUnique({
       where: { id: external_reference },
       include: { order: true },
@@ -114,29 +110,24 @@ export async function POST(req: NextRequest) {
         data: {
           provider: "mercadopago",
           event: payload.action,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          rawData: payload as any,
+          rawData: payload,
         },
       });
 
       return { ok: false, message: "Payment not found" };
     }
 
-    // 🔒 hardening
+    // hardening
     if (payment.provider !== "mercadopago") {
       throw new Error("Invalid provider");
     }
 
-    // 🛑 antifraude
+    // antifraude
     if (mpStatus === "approved" && status_detail !== "accredited") {
       return { ok: true, message: "Not accredited yet" };
     }
 
-    // 🔐 validación monto
-    console.log("💰 CHECKING MONTOS:");
-    console.log(`-> MP enviò: ${transaction_amount} ${currency_id}`);
-    console.log(`-> DB tiene: ${payment.amount} ${payment.currency}`);
-    
+    // validación monto
     if (
       Number(transaction_amount) !== Number(payment.amount) ||
       currency_id !== payment.currency
@@ -146,15 +137,14 @@ export async function POST(req: NextRequest) {
           paymentId: payment.id,
           provider: "mercadopago",
           event: "amount_mismatch",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          rawData: { mp: mpResponse, db: payment } as any,
+          rawData: { mp: JSON.parse(JSON.stringify(mpResponse)), db: payment },
         },
       });
 
       throw new Error("Amount mismatch");
     }
 
-    // 🎯 map status (🔴 FIJO OBLIGATORIO: Usar nombres estrictos del enum de Prisma)
+    // map status (FIJO OBLIGATORIO: Usar nombres estrictos del enum de Prisma)
     let newStatus: PaymentStatus;
 
     switch (mpStatus) {
@@ -174,8 +164,7 @@ export async function POST(req: NextRequest) {
         newStatus = PaymentStatus.PENDING;
     }
 
-    // 🔥 idempotencia REAL (race safe)
-    // Se compara contra PENDING o CREATED (los estados iniciales válidos de PaymentStatus)
+    // idempotencia REAL (race safe)
     const updated = await tx.payment.updateMany({
       where: {
         id: payment.id,
@@ -191,23 +180,18 @@ export async function POST(req: NextRequest) {
       return { ok: true, message: "Already processed (race safe)" };
     }
 
-    // 📦 confirmar orden
+    // confirmar orden
     if (newStatus === PaymentStatus.APPROVED) {
-      // Pasamos tx explícitamente para mantener una sola transacción real
       await confirmPaymentAndUpdateStock(tx, payment.orderId);
     }
 
-    // 🧾 log completo
+    // log completo
     await tx.paymentLog.create({
       data: {
         paymentId: payment.id,
         provider: "mercadopago",
         event: payload.action,
-        rawData: {
-          webhook: payload,
-          mp: mpResponse,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
       },
     });
 
