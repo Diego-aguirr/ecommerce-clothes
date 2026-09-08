@@ -7,6 +7,7 @@ import { useState, useTransition, useEffect } from "react";
 import { uploadProductImage, removeProductImage } from "@/actions/admin/upload";
 import { createProduct, updateProduct } from "@/actions/admin/products";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { z } from "zod";
 import { Size, Gender } from "@/generated/prisma/enums";
 
@@ -324,8 +325,13 @@ export function ProductForm({ categories, product }: Props) {
         <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-3">
           {allImages.map((img, idx) => (
             <div key={img.publicId} className="relative aspect-square rounded-lg border overflow-hidden group">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url.startsWith("http") ? img.url : `/products/${img.url}`} alt="" className="w-full h-full object-cover" />
+              <Image
+                src={img.url.startsWith("http") ? img.url : `/products/${img.url}`}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 25vw, 16vw"
+              />
               <button
                 type="button"
                 onClick={() => idx < existingImages.length ? removeExistingImage(img.publicId) : removeNewImage(img.publicId)}
