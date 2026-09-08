@@ -1,4 +1,10 @@
-// app/profile/page.tsx
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Mi Perfil | Satoru Store",
+  description: "Gestioná tus datos personales y preferencias de cuenta.",
+};
+
 import { redirect } from "next/navigation";
 import { auth } from "../../../../auth";
 

@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Restablecer Contraseña | Satoru Store",
+  description: "Establecé una nueva contraseña para tu cuenta.",
+};
+
 import ResetPasswordForm from "@/app/(auth)/reset-password/ui/ResetPasswordForm";
 
 export default function ResetPasswordPage({

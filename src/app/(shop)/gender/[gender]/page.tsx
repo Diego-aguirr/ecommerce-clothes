@@ -1,3 +1,25 @@
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ gender: string }>;
+}): Promise<Metadata> {
+  const { gender } = await params;
+  const labels: Record<string, string> = {
+    men: "Hombres",
+    women: "Mujeres",
+    kid: "Niños",
+    unisex: "Unisex",
+    outfits: "Cápsula / Combos",
+  };
+  const label = labels[gender] || gender;
+  return {
+    title: `${label} | Satoru Store`,
+    description: `Explorá nuestra colección de productos ${label.toLowerCase()}.`,
+  };
+}
+
 export const revalidate = 60;
 
 import { getPaginatedProductsWithImages } from "@/actions/product/product-pagination";

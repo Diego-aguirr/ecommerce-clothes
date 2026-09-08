@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Datos de Envío | Satoru Store",
+  description: "Completá tus datos de envío para recibir tu pedido.",
+};
+
 import { Title } from "@/components";
 import AddressForm from "./ui/AddressForm";
 import { auth } from "../../../../../auth";

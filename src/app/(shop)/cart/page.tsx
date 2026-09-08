@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Carrito | Satoru Store",
+  description:
+    "Revisá tus productos seleccionados y finalizá tu compra de forma segura.",
+};
+
 import OrderSummary from "./ui/OrderSummary";
 import { ProductIncard } from "./ui/ProductIncard";
 

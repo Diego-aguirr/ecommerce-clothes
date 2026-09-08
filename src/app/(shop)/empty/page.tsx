@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Carrito Vacío | Satoru Store",
+  description: "Tu carrito está vacío. Explorá nuestros productos y encontrá lo que buscás.",
+};
+
 import Link from "next/link";
 import { IoCartOutline } from "react-icons/io5";
 

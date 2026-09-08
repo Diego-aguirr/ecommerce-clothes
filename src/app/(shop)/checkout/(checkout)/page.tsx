@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Checkout | Satoru Store",
+  description: "Confirmá tu pedido y elegí tu método de pago preferido.",
+};
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";

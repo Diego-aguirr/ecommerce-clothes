@@ -1,3 +1,16 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Inicio | Satoru Store",
+  description:
+    "Descubrí tu estilo con las últimas tendencias y llegadas exclusivas de temporada. Envíos a todo el país.",
+  openGraph: {
+    title: "Satoru Store",
+    description: "Descubrí tu estilo con las últimas tendencias de temporada.",
+    type: "website",
+  },
+};
+
 export const revalidate = 60;
 import { getPaginatedProductsWithImages } from "@/actions/product/product-pagination";
 import { Pagination, Title } from "@/components";
