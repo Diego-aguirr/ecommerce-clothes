@@ -54,8 +54,9 @@ const LoginForm = () => {
     >
       {/* EMAIL */}
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-neutral-800">Email</label>
+        <label htmlFor="email" className="text-sm font-medium text-neutral-800">Email</label>
         <input
+          id="email"
           {...form.register("email")}
           type="email"
           className="
@@ -73,10 +74,11 @@ const LoginForm = () => {
 
       {/* PASSWORD */}
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-neutral-800   ">
+        <label htmlFor="password" className="text-sm font-medium text-neutral-800   ">
           Contraseña
         </label>
         <input
+          id="password"
           {...form.register("password")}
           type="password"
           className="

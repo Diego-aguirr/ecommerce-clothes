@@ -36,13 +36,18 @@ export default function ForgotPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <label htmlFor="email" className="block text-sm font-medium text-neutral-800">
+        Correo electrónico
+      </label>
       <input
+        id="email"
         type="email"
         required
         placeholder="Tu email"
         className="border p-2 w-full rounded"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        aria-label="Correo electrónico"
       />
 
       {error && <p className="text-red-500 text-sm">{error}</p>}

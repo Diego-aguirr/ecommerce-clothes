@@ -45,6 +45,7 @@ export function SearchInput({
         defaultValue={searchParams.get(paramKey) ?? ""}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
+        aria-label="Buscar"
         className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
         disabled={isPending}
       />

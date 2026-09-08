@@ -52,8 +52,9 @@ export const FormRegister = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       {/* NAME */}
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-neutral-800">Nombre completo</label>
+        <label htmlFor="name" className="text-sm font-medium text-neutral-800">Nombre completo</label>
         <input
+          id="name"
           className={clsx(
             "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
             { "border-red-500": errors.name }
@@ -69,8 +70,9 @@ export const FormRegister = () => {
 
       {/* EMAIL */}
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-neutral-800">Correo electrónico</label>
+        <label htmlFor="email" className="text-sm font-medium text-neutral-800">Correo electrónico</label>
         <input
+          id="email"
           className={clsx(
             "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
             { "border-red-500": errors.email }
@@ -85,8 +87,9 @@ export const FormRegister = () => {
 
       {/* PASSWORD */}
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-neutral-800">Contraseña</label>
+        <label htmlFor="password" className="text-sm font-medium text-neutral-800">Contraseña</label>
         <input
+          id="password"
           className={clsx(
             "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
             { "border-red-500": errors.password }
