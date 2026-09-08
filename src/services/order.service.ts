@@ -470,22 +470,46 @@ export async function getOrderByIdService(orderId: string) {
   });
 }
 
-/** Obtiene todas las órdenes de un usuario. */
-export async function getOrdersByUserService(userId: string) {
-  return prisma.order.findMany({
-    where: { userId },
-    select: {
-      id: true,
-      total: true,
-      isPaid: true,
-      createdAt: true,
-      status: true,
-      OrderAddress: {
-        select: { fullname: true },
+type PaginationInput = {
+  page?: number;
+  take?: number;
+};
+
+/** Obtiene órdenes paginadas de un usuario. */
+export async function getOrdersByUserService(
+  userId: string,
+  { page = 1, take = 10 }: PaginationInput = {}
+) {
+  const safePage = Math.max(1, page);
+  const safeTake = Math.max(1, Math.min(take, 50));
+  const skip = (safePage - 1) * safeTake;
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        total: true,
+        isPaid: true,
+        createdAt: true,
+        status: true,
+        OrderAddress: {
+          select: { fullname: true },
+        },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: safeTake,
+    }),
+    prisma.order.count({ where: { userId } }),
+  ]);
+
+  return {
+    orders,
+    total,
+    totalPages: Math.ceil(total / safeTake),
+    currentPage: safePage,
+  };
 }
 
 /** Obtiene todas las órdenes (admin). */

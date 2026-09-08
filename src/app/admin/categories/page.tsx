@@ -1,14 +1,25 @@
 import { requireAdmin } from "@/lib/admin/auth-utils";
-import { getCategoriesService } from "@/services/category.service";
+import { getCategories } from "@/actions/category/get-categories";
 import { CreateCategoryForm } from "@/components/admin/categories/create-category-form";
 import { DeleteCategoryButton } from "@/components/admin/categories/delete-category-button";
+import { Pagination } from "@/components/admin/ui/pagination";
 
 export const metadata = { title: "Admin | Categorías" };
 
-export default async function CategoriesPage() {
+const PAGE_SIZE = 20;
+
+type Props = { searchParams: Promise<{ page?: string }> };
+
+export default async function CategoriesPage({ searchParams }: Props) {
   await requireAdmin();
 
-  const categories = await getCategoriesService();
+  const { page } = await searchParams;
+  const currentPage = Math.max(1, Number(page) || 1);
+
+  const { data: categories, total, totalPages } = await getCategories(
+    currentPage,
+    PAGE_SIZE
+  );
 
   return (
     <div>
@@ -52,6 +63,16 @@ export default async function CategoriesPage() {
             )}
           </tbody>
         </table>
+
+        {categories.length === 0 && (
+          <div className="p-12 text-center text-gray-400 text-sm font-medium">
+            No hay categorías creadas.
+          </div>
+        )}
+
+        <div className="px-6 pb-4">
+          <Pagination total={total} pageSize={PAGE_SIZE} currentPage={currentPage} />
+        </div>
       </div>
     </div>
   );

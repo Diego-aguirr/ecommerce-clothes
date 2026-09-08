@@ -1,4 +1,5 @@
 import { Title } from "@/components";
+import { Pagination } from "@/components/ui/pagination/pagination";
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -7,12 +8,21 @@ import clsx from "clsx";
 
 import { getOrdersByUser } from "@/actions/order/get-orders-by-user";
 
-export default async function OrdersPage() {
-  const { ok, orders = [] } = await getOrdersByUser();
+const PAGE_SIZE = 10;
 
-  if (!ok) {
-    redirect("/auth/login");
+type Props = { searchParams: Promise<{ page?: string }> };
+
+export default async function OrdersPage({ searchParams }: Props) {
+  const { page } = await searchParams;
+  const currentPage = Math.max(1, Number(page) || 1);
+
+  const result = await getOrdersByUser(currentPage, PAGE_SIZE);
+
+  if (!result.ok) {
+    return redirect("/auth/login");
   }
+
+  const { orders, totalPages } = result;
 
   if (orders.length === 0) {
     return (
@@ -162,6 +172,8 @@ export default async function OrdersPage() {
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && <Pagination totalPages={totalPages} />}
       </div>
     </>
   );

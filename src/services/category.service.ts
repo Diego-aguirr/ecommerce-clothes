@@ -13,16 +13,54 @@
 import prisma from "@/lib/prisma";
 import "server-only";
 
-/** Obtiene todas las categorías con conteo de productos. */
-export async function getCategoriesService() {
-  return prisma.category.findMany({
-    orderBy: { name: "asc" },
-    include: {
-      _count: {
-        select: { Product: true },
+type PaginationInput = {
+  page?: number;
+  take?: number;
+};
+
+type CategoryWithCount = {
+  id: string;
+  name: string;
+  _count?: {
+    Product: number;
+  };
+};
+
+type PaginatedCategoriesResult = {
+  data: CategoryWithCount[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+};
+
+/** Obtiene categorías paginadas con conteo de productos. */
+export async function getCategoriesService(
+  { page = 1, take = 50 }: PaginationInput = {}
+): Promise<PaginatedCategoriesResult> {
+  const safePage = Math.max(1, page);
+  const safeTake = Math.max(1, Math.min(take, 100));
+  const skip = (safePage - 1) * safeTake;
+
+  const [data, total] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: { name: "asc" },
+      skip,
+      take: safeTake,
+      include: {
+        _count: {
+          select: { Product: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.category.count(),
+  ]);
+
+  return {
+    data,
+    total,
+    totalPages: Math.ceil(total / safeTake),
+    currentPage: safePage,
+  };
 }
 
 /** Crea una categoría nueva. Lanza si ya existe. */
