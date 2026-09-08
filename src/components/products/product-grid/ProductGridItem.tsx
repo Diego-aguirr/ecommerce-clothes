@@ -36,6 +36,7 @@ export const ProductGridItem = ({ product }: Props) => {
           className="w-full aspect-[4/5] object-cover rounded-lg transition-transform duration-500 group-hover:scale-105"
           width={400}
           height={500}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           onMouseEnter={() => {
             setHasError(false);
             setDisplayImage(product.images[1] ?? product.images[0]);
