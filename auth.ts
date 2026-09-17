@@ -2,9 +2,9 @@ import NextAuth from "next-auth";
 import prisma from "@/lib/prisma";
 import { authConfig } from "./auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import { loginSchema } from "@/lib/zod";
+import Email from "next-auth/providers/email";
+import { sendEmail } from "@/lib/mailer";
+import { magicLinkEmailTemplate } from "@/lib/magic-link-email";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -14,29 +14,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     ...(authConfig.providers ?? []),
-    Credentials({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-
-        const { email, password } = parsed.data;
-
+    Email({
+      id: "email",
+      name: "Email",
+      maxAge: 5 * 60, // 5 minutes
+      // Dummy server config — we use custom sendVerificationRequest with Resend
+      server: { host: "localhost", port: 587 },
+      from: process.env.MAIL_FROM ?? "noreply@example.com",
+      sendVerificationRequest: async ({ identifier, url }) => {
         const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() },
+          where: { email: identifier },
         });
 
-        if (!user || !user.password) return null;
+        const name = user?.name ?? identifier.split("@")[0];
 
-        const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) return null;
+        const html = magicLinkEmailTemplate({
+          name,
+          magicLinkUrl: url,
+        });
 
-        const { password: _, ...safeUser } = user;
-        return safeUser;
+        await sendEmail({
+          to: identifier,
+          subject: "Tu link para iniciar sesión",
+          html,
+        });
       },
     }),
   ],

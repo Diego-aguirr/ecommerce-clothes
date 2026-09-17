@@ -1,10 +1,10 @@
 "use client";
 
-import { loginSchema } from "@/lib/zod";
+import { emailSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { authenticate } from "@/actions/auth/login";
+import { sendMagicLink } from "@/actions/auth/login";
 import { signInWithGoogle } from "@/actions/auth/google";
 import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -16,29 +16,30 @@ const LoginForm = () => {
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isGooglePending, setIsGooglePending] = useState(false);
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof emailSchema>>({
+    resolver: zodResolver(emailSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: z.infer<typeof emailSchema>) {
     setError(null);
+    setSuccess(null);
 
     startTransition(async () => {
-      const response = await authenticate(values);
+      const response = await sendMagicLink(values);
 
       if (response?.error) {
         setError(response.error);
         return;
       }
 
-      window.location.replace(callbackUrl);
+      setSuccess(response.message ?? null);
     });
   }
 
@@ -72,38 +73,15 @@ const LoginForm = () => {
         )}
       </div>
 
-      {/* PASSWORD */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password" className="text-sm font-medium text-neutral-800   ">
-          Contraseña
-        </label>
-        <input
-          id="password"
-          {...form.register("password")}
-          type="password"
-          className="
-            w-full rounded-md border border-neutral-300
-            bg-neutral-100 px-4 py-2 text-sm
-            focus:outline-none focus:ring-2 focus:ring-black
-          "
-        />
-        {form.formState.errors.password && (
-          <p className="text-red-600 text-xs">
-            {form.formState.errors.password.message}
-          </p>
-        )}
-
-        {/* 🔑 Recuperar contraseña */}
-        <Link
-          href="/forgot-password"
-          className="mt-1 text-xs text-neutral-600 hover:text-black self-end"
-        >
-          ¿Olvidaste tu contraseña?
-        </Link>
-      </div>
-
       {/* ERROR GENERAL */}
       {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+
+      {/* SUCCESS MESSAGE */}
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-3">
+          <p className="text-green-700 text-sm text-center">{success}</p>
+        </div>
+      )}
 
       {/* CTA PRINCIPAL */}
       <button
@@ -117,7 +95,7 @@ const LoginForm = () => {
           disabled:opacity-60 disabled:cursor-not-allowed
         "
       >
-        {isPending ? "Ingresando..." : "Ingresar"}
+        {isPending ? "Enviando link..." : "Enviar link mágico"}
       </button>
 
       {/* GOOGLE BUTTON */}

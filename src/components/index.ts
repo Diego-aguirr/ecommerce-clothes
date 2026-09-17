@@ -6,8 +6,6 @@ export * from "./product/stock-label/StockLabel";
 export * from "./products/product-grid/ProductGrid";
 export * from "./products/product-grid/ProductGridItem";
 export * from "./provider/Provider";
-export * from "../app/(auth)/forgot-password/ui/ForgotPasswordForm";
-export * from "../app/(auth)/reset-password/ui/ResetPasswordForm";
 export * from "./ui/button/Button";
 export * from "./ui/card/Card";
 export * from "./ui/footer/Footer";

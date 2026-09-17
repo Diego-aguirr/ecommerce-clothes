@@ -19,7 +19,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       return { ok: false, error: "Datos inválidos" };
     }
 
-    const { name, email, password } = parsed.data;
+    const { name, email } = parsed.data;
 
     // 2. Verificar si ya existe
     const existingUser = await findUserByEmail(email);
@@ -27,8 +27,8 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       return { ok: false, error: "El email ya está en uso" };
     }
 
-    // 3. Crear usuario
-    const user = await createUser({ name, email, password });
+    // 3. Crear usuario (sin password)
+    const user = await createUser({ name, email });
 
     // 4. Token de verificación + email
     const verificationToken = await createVerificationToken(email);
@@ -52,10 +52,9 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       );
     }
 
-    // 5. Login automático
-    await signIn("credentials", {
+    // 5. Login automático con email provider
+    await signIn("email", {
       email,
-      password,
       redirect: false,
     });
 

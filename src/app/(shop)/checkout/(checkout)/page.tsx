@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { getEmailVerificationStatus } from "@/lib/email-verification";
 import { auth } from "../../../../../auth";
 
 import { OrderItems } from "./ui/OrderItems";
@@ -31,11 +30,9 @@ export default async function PaymentPage() {
     redirect("/login");
   }
 
-  // 🔒 3. Email bloqueado
-  const verification = getEmailVerificationStatus(user);
-
-  if (!verification.allowed) {
-    redirect("/shop"); // o página informativa
+  // 🔒 3. Email no verificado → shop
+  if (!user.emailVerified) {
+    redirect("/shop");
   }
 
   return (

@@ -1,6 +1,5 @@
 import { Footer, Sidebar, TopMenu, WhatsappButton, AnnouncementBar } from "@/components";
 import { auth } from "../../../auth";
-import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
 import EmailBanner from "@/components/ui/verification/EmailBanner";
 
@@ -11,15 +10,15 @@ export default async function ShopLayout({
 }) {
   const session = await auth();
 
-  let verificationStatus = null;
+  let needsVerification = false;
 
   if (session?.user?.id) {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
     });
 
-    if (user) {
-      verificationStatus = getEmailVerificationStatus(user);
+    if (user && !user.emailVerified) {
+      needsVerification = true;
     }
   }
 
@@ -29,14 +28,8 @@ export default async function ShopLayout({
       <TopMenu />
       <Sidebar />
 
-      {verificationStatus && verificationStatus.reason !== "VERIFIED" && (
-        <EmailBanner
-          reason={
-            verificationStatus.reason as
-              | "GRACE_PERIOD"
-              | "EMAIL_VERIFICATION_REQUIRED"
-          }
-        />
+      {needsVerification && (
+        <EmailBanner reason="EMAIL_VERIFICATION_REQUIRED" />
       )}
 
       <div className="px-0 sm:px-10">{children}</div>

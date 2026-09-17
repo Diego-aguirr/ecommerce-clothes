@@ -201,7 +201,6 @@ model User {
   addresses           UserAddress[]
   accounts            Account[]
   sessions            Session[]
-  passwordResetTokens PasswordResetToken[]
   orders              Order[]
 
   createdAt DateTime @default(now())
@@ -243,15 +242,6 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  expiresAt DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Province {

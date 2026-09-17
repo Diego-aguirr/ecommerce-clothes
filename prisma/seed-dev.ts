@@ -1,6 +1,5 @@
 import { PrismaClient, Size } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import bcrypt from "bcryptjs";
 import { provinces } from "@/seed/seed-province";
 import { PRODUCTION_CATEGORIES } from "@/seed/seed-categories";
 
@@ -68,15 +67,12 @@ const prisma = new PrismaClient({ adapter });
 // 👤 USUARIOS DE TEST
 // ═════════════════════════════════════════════════════════════════
 
-const TEST_PASSWORD_HASH = bcrypt.hashSync("r", 10);
-
 const users = [
   {
     id: "usr_superadmin_001",
     name: "Super Admin",
     email: "superadmin@test.com",
     emailVerified: new Date(),
-    password: TEST_PASSWORD_HASH,
     role: "admin" as const,
     isSuperAdmin: true,
     status: "ACTIVE" as const,
@@ -86,7 +82,6 @@ const users = [
     name: "Usuario Test",
     email: "user@test.com",
     emailVerified: new Date(),
-    password: TEST_PASSWORD_HASH,
     role: "user" as const,
     isSuperAdmin: false,
     status: "ACTIVE" as const,

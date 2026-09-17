@@ -1,30 +1,78 @@
 "use server";
 
-import { loginSchema } from "@/lib/zod";
+import { emailSchema } from "@/lib/zod";
 import { z } from "zod";
-import { signIn } from "../../../auth";
+import crypto from "crypto";
+import prisma from "@/lib/prisma";
+import { sendEmail } from "@/lib/mailer";
+import { magicLinkEmailTemplate } from "@/lib/magic-link-email";
 
-export const authenticate = async (values: z.infer<typeof loginSchema>) => {
+export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
   try {
-    const parsed = loginSchema.safeParse(values);
+    const parsed = emailSchema.safeParse(values);
 
     if (!parsed.success) {
-      return { error: "Datos inválidos" };
+      return { error: "Email inválido" };
     }
 
-    const { email, password } = parsed.data;
+    const { email } = parsed.data;
 
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
+    // Buscar usuario
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
     });
 
-    return { success: true };
+    // Respuesta uniforme (no revelar si el usuario existe)
+    if (!user) {
+      return {
+        ok: true,
+        message: "Si el email existe, te enviamos un link para iniciar sesión",
+      };
+    }
+
+    // Limpiar tokens anteriores
+    await prisma.verificationToken.deleteMany({
+      where: { identifier: email.toLowerCase() },
+    });
+
+    // Generar token (5 minutos)
+    const token = crypto.randomUUID();
+    const expires = new Date(Date.now() + 5 * 60 * 1000);
+
+    await prisma.verificationToken.create({
+      data: {
+        identifier: email.toLowerCase(),
+        token,
+        expires,
+      },
+    });
+
+    // Generar URL del magic link
+    const magicLinkUrl = `${process.env.APP_URL}/api/auth/magic-link?token=${token}`;
+
+    // Enviar email
+    const html = magicLinkEmailTemplate({
+      name: user.name ?? email.split("@")[0],
+      magicLinkUrl,
+    });
+
+    await sendEmail({
+      to: email,
+      subject: "Tu link para iniciar sesión",
+      html,
+    });
+
+    return {
+      ok: true,
+      message: "Si el email existe, te enviamos un link para iniciar sesión",
+    };
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Magic link error:", error);
 
     // Generic message to prevent user enumeration
-    return { error: "Email o contraseña incorrectos" };
+    return {
+      ok: true,
+      message: "Si el email existe, te enviamos un link para iniciar sesión",
+    };
   }
 };
