@@ -1,3 +1,13 @@
+/** HTML-escape para prevenir XSS en emails */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export function verifyEmailTemplate({
   name,
   verifyUrl,
@@ -5,11 +15,13 @@ export function verifyEmailTemplate({
   name: string;
   verifyUrl: string;
 }) {
+    const safeName = escapeHtml(name);
+
     return `
       <div style="font-family: Arial, sans-serif; background:#f9f9f9; padding:40px; text-align:center;">
         <div style="max-width:600px; margin:auto; background:#ffffff; padding:30px; border-radius:6px;">
           ${process.env.EMAIL_LOGO_URL ? `<img src="${process.env.EMAIL_LOGO_URL}" alt="${process.env.EMAIL_BRAND_NAME || 'SAURON'} logo" style="max-width:120px; margin-bottom:20px;" />` : ''}
-          <h2 style="color:#111;">${process.env.EMAIL_BRAND_NAME || 'SAURON'} – Bienvenido, ${name}</h2>
+          <h2 style="color:#111;">${process.env.EMAIL_BRAND_NAME || 'SAURON'} – Bienvenido, ${safeName}</h2>
           <p style="color:#333;">Tu cuenta fue creada correctamente. Por seguridad, confirma tu correo electrónico.</p>
           <p style="text-align:center; margin:40px 0;">
             <a href="${verifyUrl}" style="background:#000; color:#fff; padding:14px 24px; text-decoration:none; border-radius:4px; display:inline-block;">Confirmar email</a>

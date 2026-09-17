@@ -8,9 +8,9 @@
  *
  * Flujo:
  * 1) Lee el token desde la URL
- * 2) Verifica que exista y no esté vencido
- * 3) Genera JWT para el usuario
- * 4) Elimina el token (one-time use)
+ * 2) Elimina el token atómicamente (uso único, previene race condition)
+ * 3) Verifica que no esté vencido
+ * 4) Genera JWT para el usuario
  * 5) REDIRIGE AL USUARIO (HOME)
  *
  * ⚠️ IMPORTANTE:
@@ -34,30 +34,28 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2️⃣ Buscar token en DB
-  const verificationToken = await prisma.verificationToken.findUnique({
-    where: { token },
-  });
-
-  // ❌ Token no existe
-  if (!verificationToken) {
-    return NextResponse.redirect(
-      new URL("/login?error=token-expired", req.url),
-    );
-  }
-
-  // ❌ Token vencido
-  if (verificationToken.expires < new Date()) {
-    await prisma.verificationToken.delete({
+  // 2️⃣ Eliminar token atómicamente (previene race condition)
+  // Si dos requests llegan con el mismo token, solo uno lo elimina
+  let verificationToken;
+  try {
+    verificationToken = await prisma.verificationToken.delete({
       where: { token },
     });
-
+  } catch {
+    // Token no existe o ya fue eliminado
     return NextResponse.redirect(
       new URL("/login?error=token-expired", req.url),
     );
   }
 
-  // 3️⃣ Buscar usuario por email (identifier)
+  // 3️⃣ Verificar que no esté vencido
+  if (verificationToken.expires < new Date()) {
+    return NextResponse.redirect(
+      new URL("/login?error=token-expired", req.url),
+    );
+  }
+
+  // 4️⃣ Buscar usuario por email (identifier)
   const user = await prisma.user.findUnique({
     where: { email: verificationToken.identifier },
   });
@@ -69,15 +67,10 @@ export async function GET(req: Request) {
     );
   }
 
-  // 4️⃣ Generar JWT y hacer login
+  // 5️⃣ Generar JWT y hacer login
   await signIn("email", {
     email: user.email,
     redirect: false,
-  });
-
-  // 5️⃣ Eliminar token (uso único)
-  await prisma.verificationToken.delete({
-    where: { token },
   });
 
   // 6️⃣ REDIRECCIÓN FINAL → HOME

@@ -8,10 +8,10 @@
  *
  * Flujo:
  * 1) Lee el token desde la URL
- * 2) Verifica que exista y no esté vencido
- * 3) Marca el email del usuario como verificado
- * 4) Elimina el token (one-time use)
- * 5) REDIRIGE AL USUARIO (HOME o CART)
+ * 2) Elimina el token atómicamente (uso único, previene race condition)
+ * 3) Verifica que no esté vencido
+ * 4) Marca el email del usuario como verificado
+ * 5) REDIRIGE AL USUARIO (HOME)
  *
  * ⚠️ IMPORTANTE:
  * El link del email DEBE apuntar a /api/auth/verify
@@ -33,46 +33,32 @@ export async function GET(req: Request) {
     );
   }
 
-  // 2️⃣ Buscar token en DB
-  const verificationToken = await prisma.verificationToken.findUnique({
-    where: { token },
-  });
-
-  // ❌ Token no existe
-  if (!verificationToken) {
-    return NextResponse.redirect(
-      new URL("/login?error=token-expired", req.url),
-    );
-  }
-
-  // ❌ Token vencido
-  if (verificationToken.expires < new Date()) {
-    await prisma.verificationToken.delete({
+  // 2️⃣ Eliminar token atómicamente (previene race condition)
+  let verificationToken;
+  try {
+    verificationToken = await prisma.verificationToken.delete({
       where: { token },
     });
-
+  } catch {
+    // Token no existe o ya fue eliminado
     return NextResponse.redirect(
       new URL("/login?error=token-expired", req.url),
     );
   }
 
-  // 3️⃣ Marcar email como verificado
+  // 3️⃣ Verificar que no esté vencido
+  if (verificationToken.expires < new Date()) {
+    return NextResponse.redirect(
+      new URL("/login?error=token-expired", req.url),
+    );
+  }
+
+  // 4️⃣ Marcar email como verificado
   await prisma.user.update({
     where: { email: verificationToken.identifier },
     data: { emailVerified: new Date() },
   });
 
-  // 4️⃣ Eliminar token (uso único)
-  await prisma.verificationToken.delete({
-    where: { token },
-  });
-
-  // 5️⃣ REDIRECCIÓN FINAL
-  // 👉 HOME
+  // 5️⃣ REDIRECCIÓN FINAL → HOME
   return NextResponse.redirect(new URL("/?emailVerified=1", req.url));
-
-  // 👉 Si quisieras mandarlo al carrito:
-  // return NextResponse.redirect(
-  //   new URL("/cart?emailVerified=1", req.url),
-  // );
 }

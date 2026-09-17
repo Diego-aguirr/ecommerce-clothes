@@ -69,10 +69,9 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
   } catch (error) {
     console.error("Magic link error:", error);
 
-    // Generic message to prevent user enumeration
+    // Retornar error genérico (no revelar detalles internos)
     return {
-      ok: true,
-      message: "Si el email existe, te enviamos un link para iniciar sesión",
+      error: "Ocurrió un error. Intentá nuevamente.",
     };
   }
 };

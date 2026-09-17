@@ -2,7 +2,6 @@
 
 import { registerSchema } from "@/lib/zod";
 import { z } from "zod";
-import { signIn } from "../../../auth";
 import { sendEmail } from "@/lib/mailer";
 import { verifyEmailTemplate } from "@/lib/verify-email";
 import {
@@ -52,12 +51,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       );
     }
 
-    // 5. Login automático con email provider
-    await signIn("email", {
-      email,
-      redirect: false,
-    });
-
+    // 5. Retornar éxito (sin login automático — el usuario debe verificar su email primero)
     return { ok: true, user };
   } catch (error) {
     console.error("Register error:", error);
