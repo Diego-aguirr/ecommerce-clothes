@@ -18,7 +18,7 @@ const LoginForm = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(
-    registered ? "Cuenta creada. Iniciá sesión con tu email." : null
+    registered ? "Cuenta creada. Accedé con tu correo electrónico." : null
   );
   const [isPending, startTransition] = useTransition();
   const [isGooglePending, setIsGooglePending] = useState(false);
@@ -88,7 +88,7 @@ const LoginForm = () => {
             </svg>
           </div>
           <p className="text-green-800 font-medium text-sm">Revisá tu correo electrónico</p>
-          <p className="text-green-600 text-xs mt-1">Te enviamos un enlace para iniciar sesión. Hacé click en él para continuar.</p>
+          <p className="text-green-600 text-xs mt-1">Te enviamos un enlace para acceder a tu cuenta.</p>
         </div>
       )}
 
@@ -104,7 +104,7 @@ const LoginForm = () => {
           disabled:opacity-60 disabled:cursor-not-allowed
         "
       >
-        {isPending ? "Enviando link..." : "Enviar link mágico"}
+        {isPending ? "Ingresando..." : "Iniciar sesión"}
       </button>
 
       {/* GOOGLE BUTTON */}
