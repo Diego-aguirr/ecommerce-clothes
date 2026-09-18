@@ -35,7 +35,7 @@ const LoginForm = () => {
     setSuccess(null);
 
     startTransition(async () => {
-      const response = await sendMagicLink(values);
+      const response = await sendMagicLink(values, callbackUrl);
 
       if (response?.error) {
         setError(response.error);

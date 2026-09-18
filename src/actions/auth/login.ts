@@ -2,12 +2,13 @@
 
 import { emailSchema } from "@/lib/zod";
 import { z } from "zod";
-import crypto from "crypto";
 import prisma from "@/lib/prisma";
-import { sendEmail } from "@/lib/mailer";
-import { magicLinkEmailTemplate } from "@/lib/magic-link-email";
+import { signIn } from "../../../auth";
 
-export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
+export const sendMagicLink = async (
+  values: z.infer<typeof emailSchema>,
+  callbackUrl?: string
+) => {
   try {
     const parsed = emailSchema.safeParse(values);
 
@@ -17,9 +18,10 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
 
     const { email } = parsed.data;
 
-    // Buscar usuario
+    // Buscar usuario (solo para verificar existencia — respuesta uniforme)
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
+      select: { id: true },
     });
 
     // Respuesta uniforme (no revelar si el usuario existe)
@@ -30,51 +32,32 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
       };
     }
 
-    // Limpiar tokens anteriores
-    await prisma.verificationToken.deleteMany({
-      where: { identifier: email.toLowerCase() },
+    // Delegar a NextAuth Email provider:
+    // - Genera token, lo hashea, lo guarda en VerificationToken
+    // - Llama a sendVerificationRequest (auth.ts) que usa nuestra plantilla
+    // - El link apunta a /api/auth/callback/email?token=XXX
+    await signIn("email", {
+      email: email.toLowerCase(),
+      redirect: false,
+      callbackUrl: callbackUrl || "/",
     });
-
-    // Generar token (5 minutos)
-    const token = crypto.randomUUID();
-    const expires = new Date(Date.now() + 5 * 60 * 1000);
-
-    await prisma.verificationToken.create({
-      data: {
-        identifier: email.toLowerCase(),
-        token,
-        expires,
-      },
-    });
-
-    // Generar URL del magic link → usa callback built-in de NextAuth para crear sesión
-    const magicLinkUrl = `${process.env.APP_URL}/api/auth/callback/email?token=${token}&callbackUrl=/`;
-
-    console.log("📧 [MAGIC LINK] Generando email para:", email);
-    console.log("📧 [MAGIC LINK] URL:", magicLinkUrl);
-
-    // Enviar email
-    const html = magicLinkEmailTemplate({
-      name: user.name ?? email.split("@")[0],
-      magicLinkUrl,
-    });
-
-    await sendEmail({
-      to: email,
-      subject: "Tu link para iniciar sesión",
-      html,
-    });
-
-    console.log("📧 [MAGIC LINK] Email enviado exitosamente");
 
     return {
       ok: true,
       message: "Si el email está registrado, recibirás un enlace para iniciar sesión.",
     };
   } catch (error) {
+    // signIn con redirect: false puede lanzar un error con status 200
+    // cuando el email se envió correctamente — esto es normal
+    if (error instanceof Error && error.message.includes("_EMAIL_SENT")) {
+      return {
+        ok: true,
+        message: "Si el email está registrado, recibirás un enlace para iniciar sesión.",
+      };
+    }
+
     console.error("Magic link error:", error);
 
-    // Retornar error genérico (no revelar detalles internos)
     return {
       error: "Ocurrió un error. Intentá nuevamente.",
     };

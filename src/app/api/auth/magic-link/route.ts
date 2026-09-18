@@ -1,22 +1,14 @@
 /**
- * API ROUTE: Magic Link Redirect
- * --------------------------------
- * Redirige links viejos al callback built-in de NextAuth.
- * Los links nuevos apuntan directamente a /api/auth/callback/email.
+ * API ROUTE: Magic Link Legacy Redirect
+ * --------------------------------------
+ * Links viejos apuntaban aquí. Redirigir a login con error
+ * ya que no tienen el email param que NextAuth necesita.
  */
 
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const token = searchParams.get("token");
-
-  if (!token) {
-    return NextResponse.redirect(new URL("/login?error=invalid-token", req.url));
-  }
-
-  // Redirigir al callback de NextAuth que crea la sesión correctamente
+export async function GET() {
   return NextResponse.redirect(
-    new URL(`/api/auth/callback/email?token=${token}&callbackUrl=/`, req.url)
+    new URL("/login?error=link-expired", "http://localhost:3000")
   );
 }
