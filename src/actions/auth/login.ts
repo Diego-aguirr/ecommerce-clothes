@@ -26,7 +26,7 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
     if (!user) {
       return {
         ok: true,
-        message: "Si el email existe, te enviamos un link para iniciar sesión",
+        message: "Si el email está registrado, recibirás un enlace para iniciar sesión.",
       };
     }
 
@@ -50,6 +50,9 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
     // Generar URL del magic link
     const magicLinkUrl = `${process.env.APP_URL}/api/auth/magic-link?token=${token}`;
 
+    console.log("📧 [MAGIC LINK] Generando email para:", email);
+    console.log("📧 [MAGIC LINK] URL:", magicLinkUrl);
+
     // Enviar email
     const html = magicLinkEmailTemplate({
       name: user.name ?? email.split("@")[0],
@@ -62,9 +65,11 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
       html,
     });
 
+    console.log("📧 [MAGIC LINK] Email enviado exitosamente");
+
     return {
       ok: true,
-      message: "Si el email existe, te enviamos un link para iniciar sesión",
+      message: "Si el email está registrado, recibirás un enlace para iniciar sesión.",
     };
   } catch (error) {
     console.error("Magic link error:", error);

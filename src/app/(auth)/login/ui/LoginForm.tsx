@@ -14,9 +14,12 @@ import { useForm } from "react-hook-form";
 const LoginForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const registered = searchParams.get("registered");
 
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(
+    registered ? "Cuenta creada. Iniciá sesión con tu email." : null
+  );
   const [isPending, startTransition] = useTransition();
   const [isGooglePending, setIsGooglePending] = useState(false);
 
@@ -78,8 +81,14 @@ const LoginForm = () => {
 
       {/* SUCCESS MESSAGE */}
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-md p-3">
-          <p className="text-green-700 text-sm text-center">{success}</p>
+        <div className="bg-green-50 border border-green-200 rounded-md p-4 text-center">
+          <div className="flex justify-center mb-2">
+            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <p className="text-green-800 font-medium text-sm">Revisá tu correo electrónico</p>
+          <p className="text-green-600 text-xs mt-1">Te enviamos un enlace para iniciar sesión. Hacé click en él para continuar.</p>
         </div>
       )}
 

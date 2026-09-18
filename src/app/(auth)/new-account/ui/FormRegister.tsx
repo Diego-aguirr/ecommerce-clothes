@@ -39,7 +39,7 @@ export const FormRegister = () => {
         return;
       }
 
-      router.push("/");
+      router.push("/login?registered=1");
     });
   };
 
