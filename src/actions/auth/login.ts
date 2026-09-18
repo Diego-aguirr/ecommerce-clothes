@@ -47,8 +47,8 @@ export const sendMagicLink = async (values: z.infer<typeof emailSchema>) => {
       },
     });
 
-    // Generar URL del magic link
-    const magicLinkUrl = `${process.env.APP_URL}/api/auth/magic-link?token=${token}`;
+    // Generar URL del magic link → usa callback built-in de NextAuth para crear sesión
+    const magicLinkUrl = `${process.env.APP_URL}/api/auth/callback/email?token=${token}&callbackUrl=/`;
 
     console.log("📧 [MAGIC LINK] Generando email para:", email);
     console.log("📧 [MAGIC LINK] URL:", magicLinkUrl);
