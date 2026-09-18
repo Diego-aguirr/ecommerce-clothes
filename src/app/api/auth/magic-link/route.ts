@@ -7,8 +7,9 @@
 
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const origin = new URL(req.url).origin;
   return NextResponse.redirect(
-    new URL("/login?error=link-expired", "http://localhost:3000")
+    new URL("/login?error=link-expired", origin)
   );
 }

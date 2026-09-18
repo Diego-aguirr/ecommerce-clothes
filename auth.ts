@@ -24,6 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       sendVerificationRequest: async ({ identifier, url }) => {
         const user = await prisma.user.findUnique({
           where: { email: identifier },
+          select: { name: true },
         });
 
         const name = user?.name ?? identifier.split("@")[0];
