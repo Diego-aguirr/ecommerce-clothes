@@ -28,6 +28,11 @@ export const sendMagicLink = async (
       callbackUrl: callbackUrl || "/",
     });
 
+    // En desarrollo, loguear la URL del link para poder probar
+    if (process.env.NODE_ENV === "development" && result?.url) {
+      console.log("📧 [MAGIC LINK] URL:", result.url);
+    }
+
     if (result?.error) {
       return { error: "Ocurrió un error. Intentá nuevamente." };
     }
