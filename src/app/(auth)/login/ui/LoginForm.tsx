@@ -11,7 +11,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 
-const LoginForm = () => {
+export const LoginForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const registered = searchParams.get("registered");
@@ -167,4 +167,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+

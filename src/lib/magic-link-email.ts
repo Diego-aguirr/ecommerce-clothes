@@ -16,15 +16,16 @@ export function magicLinkEmailTemplate({
   magicLinkUrl: string;
 }) {
   const safeName = escapeHtml(name);
+  const safeUrl = escapeHtml(magicLinkUrl);
 
   return `
     <div style="font-family: Arial, sans-serif; background:#f9f9f9; padding:40px; text-align:center;">
       <div style="max-width:600px; margin:auto; background:#ffffff; padding:30px; border-radius:6px;">
-        ${process.env.EMAIL_LOGO_URL ? `<img src="${process.env.EMAIL_LOGO_URL}" alt="${process.env.EMAIL_BRAND_NAME || 'SAURON'} logo" style="max-width:120px; margin-bottom:20px;" />` : ''}
-        <h2 style="color:#111;">${process.env.EMAIL_BRAND_NAME || 'SAURON'} – Hola, ${safeName}</h2>
+        ${process.env.EMAIL_LOGO_URL ? `<img src="${escapeHtml(process.env.EMAIL_LOGO_URL)}" alt="${escapeHtml(process.env.EMAIL_BRAND_NAME || 'SAURON')} logo" style="max-width:120px; margin-bottom:20px;" />` : ''}
+        <h2 style="color:#111;">${escapeHtml(process.env.EMAIL_BRAND_NAME || 'SAURON')} – Hola, ${safeName}</h2>
         <p style="color:#333;">Hacé click en el botón para iniciar sesión en tu cuenta.</p>
         <p style="text-align:center; margin:40px 0;">
-          <a href="${magicLinkUrl}" style="background:#000; color:#fff; padding:14px 24px; text-decoration:none; border-radius:4px; display:inline-block;">Iniciar sesión</a>
+          <a href="${safeUrl}" style="background:#000; color:#fff; padding:14px 24px; text-decoration:none; border-radius:4px; display:inline-block;">Iniciar sesión</a>
         </p>
         <p style="color:#555; font-size:14px;">Este enlace es válido por <strong>5 minutos</strong>.</p>
         <hr style="margin:30px 0;" />

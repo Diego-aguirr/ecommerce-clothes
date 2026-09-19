@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "Accedé a tu cuenta para gestionar tus pedidos y datos.",
 };
 
-import LoginForm from "./ui/LoginForm";
+import { LoginForm } from "./ui/LoginForm";
 
 export default function loginPage() {
   return (

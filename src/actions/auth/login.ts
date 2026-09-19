@@ -2,7 +2,7 @@
 
 import { emailSchema } from "@/lib/zod";
 import { z } from "zod";
-import { signIn } from "../../../auth";
+import { signIn } from "@/../../auth";
 
 export const sendMagicLink = async (
   values: z.infer<typeof emailSchema>,
