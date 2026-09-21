@@ -77,6 +77,7 @@ export interface Product {
   gender: ProductGender;
   variants?: ProductVariant[];
   colors?: ProductColor[];
+  colorNames?: string[]; // Nombres de colores (para grid — sin include completo)
 }
 
 // ✅ ACTUALIZADO: Producto con variantes incluidas (para queries)
