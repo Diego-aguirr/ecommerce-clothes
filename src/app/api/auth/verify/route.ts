@@ -54,10 +54,16 @@ export async function GET(req: Request) {
   }
 
   // 4️⃣ Marcar email como verificado
-  await prisma.user.update({
-    where: { email: verificationToken.identifier },
-    data: { emailVerified: new Date() },
-  });
+  try {
+    await prisma.user.update({
+      where: { email: verificationToken.identifier },
+      data: { emailVerified: new Date() },
+    });
+  } catch {
+    return NextResponse.redirect(
+      new URL("/login?error=verification-failed", req.url)
+    );
+  }
 
   // 5️⃣ REDIRECCIÓN FINAL → HOME
   return NextResponse.redirect(new URL("/?emailVerified=1", req.url));

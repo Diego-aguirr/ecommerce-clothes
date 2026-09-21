@@ -6,6 +6,13 @@ import Email from "next-auth/providers/email";
 import { sendEmail } from "@/lib/mailer";
 import { magicLinkEmailTemplate } from "@/lib/magic-link-email";
 
+if (!process.env.AUTH_SECRET) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("AUTH_SECRET is not set. Authentication is insecure without it.");
+  }
+  console.warn("⚠️  AUTH_SECRET no está configurada. Sesiones inseguras en desarrollo.");
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
@@ -46,7 +53,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async signIn({ user, account }) {
-      // Auto-link OAuth provider to existing user when email matches
+      // Email provider: solo permitir si el usuario ya existe (no auto-registrar)
+      if (account?.provider === "email") {
+        if (!user?.email) return false;
+
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { id: true, emailVerified: true },
+        });
+
+        // No existe → rechazar silenciosamente (respuesta uniforme por seguridad)
+        if (!existingUser) return false;
+        if (!existingUser.emailVerified) return false;
+
+        // Asignar el id correcto para que el JWT lo use
+        user.id = existingUser.id;
+        return true;
+      }
+
+      // Google provider: auto-link si el email ya existe
       if (account?.provider !== "google" || !user?.email) return true;
 
       const existingUser = await prisma.user.findUnique({
@@ -59,7 +84,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       // Already has Google linked — nothing to do
       const hasGoogle = existingUser.accounts.some(
-        (a) => a.provider === "google"
+        (account) => account.provider === "google"
       );
       if (hasGoogle) return true;
 

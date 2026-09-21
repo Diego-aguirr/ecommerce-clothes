@@ -33,7 +33,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
     const verificationToken = await createVerificationToken(email);
 
     if (!process.env.APP_URL) {
-      console.error("⚠️ APP_URL no está definido en .env");
+      return { ok: true, warning: "Email de verificación no enviado. Contactá soporte." };
     }
 
     const verifyUrl = `${process.env.APP_URL}/api/auth/verify?token=${verificationToken}`;
@@ -44,17 +44,13 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
         subject: "Confirmá tu correo electrónico",
         html: verifyEmailTemplate({ name, verifyUrl }),
       });
-    } catch (err) {
-      console.error(
-        "❌ Error enviando email de verificación (usuario creado igualmente):",
-        err
-      );
+    } catch {
+      // Email failed but user was created — they can still log in
     }
 
     // 5. Retornar éxito (sin login automático — el usuario debe verificar su email primero)
-    return { ok: true, user };
-  } catch (error) {
-    console.error("Register error:", error);
+    return { ok: true };
+  } catch {
     return { ok: false, error: "Error al registrar usuario" };
   }
 }

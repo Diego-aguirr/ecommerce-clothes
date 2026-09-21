@@ -13,7 +13,7 @@ Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 
 | Forms    | React Hook Form + Zod v4                             |
 | Backend  | TypeScript strict · Prisma 7 ORM                     |
 | Database | PostgreSQL 15 (Docker local / Neon producción)       |
-| Auth     | NextAuth v5 (Google OAuth + credenciales)            |
+| Auth     | NextAuth v5 (Google OAuth + Magic Links)              |
 | Pagos    | MercadoPago                                          |
 | Imágenes | Cloudinary                                           |
 | Testing  | Vitest                                               |
@@ -197,6 +197,8 @@ src/
 │   ├── cart/           # useCartStore
 │   └── ui/             # useUIStore
 ├── lib/                # Utilidades compartidas
+│   ├── html-escape.ts  # XSS escaping para emails
+│   └── url.ts          # isLocalUrl (open redirect guard)
 ├── interfaces/         # Type contracts
 ├── hooks/              # Custom hooks
 ├── seed/               # Seed scripts
@@ -252,6 +254,7 @@ src/
 | `POST` | `/api/auth/forgot-password`     | Enviar email de recuperación |
 | `POST` | `/api/auth/reset-password`      | Restablecer contraseña       |
 | `GET`  | `/api/auth/verify`              | Verificar email              |
+| `GET`  | `/api/auth/magic-link`          | Redirect legacy (links viejos) |
 | `POST` | `/api/auth/resend-verification` | Reenviar verificación        |
 
 ---

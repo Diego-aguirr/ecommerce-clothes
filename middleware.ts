@@ -22,8 +22,6 @@ const publicRoutes = [
 const authRoutes = ["/login", "/new-account"];
 
 // Rutas privadas
-const protectedRoutes = ["/admin", "/checkout"];
-
 const apiAuthPrefix = "/api/auth";
 
 export default auth((req) => {
@@ -50,12 +48,8 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/", nextUrl));
   }
 
-  // Protegidas
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
-
-  if (!isLoggedIn && isProtectedRoute) {
+  // No logueado → redirigir a login
+  if (!isLoggedIn) {
     const callbackUrl = encodeURIComponent(pathname);
     return NextResponse.redirect(
       new URL(`/login?callbackUrl=${callbackUrl}`, nextUrl),

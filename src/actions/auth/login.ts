@@ -3,6 +3,7 @@
 import { emailSchema } from "@/lib/zod";
 import { z } from "zod";
 import { signIn } from "../../../auth";
+import { isLocalUrl } from "@/lib/url";
 
 export const sendMagicLink = async (
   values: z.infer<typeof emailSchema>,
@@ -17,21 +18,12 @@ export const sendMagicLink = async (
 
     const { email } = parsed.data;
 
-    // Delegar a NextAuth Email provider:
-    // - Genera token, lo hashea, lo guarda en VerificationToken
-    // - Llama a sendVerificationRequest (auth.ts) que usa nuestra plantilla
-    // - El link apunta a /api/auth/callback/email?token=XXX
-    // - Si el usuario no existe, igual genera el token (respuesta uniforme)
+    const safeCallbackUrl = isLocalUrl(callbackUrl || "") ? callbackUrl : "/";
     const result = await signIn("email", {
       email: email.toLowerCase(),
       redirect: false,
-      callbackUrl: callbackUrl || "/",
+      callbackUrl: safeCallbackUrl,
     });
-
-    // En desarrollo, loguear la URL del link para poder probar
-    if (process.env.NODE_ENV === "development" && result?.url) {
-      console.log("📧 [MAGIC LINK] URL:", result.url);
-    }
 
     if (result?.error) {
       return { error: "Ocurrió un error. Intentá nuevamente." };
