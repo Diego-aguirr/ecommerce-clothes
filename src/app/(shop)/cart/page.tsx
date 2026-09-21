@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     "Revisá tus productos seleccionados y finalizá tu compra de forma segura.",
 };
 
-import OrderSummary from "./ui/OrderSummary";
+import { OrderSummary } from "./ui/OrderSummary";
 import { ProductIncard } from "./ui/ProductIncard";
 
 export default function CartPage() {

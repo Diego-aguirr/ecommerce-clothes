@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { resolveImageSrc, PLACEHOLDER } from "@/lib/image-utils";
 
 interface Props {
   images: string[];
@@ -9,15 +10,6 @@ interface Props {
   className?: string;
 }
 
-const PLACEHOLDER = "/imgs/placeholder.jpg";
-
-function resolveImageSrc(image: string | undefined): string {
-  if (!image) return PLACEHOLDER;
-  if (image.startsWith("http")) return image;
-  return `/products/${image}`;
-}
-
-// Subcomponente para manejar el error de imagen individualmente
 function SlideImage({
   image,
   title,
@@ -43,12 +35,11 @@ function SlideImage({
   );
 }
 
-export default function ProductMobileSlideshow({
+export const ProductMobileSlideshow = ({
   images,
   title,
   className = "",
-}: Props) {
-  // Garantizar que si llega un array vacío de la DB, se renderice al menos 1 placeholder
+}: Props) => {
   const safeImages = images.length === 0 ? [""] : images;
 
   return (
@@ -56,14 +47,13 @@ export default function ProductMobileSlideshow({
       <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide w-full shadow-lg rounded-2xl">
         {safeImages.map((image, i) => (
           <div key={i} className="min-w-full snap-center shrink-0">
-            <div className="relative w-full aspect-4/5 object-cover sm:aspect-square">
+            <div className="relative w-full aspect-[4/5] object-cover sm:aspect-square">
               <SlideImage image={image} title={title} i={i} />
             </div>
           </div>
         ))}
       </div>
 
-      {/* Indicadores estilo iOS/Mobile */}
       {safeImages.length > 1 && (
         <div className="flex justify-center gap-2 mt-3">
           {safeImages.map((_, idx) => (
@@ -73,4 +63,4 @@ export default function ProductMobileSlideshow({
       )}
     </div>
   );
-}
+};

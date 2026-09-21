@@ -3,7 +3,7 @@
  * FASE 1: Modelo de Datos
  */
 
-// Tipos de color permitidos (expandir según necesidad)
+// Tipos de color permitidos
 export type ProductColorName = 
   | "negro"
   | "blanco"
@@ -17,7 +17,7 @@ export type ProductColorName =
   | "camel"
   | "marron"
   | "crema"
-  | string; // Permitir colores personalizados
+  | (string & {}); // Permitir colores personalizados sin perder autocompletado
 
 // Tipos de tallas (del enum Size de Prisma)
 export type Size =

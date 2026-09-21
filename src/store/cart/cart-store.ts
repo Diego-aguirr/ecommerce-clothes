@@ -109,8 +109,6 @@ export const useCartStore = create<state>()(
       // ✅ NUEVO: Migración de versiones
       onRehydrateStorage: () => (state) => {
         if (state && state.version !== CART_VERSION) {
-          // Versión antigua detectada, limpiar carrito
-          console.log("🛒 Versión antigua del carrito detectada, limpiando...");
           state.cart = [];
           state.version = CART_VERSION;
         }

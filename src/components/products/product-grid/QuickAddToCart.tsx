@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Product, CartProduct, Size } from "@/interfaces";
 import { useCartStore } from "@/store/cart/cart-store";
@@ -21,6 +21,7 @@ export const QuickAddToCart = ({ product }: Props) => {
   const [hasAdded, setHasAdded] = useState(false);
   const [errorPrompt, setErrorPrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Funciones strictas para control de propagación debido a que
   // el contenedor padre es usualmente un <Link> a la PDP.
@@ -58,8 +59,8 @@ export const QuickAddToCart = ({ product }: Props) => {
         if (variant) {
           setSelectedVariant(variant);
         }
-      } catch (error) {
-        console.error("Error fetching variant:", error);
+      } catch {
+        // Error fetching variant — silently ignore
       } finally {
         setIsLoading(false);
       }
@@ -97,9 +98,9 @@ export const QuickAddToCart = ({ product }: Props) => {
 
     addProductToCart(cartProduct);
     
-    // Feedback visual
     setHasAdded(true);
-    setTimeout(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
       setHasAdded(false);
       setIsOpen(false);
       setSelectedSize(undefined);

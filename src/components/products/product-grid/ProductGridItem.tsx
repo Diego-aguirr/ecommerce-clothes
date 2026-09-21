@@ -5,18 +5,10 @@ import Link from "next/link";
 
 import { Product } from "@/interfaces";
 import { useState } from "react";
+import { resolveImageSrc, PLACEHOLDER } from "@/lib/image-utils";
 
 interface Props {
   product: Product;
-}
-
-const PLACEHOLDER = "/imgs/placeholder.jpg";
-
-// Resuelve la URL de la imagen: Cloudinary (absoluta) o legacy local (/public/products/)
-function resolveImageSrc(image: string | undefined): string {
-  if (!image) return PLACEHOLDER;
-  if (image.startsWith("http")) return image;
-  return `/products/${image}`;
 }
 
 import { QuickAddToCart } from "./QuickAddToCart";

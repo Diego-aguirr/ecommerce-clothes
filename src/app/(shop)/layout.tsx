@@ -1,6 +1,6 @@
 import { Footer, Sidebar, TopMenu, WhatsappButton, AnnouncementBar } from "@/components";
 import { auth } from "../../../auth";
-import prisma from "@/lib/prisma";
+import { findUserByIdForAuth } from "@/services/auth.service";
 import EmailBanner from "@/components/ui/verification/EmailBanner";
 
 export default async function ShopLayout({
@@ -13,9 +13,7 @@ export default async function ShopLayout({
   let needsVerification = false;
 
   if (session?.user?.id) {
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    });
+    const user = await findUserByIdForAuth(session.user.id);
 
     if (user && !user.emailVerified) {
       needsVerification = true;

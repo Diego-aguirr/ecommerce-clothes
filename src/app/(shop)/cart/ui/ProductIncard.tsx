@@ -2,7 +2,6 @@
 import { QuantitySelector } from "@/components";
 import { useCartStore } from "@/store/cart/cart-store";
 import Image from "next/image";
-import { useState } from "react";
 import Link from "next/link";
 
 export const ProductIncard = () => {
@@ -10,19 +9,14 @@ export const ProductIncard = () => {
   const updateProductQuantity = useCartStore(
     (state) => state.updateProductQuantity,
   );
-  const [loaded, setLoaded] = useState(true);
 
   const productIncart = useCartStore((state) => state.cart);
-
-  if (!loaded) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="flex flex-col space-y-4 sm:space-y-6">
       {productIncart.map((product) => (
         <div
-          key={`${product.slug}-${product.size} `}
+          key={product.variantId ?? `${product.slug}-${product.size}`}
           className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-all duration-300"
         >
           <div className="flex flex-col sm:flex-row gap-4">

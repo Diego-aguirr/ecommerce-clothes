@@ -23,8 +23,7 @@ export async function getVariantForQuickAdd(
 ): Promise<QuickVariantInfo | null> {
   try {
     return await getVariantForQuickAddService(productId, size);
-  } catch (error) {
-    console.error("Error fetching variant for quick add:", error);
+  } catch {
     return null;
   }
 }

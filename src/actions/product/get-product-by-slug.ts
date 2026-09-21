@@ -23,8 +23,7 @@ export const getProductBySlug = async (
 ): Promise<ProductWithVariants | null> => {
   try {
     return await getProductBySlugService(slug);
-  } catch (error) {
-    console.error("Error al obtener producto por slug:", error);
+  } catch {
     throw new Error("Error al obtener producto por slug");
   }
 };

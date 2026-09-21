@@ -27,6 +27,14 @@ export async function findUserByEmail(email: string) {
   });
 }
 
+/** Busca usuario por ID (solo id + emailVerified — para auth checks en pages). */
+export async function findUserByIdForAuth(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { id: true, emailVerified: true },
+  });
+}
+
 /**
  * Crea un usuario sin password (magic links).
  * Retorna el usuario sin password.

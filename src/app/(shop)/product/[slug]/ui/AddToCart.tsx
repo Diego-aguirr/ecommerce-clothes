@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { QuantitySelector, SizeSelector } from "@/components";
 import { ColorSelector } from "@/components/product/color-selector/ColorSelector";
@@ -35,6 +35,7 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
   const [quantity, setQuantity] = useState(1);
   const [posted, setPosted] = useState(false);
   const [added, setAdded] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Obtener imágenes del color seleccionado
   const selectedColorData = variantsByColor.find((vc) => vc.color === selectedColor);
@@ -71,7 +72,8 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
     setQuantity(1);
     setPosted(false);
     setAdded(true);
-    setTimeout(() => setAdded(false), 3000);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setAdded(false), 3000);
   };
 
   return (
@@ -158,13 +160,13 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
       {/* Shipping info */}
       <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
         <div className="flex items-center gap-3 text-sm text-gray-500">
-          <span className="text-lg" aria-hidden>
+          <span className="text-lg" aria-hidden="true">
             🚚
           </span>
           <span>Envíos a todo el país</span>
         </div>
         <div className="flex items-center gap-3 text-sm text-gray-500">
-          <span className="text-lg" aria-hidden>
+          <span className="text-lg" aria-hidden="true">
             🏪
           </span>
           <span>Retiro en local disponible</span>
