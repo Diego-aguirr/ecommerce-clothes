@@ -2,7 +2,6 @@
 
 import { registerSchema } from "@/lib/zod";
 import { z } from "zod";
-import { signIn } from "../../../auth";
 import { sendEmail } from "@/lib/mailer";
 import { verifyEmailTemplate } from "@/lib/verify-email";
 import {
@@ -19,7 +18,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       return { ok: false, error: "Datos inválidos" };
     }
 
-    const { name, email, password } = parsed.data;
+    const { name, email } = parsed.data;
 
     // 2. Verificar si ya existe
     const existingUser = await findUserByEmail(email);
@@ -27,14 +26,14 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       return { ok: false, error: "El email ya está en uso" };
     }
 
-    // 3. Crear usuario
-    const user = await createUser({ name, email, password });
+    // 3. Crear usuario (sin password)
+    const user = await createUser({ name, email });
 
     // 4. Token de verificación + email
     const verificationToken = await createVerificationToken(email);
 
     if (!process.env.APP_URL) {
-      console.error("⚠️ APP_URL no está definido en .env");
+      return { ok: true, warning: "Email de verificación no enviado. Contactá soporte." };
     }
 
     const verifyUrl = `${process.env.APP_URL}/api/auth/verify?token=${verificationToken}`;
@@ -45,23 +44,13 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
         subject: "Confirmá tu correo electrónico",
         html: verifyEmailTemplate({ name, verifyUrl }),
       });
-    } catch (err) {
-      console.error(
-        "❌ Error enviando email de verificación (usuario creado igualmente):",
-        err
-      );
+    } catch {
+      // Email failed but user was created — they can still log in
     }
 
-    // 5. Login automático
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    return { ok: true, user };
-  } catch (error) {
-    console.error("Register error:", error);
+    // 5. Retornar éxito (sin login automático — el usuario debe verificar su email primero)
+    return { ok: true };
+  } catch {
     return { ok: false, error: "Error al registrar usuario" };
   }
 }

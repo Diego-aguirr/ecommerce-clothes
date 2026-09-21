@@ -1,15 +1,10 @@
 "use server";
 
 import { signIn } from "../../../auth";
-
-function isLocalUrl(url: string): boolean {
-  // Only allow local paths starting with /, not // or external URLs
-  return url.startsWith("/") && !url.startsWith("//");
-}
+import { isLocalUrl } from "@/lib/url";
 
 export async function signInWithGoogle(callbackUrl?: string) {
   try {
-    // Validate to prevent open redirect attacks
     const target = isLocalUrl(callbackUrl || "") ? callbackUrl : "/";
 
     await signIn("google", {
@@ -19,7 +14,10 @@ export async function signInWithGoogle(callbackUrl?: string) {
 
     return { ok: true };
   } catch (error) {
-    console.error("Google sign-in error:", error);
+    // NextAuth lanza redirect como excepción con redirect: true — es comportamiento normal
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
     return { ok: false, error: "Error al iniciar sesión con Google" };
   }
 }

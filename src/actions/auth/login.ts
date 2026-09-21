@@ -1,30 +1,41 @@
 "use server";
 
-import { loginSchema } from "@/lib/zod";
+import { emailSchema } from "@/lib/zod";
 import { z } from "zod";
 import { signIn } from "../../../auth";
+import { isLocalUrl } from "@/lib/url";
 
-export const authenticate = async (values: z.infer<typeof loginSchema>) => {
+export const sendMagicLink = async (
+  values: z.infer<typeof emailSchema>,
+  callbackUrl?: string
+) => {
   try {
-    const parsed = loginSchema.safeParse(values);
+    const parsed = emailSchema.safeParse(values);
 
     if (!parsed.success) {
-      return { error: "Datos inválidos" };
+      return { error: "Email inválido" };
     }
 
-    const { email, password } = parsed.data;
+    const { email } = parsed.data;
 
-    await signIn("credentials", {
-      email,
-      password,
+    const safeCallbackUrl = isLocalUrl(callbackUrl || "") ? callbackUrl : "/";
+    const result = await signIn("email", {
+      email: email.toLowerCase(),
       redirect: false,
+      callbackUrl: safeCallbackUrl,
     });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Login error:", error);
+    if (result?.error) {
+      return { error: "Ocurrió un error. Intentá nuevamente." };
+    }
 
-    // Generic message to prevent user enumeration
-    return { error: "Email o contraseña incorrectos" };
+    return {
+      ok: true,
+      message: "Si el email está registrado, recibirás un enlace para iniciar sesión.",
+    };
+  } catch {
+    return {
+      error: "Ocurrió un error. Intentá nuevamente.",
+    };
   }
 };

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getEmailVerificationStatus } from "@/lib/email-verification";
 import { auth } from "../../../../../auth";
 
 export async function POST() {
@@ -20,11 +19,8 @@ export async function POST() {
     return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 });
   }
 
-  // 3️⃣ Evaluar estado de verificación
-  const verification = getEmailVerificationStatus(user);
-
-  if (!verification.allowed) {
-    // ⛔ Checkout bloqueado
+  // 3️⃣ Verificar email (sin grace period)
+  if (!user.emailVerified) {
     return NextResponse.json(
       {
         error: "EMAIL_VERIFICATION_REQUIRED",

@@ -5,7 +5,6 @@
  * Usado por: auth/register action.
  *
  * Reglas:
- * - Hashear passwords con bcrypt (10 rounds)
  * - No exponer passwords en respuestas
  * - Generar tokens de verificación con expiración de 24h
  * - Usar "server-only" para evitar imports en client components
@@ -13,13 +12,11 @@
 
 import prisma from "@/lib/prisma";
 import "server-only";
-import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 
 type RegisterInput = {
   name: string;
   email: string;
-  password: string;
 };
 
 /** Verifica si un email ya está registrado. */
@@ -31,17 +28,14 @@ export async function findUserByEmail(email: string) {
 }
 
 /**
- * Crea un usuario con password hasheado.
+ * Crea un usuario sin password (magic links).
  * Retorna el usuario sin password.
  */
 export async function createUser(data: RegisterInput) {
-  const hashedPassword = await bcryptjs.hash(data.password, 10);
-
   return prisma.user.create({
     data: {
       name: data.name,
       email: data.email,
-      password: hashedPassword,
       role: "user",
     },
     select: { id: true, name: true, email: true },

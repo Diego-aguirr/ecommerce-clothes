@@ -9,7 +9,6 @@ import { Title } from "@/components";
 import AddressForm from "./ui/AddressForm";
 import { auth } from "../../../../../auth";
 import { redirect } from "next/navigation";
-import { getEmailVerificationStatus } from "@/lib/email-verification";
 import prisma from "@/lib/prisma";
 import { getProvincies } from "@/actions/provincies/get-provincies";
 import { getUserAddress } from "@/actions/address/get-user-address";
@@ -46,11 +45,9 @@ export default async function AddressPage() {
     redirect("/login");
   }
 
-  // 🔒 3. Email bloqueado
-  const verification = getEmailVerificationStatus(user);
-
-  if (!verification.allowed) {
-    redirect("/shop"); // o página informativa
+  // 🔒 3. Email no verificado → shop
+  if (!user.emailVerified) {
+    redirect("/shop");
   }
   return (
     <div className="min-h-screen bg-gray-50 py-8">

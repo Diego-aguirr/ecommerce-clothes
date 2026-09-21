@@ -1,21 +1,11 @@
 import { z } from "zod";
 
-export const loginSchema = z.object({
+export const emailSchema = z.object({
   email: z.email({ error: "Email inválido" }),
-  password: z
-    .string()
-    .min(1, { error: "Contraseña requerida" })
-    .min(6, { error: "Mínimo 6 caracteres" })
-    .max(32, { error: "Máximo 32 caracteres" }),
 });
 
 export const registerSchema = z.object({
   email: z.email({ error: "Email inválido" }),
-  password: z
-    .string()
-    .min(1, { error: "Contraseña requerida" })
-    .min(6, { error: "Mínimo 6 caracteres" })
-    .max(32, { error: "Máximo 32 caracteres" }),
   name: z
     .string()
     .min(1, { error: "Nombre requerido" })

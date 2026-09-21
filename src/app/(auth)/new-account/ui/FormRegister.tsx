@@ -39,7 +39,7 @@ export const FormRegister = () => {
         return;
       }
 
-      router.push("/");
+      router.push("/login?registered=1");
     });
   };
 
@@ -82,23 +82,6 @@ export const FormRegister = () => {
         />
         {errors.email && (
           <p className="text-red-600 text-xs">{errors.email.message}</p>
-        )}
-      </div>
-
-      {/* PASSWORD */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password" className="text-sm font-medium text-neutral-800">Contraseña</label>
-        <input
-          id="password"
-          className={clsx(
-            "w-full rounded-md border border-neutral-300 bg-neutral-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black",
-            { "border-red-500": errors.password }
-          )}
-          type="password"
-          {...register("password")}
-        />
-        {errors.password && (
-          <p className="text-red-600 text-xs">{errors.password.message}</p>
         )}
       </div>
 

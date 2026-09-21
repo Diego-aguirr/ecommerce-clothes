@@ -1,8 +1,4 @@
-import bcrypt from "bcryptjs";
 import { PRODUCTION_CATEGORIES } from "./seed-categories";
-
-// Password hasheado para testing: "r"
-const TEST_PASSWORD_HASH = bcrypt.hashSync("r", 10);
 
 export const initialData = {
   users: [
@@ -11,7 +7,6 @@ export const initialData = {
       name: "Super Admin",
       email: "superadmin@test.com",
       emailVerified: new Date(),
-      password: TEST_PASSWORD_HASH,
       role: "admin" as const,
       isSuperAdmin: true,
       status: "ACTIVE" as const,
@@ -21,7 +16,6 @@ export const initialData = {
       name: "Admin Test",
       email: "admin@test.com",
       emailVerified: new Date(),
-      password: TEST_PASSWORD_HASH,
       role: "admin" as const,
       isSuperAdmin: false,
       status: "ACTIVE" as const,
@@ -31,7 +25,6 @@ export const initialData = {
       name: "Usuario Test",
       email: "user@test.com",
       emailVerified: new Date(),
-      password: TEST_PASSWORD_HASH,
       role: "user" as const,
       isSuperAdmin: false,
       status: "ACTIVE" as const,
