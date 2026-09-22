@@ -184,7 +184,7 @@ src/
 │   ├── admin/          # CRUD dominios (admin)
 │   └── payment/        # Payment actions: MP preference, admin approval
 ├── app/                # Pages y rutas (App Router)
-│   ├── (auth)/         # Login, register, forgot/reset password
+│   ├── (auth)/         # Login, register
 │   ├── (shop)/         # Productos, carrito, checkout, órdenes
 │   ├── admin/          # Panel de administración
 │   └── api/            # API endpoints y webhooks
@@ -228,8 +228,6 @@ src/
 | ------------------ | ---------------------- |
 | `/login`           | Inicio de sesión       |
 | `/new-account`     | Registro               |
-| `/forgot-password` | Recuperar contraseña   |
-| `/reset-password`  | Restablecer contraseña |
 
 ### Admin (protegido)
 
@@ -251,8 +249,6 @@ src/
 | ------ | ------------------------------- | ---------------------------- |
 | `POST` | `/api/webhooks/mercadopago`     | Webhook de pagos             |
 | `POST` | `/api/checkout/start`           | Iniciar checkout             |
-| `POST` | `/api/auth/forgot-password`     | Enviar email de recuperación |
-| `POST` | `/api/auth/reset-password`      | Restablecer contraseña       |
 | `GET`  | `/api/auth/magic-link`          | Redirect legacy (links viejos) |
 
 ---

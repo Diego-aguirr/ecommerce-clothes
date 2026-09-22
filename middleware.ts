@@ -13,8 +13,6 @@ const publicRoutes = [
   "/empty",
   "/login",
   "/new-account",
-  "/forgot-password",
-  "/reset-password",
   "/api/webhooks",
 ];
 

@@ -76,8 +76,6 @@ Server Components
 ### Auth
 - `/login` — Inicio de sesión
 - `/new-account` — Registro
-- `/forgot-password` — Recuperar contraseña
-- `/reset-password` — Restablecer contraseña
 
 ### Admin (protegido)
 - `/admin` — Dashboard
@@ -94,8 +92,6 @@ Server Components
 ### API Endpoints
 - `POST /api/webhooks/mercadopago` — Webhook de pagos
 - `POST /api/checkout/start` — Iniciar checkout
-- `POST /api/auth/forgot-password` — Enviar email de recuperación
-- `POST /api/auth/reset-password` — Restablecer contraseña
 
 ## Servicios (Capa de Negocio)
 
@@ -140,7 +136,7 @@ Server Components
 
 `middleware.ts` protege rutas:
 - **Públicas**: home, productos, about, contact, envíos, privacy, terms
-- **Auth**: login, register, forgot-password, reset-password
+- **Auth**: login, register
 - **Protegidas**: checkout, orders, profile, admin
 
 ## Hooks
@@ -154,16 +150,9 @@ Server Components
 | Archivo | Función |
 |---------|---------|
 | `src/lib/mailer.ts` | Cliente Resend para emails |
-| `src/lib/sendResetPasswordEmail.ts` | Helper para enviar reset de contraseña |
 | `src/lib/errors.ts` | Error handler unificado + ActionError class |
 | `src/lib/admin/auth-utils.ts` | Guards requireAdmin() + requireSuperAdmin() |
 | `src/lib/admin/audit-logger.ts` | Logger de acciones admin (AuditLog) |
-
-## Archivos Legacy (no usar)
-
-| Archivo | Estado |
-|---------|--------|
-| `src/interfaces/paypal.interface.ts` | Legacy/unused — PayPal ya no se usa |
 
 ## Comandos
 

@@ -4,7 +4,7 @@
 
 | Dominio | Estado | Prioridad | Acciones Requeridas |
 |---------|--------|-----------|---------------------|
-| Auth | ⚠️ Parcial | Alta | Verificar auto-link en producción, testear recuperación contraseña |
+| Auth | ⚠️ Parcial | Alta | Verificar auto-link en producción |
 | Products | ⚠️ Parcial | Alta | Verificar stock en órdenes |
 | Orders | ⚠️ Parcial | Alta | Testear decremento atómico, pickup sin dirección |
 | Payments | ✅ Resuelto | Baja | Implementación completa verificada |
@@ -31,8 +31,6 @@
 
 ### 3. Auth — Producción
 - [ ] Verificar que el auto-link de Google OAuth funcione
-- [ ] Testear flujo completo de recuperación de contraseña
-- [ ] Confirmar que el email de verificación se envíe
 - [ ] Revisar que `isSuperAdmin` esté protegido
 
 ## Acciones Secundarias (Hacer después)

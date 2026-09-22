@@ -355,7 +355,7 @@ src/
 │   ├── admin/            - [Admin actions: CRUD for all domains]
 │   └── index.ts          - [Re-exports]
 ├── app/                  - [Pages and Routes]
-│   ├── (auth)/           - [Auth routes: login, register, forgot/reset password]
+│   ├── (auth)/           - [Auth routes: login, register]
 │   ├── (shop)/           - [Shop routes: products, cart, checkout, orders, payments]
 │   ├── admin/            - [Admin panel: dashboard, products, orders, users, categories, payments, audit]
 │   └── api/              - [API Endpoints: auth, checkout, webhooks]
