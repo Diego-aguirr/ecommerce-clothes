@@ -23,7 +23,8 @@ const resolveAuthError = (code: string | null): string | null => {
   if (!code) return null;
   switch (code) {
     case "link-expired":
-      return AUTH_ERROR_MESSAGES[code];
+    case "Verification":
+      return "El enlace expiró o ya fue usado. Iniciá sesión de nuevo para recibir uno nuevo.";
     default:
       // Configuration, OAuthCallback, AccessDenied y códigos desconocidos:
       // nunca exponer el código crudo al usuario.
