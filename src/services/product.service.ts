@@ -396,19 +396,15 @@ export async function getPaginatedProductsService({
         take: 2,
         select: { url: true },
       },
-      colors: {
-        select: { color: true },
-      },
     },
   });
 
   return {
     currentPage: page,
     totalPages,
-    products: products.map(({ ProductImage, colors, ...product }) => ({
+    products: products.map(({ ProductImage, ...product }) => ({
       ...product,
       images: ProductImage.map((image: { url: string }) => image.url),
-      colorNames: colors.map((c: { color: string }) => c.color),
     })),
   };
 }

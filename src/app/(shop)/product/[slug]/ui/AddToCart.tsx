@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { QuantitySelector, SizeSelector } from "@/components";
 import { ColorSelector } from "@/components/product/color-selector/ColorSelector";
@@ -36,6 +36,13 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
   const [posted, setPosted] = useState(false);
   const [added, setAdded] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup al desmontar — evita setState post-unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   // Obtener imágenes del color seleccionado
   const selectedColorData = variantsByColor.find((vc) => vc.color === selectedColor);

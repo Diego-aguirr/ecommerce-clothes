@@ -5,7 +5,7 @@
 | Dominio | Estado | Prioridad | Acciones Requeridas |
 |---------|--------|-----------|---------------------|
 | Auth | ⚠️ Parcial | Alta | Verificar auto-link en producción, testear recuperación contraseña |
-| Products | ⚠️ Parcial | Alta | Verificar stock en órdenes, QuickAddToCart con labels |
+| Products | ⚠️ Parcial | Alta | Verificar stock en órdenes |
 | Orders | ⚠️ Parcial | Alta | Testear decremento atómico, pickup sin dirección |
 | Payments | ✅ Resuelto | Baja | Implementación completa verificada |
 | Cart & Checkout | ⚠️ Parcial | Alta | Persistencia de carrito, totales, redirect a MP |
@@ -37,8 +37,7 @@
 
 ## Acciones Secundarias (Hacer después)
 
-### 4. Products — QuickAddToCart
-- [ ] Verificar que muestre labels de color legibles (no "gris_melange")
+### 4. Products
 - [ ] Testear que el toggle de variantes funcione
 - [ ] Revisar paginación con filtros combinados
 
@@ -71,7 +70,6 @@ Ninguno documentado actualmente. Los bugs encontrados fueron resueltos:
 - OAuthAccountNotLinked (auto-link)
 - Double stock decrement (idempotencia)
 - Empty strings en pickup (conversión a null)
-- QuickAddToCart con strings crudos de DB
 
 ## Próximos Pasos
 
