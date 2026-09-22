@@ -33,12 +33,22 @@ interface UseProductVariantReturn {
 export const useProductVariant = (
   variantsByColor: VariantsByColor[]
 ): UseProductVariantReturn => {
-  // Estado inicial: primer color disponible
+  // Todas las tallas disponibles (de todos los colores)
+  const allSizes = new Set<Size>();
+  variantsByColor.forEach((vc) => {
+    vc.variants.forEach((v) => allSizes.add(v.size));
+  });
+  const availableSizes = Array.from(allSizes).sort();
+
+  // Estado inicial: primer color disponible.
+  // Si solo hay 1 talla en todo el producto, auto-seleccionarla.
   const [selectedColor, setSelectedColor] = useState<string>(
     variantsByColor[0]?.color || "default"
   );
 
-  const [selectedSize, setSelectedSize] = useState<Size | undefined>(undefined);
+  const [selectedSize, setSelectedSize] = useState<Size | undefined>(
+    availableSizes.length === 1 ? availableSizes[0] : undefined
+  );
 
   // Colores disponibles
   const availableColors = variantsByColor.map((vc) => ({
@@ -50,13 +60,6 @@ export const useProductVariant = (
   // Variantes del color seleccionado
   const variantsForSelectedColor =
     variantsByColor.find((vc) => vc.color === selectedColor)?.variants || [];
-
-  // Todas las tallas disponibles (de todos los colores)
-  const allSizes = new Set<Size>();
-  variantsByColor.forEach((vc) => {
-    vc.variants.forEach((v) => allSizes.add(v.size));
-  });
-  const availableSizes = Array.from(allSizes).sort();
 
   // Tallas disponibles para el color seleccionado
   const availableSizesForColor = variantsForSelectedColor
@@ -85,8 +88,8 @@ export const useProductVariant = (
   // Handlers
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
-    // Resetear talla seleccionada al cambiar de color
-    setSelectedSize(undefined);
+    // Resetear talla al cambiar de color, salvo talla única (auto-seleccionada)
+    setSelectedSize(availableSizes.length === 1 ? availableSizes[0] : undefined);
   };
 
   const handleSizeChange = (size: Size) => {

@@ -142,7 +142,9 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
           {added 
             ? "✓ Agregado" 
             : !canAddToCart 
-            ? "Seleccioná talle y color" 
+            ? selectedSize 
+              ? "Sin stock disponible" 
+              : "Seleccioná talle y color"
             : "Agregar al carrito"
           }
         </button>
