@@ -11,17 +11,11 @@ interface Props {
   product: Product;
 }
 
-import { QuickAddToCart } from "./QuickAddToCart";
-
 export const ProductGridItem = ({ product }: Props) => {
   const [displayImage, setDisplayImage] = useState(product.images[0]);
   const [hasError,     setHasError]     = useState(false);
 
   const currentSrc = hasError ? PLACEHOLDER : resolveImageSrc(displayImage);
-
-  // Quick Add solo para productos de 1 color (evita error de variante)
-  const colorCount = product.colorNames?.length ?? product.colors?.length ?? 0;
-  const isSingleColor = colorCount <= 1;
 
   return (
     <div className="rounded-lg overflow-hidden fade-in relative group flex flex-col">
@@ -53,13 +47,6 @@ export const ProductGridItem = ({ product }: Props) => {
           </Link>
           <span className="font-bold text-base sm:text-lg mt-1">${product.price.toLocaleString("es-AR")}</span>
         </div>
-        
-        {/* Quick Add CTA — solo productos de 1 color */}
-        {isSingleColor && (
-          <div className="mt-2 sm:mt-3">
-            <QuickAddToCart product={product} />
-          </div>
-        )}
       </div>
     </div>
   );
