@@ -35,7 +35,6 @@ export async function uploadProductImage(formData: FormData): Promise<{ ok: bool
 
     return { ok: true, url, publicId };
   } catch (error: unknown) {
-    console.error("Error crítico subiendo imagen:", error);
     return { ok: false, error: "Fallo temporal del servicio de alojamiento de imágenes. Intenta más tarde." };
   }
 }
@@ -55,7 +54,6 @@ export async function removeProductImage(publicId: string): Promise<{ ok: boolea
 
     return { ok: true };
   } catch (error) {
-    console.error("Error eliminando imagen de Cloudinary:", error);
     return { ok: false, error: "Error eliminando imagen previsualizada." };
   }
 }

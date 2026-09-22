@@ -91,9 +91,7 @@ export function ProductWizard({ categories, product }: Props) {
     setValue,
     watch,
     formState: { errors },
-  // FIXME(Phase 6): Type with z.input<typeof CreateProductSchema> after form refactor
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } = useForm<any>({
+  } = useForm<z.input<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
       title: product?.title ?? "",
@@ -110,7 +108,7 @@ export function ProductWizard({ categories, product }: Props) {
   });
    
 
-  const selectedSizes: string[] = watch("sizes") ?? [];
+  const selectedSizes: Size[] = watch("sizes") ?? [];
   const title: string = watch("title") ?? "";
 
   // Step validation

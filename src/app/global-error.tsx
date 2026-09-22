@@ -17,7 +17,7 @@ export default function GlobalError({
               Error crítico
             </h2>
             <p className="text-gray-500 text-sm mb-6 max-w-md">
-              {error.message || "La aplicación encontró un error inesperado."}
+              La aplicación encontró un error inesperado.
             </p>
             <button
               onClick={reset}

@@ -109,7 +109,6 @@ export const PlaceOrder = () => {
     } catch (error) {
       setIsPlacingOrder(false);
       setErrorMessage("Ocurrió un error inesperado. Intente de nuevo.");
-      console.error(error);
     }
   };
 

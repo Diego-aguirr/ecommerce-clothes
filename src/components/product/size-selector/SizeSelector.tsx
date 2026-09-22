@@ -1,3 +1,5 @@
+"use client";
+
 import type { Size } from "@/interfaces";
 import clsx from "clsx";
 

@@ -2,19 +2,13 @@
 
 import { Size, Gender } from "@/generated/prisma/enums";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { z } from "zod";
+import { CreateProductSchema } from "@/lib/validations/product.schema";
 
 const ALL_SIZES = Object.values(Size);
 const ALL_GENDERS = Object.values(Gender);
 
-type FormData = {
-  title: string;
-  description: string;
-  price: number;
-  sizes: Size[];
-  tags: string[];
-  gender: Gender;
-  categoryId: string;
-};
+type FormData = z.input<typeof CreateProductSchema>;
 
 type StepBasicDataProps = {
   register: UseFormRegister<FormData>;

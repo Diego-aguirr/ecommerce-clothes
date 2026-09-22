@@ -14,7 +14,6 @@ export const getUserAddress = async () => {
     const data = await getUserAddressService(session.user.id);
     return { ok: true, data };
   } catch (error) {
-    console.error("Error obteniendo dirección:", error);
     return { ok: false, error: "Error interno al obtener la dirección" };
   }
 };

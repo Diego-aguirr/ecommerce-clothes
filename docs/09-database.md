@@ -38,7 +38,6 @@ ProductColor (1) ──→ (N) ProductColorImage
 User (1) ──→ (N) Account
 User (1) ──→ (N) Session
 User (1) ──→ (N) UserAddress
-User (1) ──→ (N) PasswordResetToken
 User (1) ──→ (N) Order
 ```
 

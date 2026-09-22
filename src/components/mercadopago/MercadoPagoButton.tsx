@@ -19,7 +19,6 @@ export const MercadoPagoButton = ({ orderId }: Props) => {
     try {
       // Llamar al action del servidor
       const result = await createPreference(orderId);
-      console.log("Respuesta de createPreference:", result);
 
       if (!result.ok) {
         setError(result.message || "No se pudo generar el enlace de pago");
@@ -34,7 +33,6 @@ export const MercadoPagoButton = ({ orderId }: Props) => {
       // 🚀 Redirigir al usuario al checkout oficial de Mercado Pago
       window.location.href = result.init_point;
     } catch (err) {
-      console.error(err);
       setError("Error interno al conectar con Mercado Pago");
     } finally {
       setLoading(false);

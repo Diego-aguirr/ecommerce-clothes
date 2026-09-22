@@ -9,7 +9,7 @@ import { Title } from "@/components";
 import AddressForm from "./ui/AddressForm";
 import { auth } from "../../../../../auth";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { findUserByIdForAuth } from "@/services/auth.service";
 import { getProvincies } from "@/actions/provincies/get-provincies";
 import { getUserAddress } from "@/actions/address/get-user-address";
 import { FaInfoCircle } from "react-icons/fa";
@@ -37,9 +37,7 @@ export default async function AddressPage() {
   }
 
   // 🔒 2. Usuario real
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
+  const user = await findUserByIdForAuth(session.user.id);
 
   if (!user) {
     redirect("/login");

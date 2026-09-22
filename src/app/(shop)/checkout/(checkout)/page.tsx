@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { findUserByIdForAuth } from "@/services/auth.service";
 import { auth } from "../../../../../auth";
 
 import { OrderItems } from "./ui/OrderItems";
@@ -22,9 +22,7 @@ export default async function PaymentPage() {
   }
 
   // 🔒 2. Usuario real
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
+  const user = await findUserByIdForAuth(session.user.id);
 
   if (!user) {
     redirect("/login");

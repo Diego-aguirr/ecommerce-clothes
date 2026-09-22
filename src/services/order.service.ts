@@ -511,15 +511,3 @@ export async function getOrdersByUserService(
     currentPage: safePage,
   };
 }
-
-/** Obtiene todas las órdenes (admin). */
-export async function getPaginatedOrdersService() {
-  return prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      OrderAddress: {
-        select: { fullname: true },
-      },
-    },
-  });
-}

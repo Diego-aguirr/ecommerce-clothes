@@ -44,7 +44,6 @@ export async function createPreference(orderId: string): Promise<CreatePreferenc
 
     return { ok: true, ...result };
   } catch (error) {
-    console.error("Error creando preferencia:", error);
     return {
       ok: false,
       message:

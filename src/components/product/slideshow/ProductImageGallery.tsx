@@ -2,22 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { resolveImageSrc, PLACEHOLDER } from "@/lib/image-utils";
 
 // ─── Types ──────────────────────────────────────────────────────
 interface ProductImageGalleryProps {
   images: string[];
   title: string;
   className?: string;
-}
-
-// ─── Constants ──────────────────────────────────────────────────
-const PLACEHOLDER = "/imgs/placeholder.jpg";
-
-// ─── Helper: Resolve image source ───────────────────────────────
-function resolveImageSrc(image: string | undefined): string {
-  if (!image) return PLACEHOLDER;
-  if (image.startsWith("http") || image.startsWith("/")) return image;
-  return `/products/${image}`;
 }
 
 // ─── Subcomponent: Single image with error handling ─────────────
@@ -333,11 +324,11 @@ function FullscreenModal({
 }
 
 // ─── Main Component ─────────────────────────────────────────────
-export default function ProductImageGallery({
+export const ProductImageGallery = ({
   images,
   title,
   className = "",
-}: ProductImageGalleryProps) {
+}: ProductImageGalleryProps) => {
   // Garantizar al menos 1 imagen (placeholder si está vacío)
   const safeImages = images.length === 0 ? [""] : images;
   const imageCount = safeImages.length;

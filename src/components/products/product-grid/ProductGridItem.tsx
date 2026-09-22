@@ -5,21 +5,11 @@ import Link from "next/link";
 
 import { Product } from "@/interfaces";
 import { useState } from "react";
+import { resolveImageSrc, PLACEHOLDER } from "@/lib/image-utils";
 
 interface Props {
   product: Product;
 }
-
-const PLACEHOLDER = "/imgs/placeholder.jpg";
-
-// Resuelve la URL de la imagen: Cloudinary (absoluta) o legacy local (/public/products/)
-function resolveImageSrc(image: string | undefined): string {
-  if (!image) return PLACEHOLDER;
-  if (image.startsWith("http")) return image;
-  return `/products/${image}`;
-}
-
-import { QuickAddToCart } from "./QuickAddToCart";
 
 export const ProductGridItem = ({ product }: Props) => {
   const [displayImage, setDisplayImage] = useState(product.images[0]);
@@ -56,11 +46,6 @@ export const ProductGridItem = ({ product }: Props) => {
             {product.title}
           </Link>
           <span className="font-bold text-base sm:text-lg mt-1">${product.price.toLocaleString("es-AR")}</span>
-        </div>
-        
-        {/* Quick Add CTA */}
-        <div className="mt-2 sm:mt-3">
-          <QuickAddToCart product={product} />
         </div>
       </div>
     </div>

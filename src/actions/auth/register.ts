@@ -2,13 +2,7 @@
 
 import { registerSchema } from "@/lib/zod";
 import { z } from "zod";
-import { sendEmail } from "@/lib/mailer";
-import { verifyEmailTemplate } from "@/lib/verify-email";
-import {
-  findUserByEmail,
-  createUser,
-  createVerificationToken,
-} from "@/services/auth.service";
+import { findUserByEmail, createUser } from "@/services/auth.service";
 
 export async function registerAction(data: z.infer<typeof registerSchema>) {
   try {
@@ -26,29 +20,10 @@ export async function registerAction(data: z.infer<typeof registerSchema>) {
       return { ok: false, error: "El email ya está en uso" };
     }
 
-    // 3. Crear usuario (sin password)
-    const user = await createUser({ name, email });
+    // 3. Crear usuario (sin password — el magic link del login verifica el email)
+    await createUser({ name, email });
 
-    // 4. Token de verificación + email
-    const verificationToken = await createVerificationToken(email);
-
-    if (!process.env.APP_URL) {
-      return { ok: true, warning: "Email de verificación no enviado. Contactá soporte." };
-    }
-
-    const verifyUrl = `${process.env.APP_URL}/api/auth/verify?token=${verificationToken}`;
-
-    try {
-      await sendEmail({
-        to: email,
-        subject: "Confirmá tu correo electrónico",
-        html: verifyEmailTemplate({ name, verifyUrl }),
-      });
-    } catch {
-      // Email failed but user was created — they can still log in
-    }
-
-    // 5. Retornar éxito (sin login automático — el usuario debe verificar su email primero)
+    // 4. Retornar éxito (sin login automático — el usuario ingresa con magic link)
     return { ok: true };
   } catch {
     return { ok: false, error: "Error al registrar usuario" };

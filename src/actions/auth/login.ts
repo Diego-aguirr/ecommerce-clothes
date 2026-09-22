@@ -25,10 +25,7 @@ export const sendMagicLink = async (
       callbackUrl: safeCallbackUrl,
     });
 
-    if (result?.error) {
-      return { error: "Ocurrió un error. Intentá nuevamente." };
-    }
-
+    // Respuesta uniforme: nunca revelar si el email está registrado.
     return {
       ok: true,
       message: "Si el email está registrado, recibirás un enlace para iniciar sesión.",

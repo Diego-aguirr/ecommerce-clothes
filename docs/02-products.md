@@ -25,7 +25,6 @@ Gestiona el catálogo completo: productos, variantes (talla+color), colores, im�
 | `src/actions/product/get-product-by-slug.ts` | Obtener producto por slug |
 | `src/actions/product/get-stock-by-slug.ts` | Obtener stock por slug |
 | `src/actions/product/product-pagination.ts` | Paginación de productos |
-| `src/actions/product/get-variant-for-quick-add.ts` | Variante para QuickAddToCart |
 | `src/actions/admin/products.ts` | CRUD admin de productos |
 | `src/actions/admin/variants.ts` | CRUD admin de variantes |
 | `src/actions/admin/colors.ts` | CRUD admin de colores |
@@ -36,7 +35,6 @@ Gestiona el catálogo completo: productos, variantes (talla+color), colores, im�
 |---------|---------|
 | `src/components/products/product-grid/ProductGrid.tsx` | Grid de productos |
 | `src/components/products/product-grid/ProductGridItem.tsx` | Item del grid |
-| `src/components/products/product-grid/QuickAddToCart.tsx` | Modal rápido agregar al carrito |
 | `src/components/product/size-selector/SizeSelector.tsx` | Selector de tallas |
 | `src/components/product/color-selector/ColorSelector.tsx` | Selector de colores |
 | `src/components/product/quantity-selector/QuantitySelector.tsx` | Selector de cantidad |
@@ -103,10 +101,10 @@ Cada producto tiene variantes por combinación talla+color:
 - [ ] Verificar que el stock se actualice correctamente al crear órdenes
 - [ ] Testear paginación con filtros combinados (género + categoría)
 - [ ] Revisar que las imágenes de colores se muestren correctamente
-- [ ] Confirmar que QuickAddToCart muestre colores con label legible (no "gris_melange")
+- [ ] Confirmar que ColorSelector muestre colores con label legible (no "gris_melange")
 - [ ] Verificar que el toggle de variantes (isActive) funcione
 
 ## Bugs Conocidos y Resueltos
 
-- **QuickAddToCart mostraba strings crudos de DB**: Se resolvió uniendo con ProductColor para mostrar labels legibles
+- **Selector de colores mostraba strings crudos de DB**: Se resolvió uniendo con ProductColor para mostrar labels legibles
 - **Double stock decrement**: Al cambiar variantes, el decremento se ejecutaba dos veces

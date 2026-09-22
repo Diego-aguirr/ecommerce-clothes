@@ -1,27 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useCartStore } from "@/store";
 import { IoArrowBack, IoCard, IoShieldCheckmark } from "react-icons/io5";
 import { currencyFormat } from "@/utils";
 
-const OrderSummary = () => {
-  const [loaded, setLoaded] = useState(true);
-
-  // 👇 leemos estado directamente
+export const OrderSummary = () => {
   const cart = useCartStore((state) => state.cart);
 
-  if (!loaded) return <p>Cargando...</p>;
-
-  // 👇 cálculos simples derivados (seguros)
   const itemsInCart = cart.reduce((sum, p) => sum + p.quantity, 0);
   const subTotal = cart.reduce((sum, p) => sum + p.price * p.quantity, 0);
 
-  // 👇 IVA del 21%
   const IVA_RATE = 0.21;
-  const total = subTotal; // subTotal ya incluye IVA
-  const ivaIncluido = total - total / (1 + IVA_RATE); // IVA extraído para mostrar
+  const total = subTotal;
+  const ivaIncluido = total - total / (1 + IVA_RATE);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 sticky top-6">
@@ -30,7 +22,6 @@ const OrderSummary = () => {
       </h2>
 
       <div className="space-y-3 mb-6">
-        {/* Subtotal */}
         <div className="flex justify-between text-gray-600">
           <span>
             Subtotal ({itemsInCart} producto{itemsInCart !== 1 ? "s" : ""})
@@ -38,7 +29,6 @@ const OrderSummary = () => {
           <span className="font-medium">{currencyFormat(subTotal)}</span>
         </div>
 
-        {/* Envío */}
         <div className="flex justify-between text-gray-600">
           <span>Envío</span>
           <span className="font-medium text-gray-900">
@@ -46,7 +36,6 @@ const OrderSummary = () => {
           </span>
         </div>
 
-        {/* Línea separadora y Total */}
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between text-lg font-bold text-gray-900">
             <span>Total</span>
@@ -58,7 +47,6 @@ const OrderSummary = () => {
         </div>
       </div>
 
-      {/* Botones de acción */}
       <div className="space-y-3">
         <Link
           href="/checkout/address"
@@ -77,7 +65,6 @@ const OrderSummary = () => {
         </Link>
       </div>
 
-      {/* Beneficios */}
       <div className="mt-6 pt-6 border-t border-gray-100">
         <div className="space-y-2 text-sm text-gray-600">
           <div className="flex items-center gap-2">
@@ -93,5 +80,3 @@ const OrderSummary = () => {
     </div>
   );
 };
-
-export default OrderSummary;

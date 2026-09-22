@@ -22,7 +22,6 @@ Gestiona la creación, consulta y gestión de órdenes de compra. Incluye la cre
 | `src/actions/order/place-order.ts` | Crear orden (orquestador principal) |
 | `src/actions/order/get-order-by-id.ts` | Obtener orden por ID |
 | `src/actions/order/get-orders-by-user.ts` | Órdenes del usuario |
-| `src/actions/order/get-paginated-orders.ts` | Órdenes paginadas (admin) |
 | `src/actions/admin/orders.ts` | Gestión admin de órdenes |
 
 ### Pages

@@ -32,7 +32,6 @@ export const getOrdersByUser = async (
     const result = await getOrdersByUserService(session.user.id, { page, take });
     return { ok: true, ...result };
   } catch (error) {
-    console.error("Error getOrdersByUser:", error);
     return { ok: false, message: "Error al obtener su historial de órdenes" };
   }
 };

@@ -4,7 +4,7 @@
 Sistema de Autenticación
 
 ## Función
-Gestiona registro, login, sesiones, recuperación de contraseña y verificación de email. Soporta autenticación con credenciales (email/password) y Google OAuth.
+Gestiona registro, login por magic link y Google OAuth, sesiones y verificación de email automática al iniciar sesión.
 
 ## Importancia
 🔴 **CRÍTICO** — Es la puerta de entrada. Sin auth funcional, nada más funciona.
@@ -21,42 +21,33 @@ Gestiona registro, login, sesiones, recuperación de contraseña y verificación
 |---------|---------|
 | `src/actions/auth/register.ts` | Registro con Zod validation |
 | `src/actions/auth/login.ts` | Login con credenciales |
-| `src/actions/auth/logout.ts` | Cierre de sesión |
 | `src/actions/auth/google.ts` | OAuth con Google |
 
 ### API Routes
 | Archivo | Función |
 |---------|---------|
 | `src/app/api/auth/[...nextauth]/route.ts` | NextAuth handler |
-| `src/app/api/auth/forgot-password/route.ts` | Enviar email de recuperación |
-| `src/app/api/auth/reset-password/route.ts` | Restablecer contraseña |
-| `src/app/api/auth/verify/route.ts` | Verificar email |
-| `src/app/api/auth/resend-verification/route.ts` | Reenviar verificación |
+| `src/app/api/auth/magic-link/route.ts` | Redirect legacy de links viejos |
 
 ### Pages
 | Ruta | Función |
 |------|---------|
 | `(auth)/login/page.tsx` | Formulario de login |
 | `(auth)/new-account/page.tsx` | Formulario de registro |
-| `(auth)/forgot-password/page.tsx` | Solicitar recuperación |
-| `(auth)/reset-password/page.tsx` | Nueva contraseña |
 
 ### Modelos Relacionados
 - `User` — Usuarios con roles (user/admin), estados (ACTIVE/BLOCKED/DELETED)
 - `Account` — Cuentas OAuth (Google)
 - `Session` — Sesiones activas
-- `VerificationToken` — Tokens de verificación de email
-- `PasswordResetToken` — Tokens de recuperación de contraseña
+- `VerificationToken` — Tokens de magic link (Auth.js)
 
 ## Flujo de Registro
 
 ```
 1. Usuario llena formulario (Zod validation)
 2. action register.ts → auth.service.ts
-3. Hash de password con bcrypt
-4. Crear User en DB
-5. Enviar email de verificación
-6. Redirect a login
+3. Crear User en DB (sin password)
+4. Redirect a login — el magic link verifica el email al iniciar sesión
 ```
 
 ## Flujo de Login
@@ -91,8 +82,6 @@ Gestiona registro, login, sesiones, recuperación de contraseña y verificación
 ## Requiere Revisión
 
 - [ ] Verificar que el auto-link funcione correctamente en producción
-- [ ] Confirmar que el email de verificación se envía
-- [ ] Testear flujo completo de recuperación de contraseña
 - [ ] Revisar que `isSuperAdmin` esté bien protegido
 
 ## Bugs Conocidos y Resueltos

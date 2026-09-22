@@ -11,9 +11,6 @@ function getResend(): Resend | null {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn(
-      "⚠️  RESEND_API_KEY no está configurada. Los emails se loguearán en consola en lugar de enviarse."
-    );
     return null;
   }
 
@@ -43,10 +40,6 @@ export async function sendEmail({
 
   // Modo desarrollo: loguear en consola sin enviar
   if (!client) {
-    console.log("📧 [DEV EMAIL - No enviado]");
-    console.log("   Para:", to);
-    console.log("   Asunto:", subject);
-    console.log("   Preview:", html.slice(0, 200).replace(/\n/g, " ") + "...");
     return { id: "dev-mode" };
   }
 
@@ -58,7 +51,6 @@ export async function sendEmail({
   });
 
   if (error) {
-    console.error("Resend email error:", error);
     throw error;
   }
 

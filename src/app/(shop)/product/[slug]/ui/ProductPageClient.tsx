@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { titleFont } from "@/config/fonts";
-import ProductImageGallery from "@/components/product/slideshow/ProductImageGallery";
-import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
+import { ProductImageGallery } from "@/components/product/slideshow/ProductImageGallery";
+import { ProductMobileSlideshow } from "@/components/product/slideshow/ProductMobileSlideshow";
 import { AddToCart } from "./AddToCart";
 import { ShareButtons } from "@/components/product/share-buttons/ShareButtons";
 import type { ProductWithVariants } from "@/actions/product/get-product-by-slug";

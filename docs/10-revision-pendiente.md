@@ -4,8 +4,8 @@
 
 | Dominio | Estado | Prioridad | Acciones Requeridas |
 |---------|--------|-----------|---------------------|
-| Auth | ⚠️ Parcial | Alta | Verificar auto-link en producción, testear recuperación contraseña |
-| Products | ⚠️ Parcial | Alta | Verificar stock en órdenes, QuickAddToCart con labels |
+| Auth | ⚠️ Parcial | Alta | Verificar auto-link en producción |
+| Products | ⚠️ Parcial | Alta | Verificar stock en órdenes |
 | Orders | ⚠️ Parcial | Alta | Testear decremento atómico, pickup sin dirección |
 | Payments | ✅ Resuelto | Baja | Implementación completa verificada |
 | Cart & Checkout | ⚠️ Parcial | Alta | Persistencia de carrito, totales, redirect a MP |
@@ -31,14 +31,11 @@
 
 ### 3. Auth — Producción
 - [ ] Verificar que el auto-link de Google OAuth funcione
-- [ ] Testear flujo completo de recuperación de contraseña
-- [ ] Confirmar que el email de verificación se envíe
 - [ ] Revisar que `isSuperAdmin` esté protegido
 
 ## Acciones Secundarias (Hacer después)
 
-### 4. Products — QuickAddToCart
-- [ ] Verificar que muestre labels de color legibles (no "gris_melange")
+### 4. Products
 - [ ] Testear que el toggle de variantes funcione
 - [ ] Revisar paginación con filtros combinados
 
@@ -71,7 +68,6 @@ Ninguno documentado actualmente. Los bugs encontrados fueron resueltos:
 - OAuthAccountNotLinked (auto-link)
 - Double stock decrement (idempotencia)
 - Empty strings en pickup (conversión a null)
-- QuickAddToCart con strings crudos de DB
 
 ## Próximos Pasos
 

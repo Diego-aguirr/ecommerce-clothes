@@ -11,14 +11,36 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 
+const AUTH_ERROR_MESSAGES = {
+  "link-expired":
+    "El enlace expiró o ya fue usado. Iniciá sesión de nuevo para recibir uno nuevo.",
+} as const;
+
+const GENERIC_AUTH_ERROR =
+  "No pudimos iniciar sesión o el enlace falló. Intentá de nuevo en unos minutos.";
+
+const resolveAuthError = (code: string | null): string | null => {
+  if (!code) return null;
+  switch (code) {
+    case "link-expired":
+    case "Verification":
+      return "El enlace expiró o ya fue usado. Iniciá sesión de nuevo para recibir uno nuevo.";
+    default:
+      // Configuration, OAuthCallback, AccessDenied y códigos desconocidos:
+      // nunca exponer el código crudo al usuario.
+      return GENERIC_AUTH_ERROR;
+  }
+};
+
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const registered = searchParams.get("registered");
+  const urlError = resolveAuthError(searchParams.get("error"));
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(urlError);
   const [success, setSuccess] = useState<string | null>(
-    registered ? "Cuenta creada. Accedé con tu correo electrónico." : null
+    registered && !urlError ? "Cuenta creada. Accedé con tu correo electrónico." : null
   );
   const [isPending, startTransition] = useTransition();
   const [isGooglePending, setIsGooglePending] = useState(false);

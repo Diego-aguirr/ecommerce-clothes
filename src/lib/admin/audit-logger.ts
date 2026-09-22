@@ -34,11 +34,8 @@ export async function logAdminAction(data: AuditLogData) {
           metadata: data.metadata || undefined,
         },
       });
-    } catch (error) {
-      console.error(
-        "[AUDIT LOG ERROR] Fallo al crear trazabilidad de auditoría:",
-        error,
-      );
+    } catch (_e) {
+      // Ignorar errores de trazabilidad asíncrona (fire-and-forget)
     }
   });
 }
