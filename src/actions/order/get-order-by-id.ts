@@ -24,7 +24,6 @@ export const getOrderById = async (id: string) => {
 
     return { ok: true, order };
   } catch (error) {
-    console.error("Error getOrderById:", error);
     return { ok: false, message: "Error interno al obtener la orden" };
   }
 };

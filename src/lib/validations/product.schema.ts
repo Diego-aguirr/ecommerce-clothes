@@ -42,15 +42,17 @@ export const CreateProductSchema = z.object({
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
   price: z.number().min(0, "El precio no puede ser negativo"),
   sizes: z.array(z.nativeEnum(Size)).min(1, "Debes seleccionar al menos una talla"),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).min(0, "Debes agregar al menos una etiqueta"),
   gender: z.nativeEnum(Gender),
   categoryId: z.string().uuid("ID de categoría inválido"),
-  images: z.array(
-    z.object({
-      url: z.string().min(1, "La URL de la imagen es requerida"),
-      publicId: z.string().min(1, "El publicId es requerido para gestionar imágenes")
-    })
-  ).default([]),
-  colors: z.array(ProductColorSchema).default([]),
-  variants: z.array(ProductVariantSchema).default([]),
+  images: z
+    .array(
+      z.object({
+        url: z.string().min(1, "La URL de la imagen es requerida"),
+        publicId: z.string().min(1, "El publicId es requerido para gestionar imágenes")
+      })
+    )
+    .min(1, "Debes subir al menos una imagen del producto"),
+  colors: z.array(ProductColorSchema).min(1, "Debes agregar al menos un color"),
+  variants: z.array(ProductVariantSchema).min(1, "Debes agregar al menos una variante"),
 });

@@ -11,9 +11,6 @@ export function getMpClient(): MercadoPagoConfig | null {
 
   const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!token) {
-    console.warn(
-      "⚠️  MERCADOPAGO_ACCESS_TOKEN no está configurado. Los pagos con MercadoPago no funcionarán."
-    );
     return null;
   }
 

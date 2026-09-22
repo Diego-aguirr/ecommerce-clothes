@@ -41,8 +41,6 @@ export async function POST(req: NextRequest) {
   if (!isValidSignature) {
     if (process.env.NODE_ENV === "production") {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    } else {
-      console.warn("[DEV MODE] Firma de Mercado Pago inválida, pero dejando pasar el Webhook para simulación local...");
     }
   }
 
@@ -64,7 +62,6 @@ export async function POST(req: NextRequest) {
   const result = await prisma.$transaction(async (tx) => {
     const client = getMpClient();
     if (!client) {
-      console.error("MercadoPago no está configurado. Webhook ignorado.");
       return { ok: false, message: "MercadoPago not configured" };
     }
 

@@ -14,7 +14,6 @@ export const getCategories = async (
   try {
     return await getCategoriesService({ page, take });
   } catch (error) {
-    console.error("Error fetching categories:", error);
     return { data: [], total: 0, totalPages: 0, currentPage: 1 } as GetCategoriesResult;
   }
 };

@@ -6,7 +6,7 @@ import { StepBasicData } from "./step-basic-data";
 import { StepImages } from "./step-images";
 import { StepColors } from "./step-colors";
 import { StepVariants } from "./step-variants";
-import { UseFormRegister, FieldErrors, UseFormSetValue } from "react-hook-form";
+import { UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { z } from "zod";
 import { CreateProductSchema } from "@/lib/validations/product.schema";
 
@@ -46,20 +46,16 @@ type ExistingVariant = {
 type Tab = "datos" | "imagenes" | "colores" | "stock";
 
  
-// FIXME(Phase 6): Replace any with z.input<typeof CreateProductSchema> after form refactor
+ 
 type EditProductTabsProps = {
   product: ExistingProduct;
   categories: { id: string; name: string }[];
   existingColors: ExistingColor[];
   existingVariants: ExistingVariant[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: UseFormRegister<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  errors: FieldErrors<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: UseFormSetValue<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  watch: (name: string) => any;
+  register: UseFormRegister<z.input<typeof CreateProductSchema>>;
+  errors: FieldErrors<z.input<typeof CreateProductSchema>>;
+  setValue: UseFormSetValue<z.input<typeof CreateProductSchema>>;
+  watch: UseFormWatch<z.input<typeof CreateProductSchema>>;
 };
  
 
@@ -110,7 +106,7 @@ export function EditProductTabs({
     return allVariants;
   });
 
-  const selectedSizes: string[] = watch("sizes") ?? product.sizes;
+  const selectedSizes: Size[] = watch("sizes") ?? product.sizes;
   const title = watch("title") ?? product.title;
 
   const handleToggleSize = (size: Size) => {

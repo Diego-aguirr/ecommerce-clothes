@@ -55,7 +55,6 @@ export const placeOrder = async (
 
     return { ok: true, ...result };
   } catch (error: unknown) {
-    console.error("Error crítico procesando la orden:", error);
 
     const err = error as { code?: string };
     if (err.code === "P2002") {

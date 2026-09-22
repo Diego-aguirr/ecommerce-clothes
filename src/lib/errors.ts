@@ -14,7 +14,6 @@ export function handleActionError(
   }
 
   // Log for debugging (with context)
-  console.error(`[Action Error${context ? ` - ${context}` : ""}]:`, error);
 
   // Return generic message for unknown errors (security)
   return { ok: false, message: "Ha ocurrido un error. Intente nuevamente." };

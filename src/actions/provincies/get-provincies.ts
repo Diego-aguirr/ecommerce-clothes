@@ -10,7 +10,6 @@ export const getProvincies = async () => {
   try {
     return await getProvincesService();
   } catch (error) {
-    console.error("Error fetching provincies:", error);
     return [];
   }
 };

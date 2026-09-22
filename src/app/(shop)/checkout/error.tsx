@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback } from "react";
 
 export default function Error({
   error,
@@ -9,10 +9,6 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
@@ -20,7 +16,7 @@ export default function Error({
           Algo salió mal
         </h2>
         <p className="text-gray-500 text-sm mb-4">
-          {error.message || "Error en el checkout"}
+          Error en el checkout
         </p>
         <button
           onClick={reset}

@@ -8,7 +8,6 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  console.log("AuthLayout session:", session);
   if (session?.user) {
     redirect("/");
   }
