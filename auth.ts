@@ -64,7 +64,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // No existe → rechazar silenciosamente (respuesta uniforme por seguridad)
         if (!existingUser) return false;
-        if (!existingUser.emailVerified) return false;
 
         // Asignar el id correcto para que el JWT lo use
         user.id = existingUser.id;
@@ -126,6 +125,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.isSuperAdmin = token.isSuperAdmin as boolean;
       }
       return session;
+    },
+  },
+
+  events: {
+    // Se dispara solo cuando el login se completa (click del magic link
+    // o retorno de Google), nunca al enviar el link → identidad probada.
+    async signIn({ user }) {
+      if (!user.id) return;
+      await prisma.user.updateMany({
+        where: { id: user.id, emailVerified: null },
+        data: { emailVerified: new Date() },
+      });
     },
   },
 });

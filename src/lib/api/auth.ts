@@ -28,7 +28,3 @@ export function resetPassword(token: string, password: string) {
     password,
   });
 }
-
-export function resendVerificationEmail() {
-  return post<ApiResponse>("/api/auth/resend-verification", {});
-}

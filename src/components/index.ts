@@ -17,7 +17,6 @@ export * from "./ui/sidebar/Sidebar";
 export * from "./ui/spinner/Spinner";
 export * from "./ui/title/Title";
 export * from "./ui/top-menu/TopMenu";
-export * from "./ui/verification/EmailBanner";
 export * from "./mercadopago/MercadoPagoButton";
 export * from "./ui/whatsapp-button/WhatsappButton";
 export * from "./ui/shipping-method-selector/ShippingMethodSelector";
