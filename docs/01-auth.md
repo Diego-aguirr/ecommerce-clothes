@@ -30,8 +30,6 @@ Gestiona registro, login, sesiones, recuperación de contraseña y verificación
 | `src/app/api/auth/[...nextauth]/route.ts` | NextAuth handler |
 | `src/app/api/auth/forgot-password/route.ts` | Enviar email de recuperación |
 | `src/app/api/auth/reset-password/route.ts` | Restablecer contraseña |
-| `src/app/api/auth/verify/route.ts` | Verificar email |
-| `src/app/api/auth/resend-verification/route.ts` | Reenviar verificación |
 
 ### Pages
 | Ruta | Función |
@@ -53,10 +51,8 @@ Gestiona registro, login, sesiones, recuperación de contraseña y verificación
 ```
 1. Usuario llena formulario (Zod validation)
 2. action register.ts → auth.service.ts
-3. Hash de password con bcrypt
-4. Crear User en DB
-5. Enviar email de verificación
-6. Redirect a login
+3. Crear User en DB (sin password)
+4. Redirect a login — el magic link verifica el email al iniciar sesión
 ```
 
 ## Flujo de Login
@@ -91,7 +87,6 @@ Gestiona registro, login, sesiones, recuperación de contraseña y verificación
 ## Requiere Revisión
 
 - [ ] Verificar que el auto-link funcione correctamente en producción
-- [ ] Confirmar que el email de verificación se envía
 - [ ] Testear flujo completo de recuperación de contraseña
 - [ ] Revisar que `isSuperAdmin` esté bien protegido
 

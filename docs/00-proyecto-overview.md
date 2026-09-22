@@ -96,8 +96,6 @@ Server Components
 - `POST /api/checkout/start` — Iniciar checkout
 - `POST /api/auth/forgot-password` — Enviar email de recuperación
 - `POST /api/auth/reset-password` — Restablecer contraseña
-- `GET /api/auth/verify` — Verificar email
-- `POST /api/auth/resend-verification` — Reenviar verificación
 
 ## Servicios (Capa de Negocio)
 
@@ -156,10 +154,7 @@ Server Components
 | Archivo | Función |
 |---------|---------|
 | `src/lib/mailer.ts` | Cliente Resend para emails |
-| `src/lib/verify-email.ts` | Template HTML de email de verificación |
-| `src/lib/sendVerificationEmail.ts` | Helper para enviar verificación |
 | `src/lib/sendResetPasswordEmail.ts` | Helper para enviar reset de contraseña |
-| `src/lib/email-verification.ts` | Lógica de estado de verificación (gracia 24h) |
 | `src/lib/errors.ts` | Error handler unificado + ActionError class |
 | `src/lib/admin/auth-utils.ts` | Guards requireAdmin() + requireSuperAdmin() |
 | `src/lib/admin/audit-logger.ts` | Logger de acciones admin (AuditLog) |

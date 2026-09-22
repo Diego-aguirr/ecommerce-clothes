@@ -12,10 +12,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 
 const AUTH_ERROR_MESSAGES = {
-  "invalid-token": "El enlace de verificación no es válido. Solicitá uno nuevo.",
-  "token-expired": "El enlace de verificación expiró. Solicitá uno nuevo.",
-  "link-expired": "El enlace expiró o ya fue usado. Iniciá sesión de nuevo para recibir uno nuevo.",
-  "verification-failed": "No pudimos verificar tu email. Intentá de nuevo en unos minutos.",
+  "link-expired":
+    "El enlace expiró o ya fue usado. Iniciá sesión de nuevo para recibir uno nuevo.",
 } as const;
 
 const GENERIC_AUTH_ERROR =
@@ -24,10 +22,7 @@ const GENERIC_AUTH_ERROR =
 const resolveAuthError = (code: string | null): string | null => {
   if (!code) return null;
   switch (code) {
-    case "invalid-token":
-    case "token-expired":
     case "link-expired":
-    case "verification-failed":
       return AUTH_ERROR_MESSAGES[code];
     default:
       // Configuration, OAuthCallback, AccessDenied y códigos desconocidos:
