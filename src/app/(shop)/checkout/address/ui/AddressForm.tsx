@@ -102,7 +102,7 @@ export default function AddressForm({
           id="fullname"
           placeholder="Juan Pérez"
           required
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
           {...register("fullname", { required: true })}
         />
       </div>
@@ -124,7 +124,7 @@ export default function AddressForm({
                 id="street"
                 placeholder="Av. Corrientes 1234"
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
                 {...register("street", { required: isDelivery })}
               />
             </div>
@@ -140,7 +140,7 @@ export default function AddressForm({
                 type="text"
                 id="apartment"
                 placeholder="5B"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
                 {...register("apartment")}
               />
             </div>
@@ -160,7 +160,7 @@ export default function AddressForm({
                 id="zip"
                 placeholder="C1043AAS"
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
                 {...register("zip", { required: isDelivery })}
               />
             </div>
@@ -176,7 +176,7 @@ export default function AddressForm({
                 id="city"
                 placeholder="Resistencia"
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
                 {...register("city", { required: isDelivery })}
               />
             </div>
@@ -193,7 +193,7 @@ export default function AddressForm({
             <select
               id="province"
               required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
               {...register("provinceId", { required: isDelivery })}
             >
               <option value="">Selecciona una provincia</option>
@@ -221,7 +221,7 @@ export default function AddressForm({
             id="phone"
             placeholder="11 2345-6789"
             required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
             {...register("phone", { required: true })}
           />
           <p className="mt-1 text-xs text-gray-500">
@@ -242,7 +242,7 @@ export default function AddressForm({
             id="dni"
             placeholder="12.345.678"
             required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300"
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
             {...register("dni", { required: true })}
           />
           <p className="mt-1 text-xs text-gray-500">
@@ -265,7 +265,7 @@ export default function AddressForm({
             id="description"
             placeholder="Ej: Casa con reja negra, timbre roto, dejar paquete en portería..."
             rows={3}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-brand-accent focus:border-brand-accent transition-all duration-300 resize-none"
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300 resize-none"
             {...register("description")}
           />
           <p className="mt-1 text-xs text-gray-500">
@@ -281,7 +281,7 @@ export default function AddressForm({
           <input
             type="checkbox"
             id="rememberAddress"
-            className="mr-2 h-4 w-4 text-brand-primary focus:ring-brand-accent border-gray-300 rounded"
+            className="mr-2 h-4 w-4 text-brand-primary focus:ring-gray-700 border-gray-300 rounded"
             {...register("rememberAddress")}
           />
           <label

@@ -19,7 +19,7 @@ export const OrderItems = () => {
         <p className="text-gray-500 mb-4">Tu carrito está vacío</p>
         <Link
           href="/"
-          className="text-brand-primary font-semibold hover:text-brand-accent transition-colors"
+          className="text-brand-primary font-semibold hover:text-gray-700 transition-colors"
         >
           Agregar productos
         </Link>

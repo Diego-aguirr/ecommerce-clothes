@@ -57,25 +57,25 @@ export const TopMenu = () => {
         >
           <Link
             href="/gender/men"
-            className="hover:text-brand-accent transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent rounded px-1"
+            className="hover:text-gray-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-700 rounded px-1"
           >
             Hombre
           </Link>
           <Link
             href="/gender/women"
-            className="hover:text-brand-accent transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent rounded px-1"
+            className="hover:text-gray-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-700 rounded px-1"
           >
             Mujer
           </Link>
           <Link
             href="/gender/outfits"
-            className="hover:text-brand-accent transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent rounded px-1"
+            className="hover:text-gray-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-700 rounded px-1"
           >
             Outfits
           </Link>
           <Link
             href="/gender/unisex"
-            className="hover:text-brand-accent transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent rounded px-1"
+            className="hover:text-gray-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-700 rounded px-1"
           >
             Accesorios
           </Link>
@@ -85,7 +85,7 @@ export const TopMenu = () => {
         <div className="flex items-center space-x-2 sm:space-x-4">
            <Link
              href={totalItems === 0 && loaded ? "/empty" : "/cart"}
-             className="relative p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
+             className="relative p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-700"
              aria-label={loaded && totalItems > 0 ? `Carrito con ${totalItems} artículos` : "Carrito vacío"}
            >
              {loaded && totalItems > 0 && (
@@ -105,7 +105,7 @@ export const TopMenu = () => {
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   onKeyDown={handleKeyDown}
-                  className="flex items-center space-x-2 p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent group"
+                  className="flex items-center space-x-2 p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-700 group"
                   aria-expanded={isUserMenuOpen}
                   aria-haspopup="true"
                   aria-label="Menú de usuario"
@@ -124,7 +124,7 @@ export const TopMenu = () => {
               ) : (
                 <Link
                    href="/login"
-                   className="flex items-center p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                   className="flex items-center p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-700"
                    aria-label="Ingresar a mi cuenta"
                    title="Ingresar"
                  >
@@ -177,7 +177,7 @@ export const TopMenu = () => {
                       <div className="border-t border-gray-100"></div>
                       <Link
                         href="/admin"
-                        className="block px-4 py-2 text-sm text-brand-accent hover:bg-gray-100 font-semibold focus:bg-gray-100 focus:outline-none transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-semibold focus:bg-gray-100 focus:outline-none transition-colors"
                         role="menuitem"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
@@ -208,7 +208,7 @@ export const TopMenu = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={openSideMenu}
-            className="md:hidden p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
+            className="md:hidden p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-700"
             aria-label="Abrir menú de navegación lateral"
             aria-expanded="false"
           >

@@ -43,14 +43,14 @@ export default async function PaymentPage() {
         <div className="flex justify-center items-center text-sm mb-8">
           <Link
             href="/cart"
-            className="text-brand-primary font-semibold hover:text-brand-accent transition-colors"
+            className="text-brand-primary font-semibold hover:text-gray-700 transition-colors"
           >
             Carrito
           </Link>
           <span className="mx-3 text-gray-400">›</span>
           <Link
             href="/checkout/address"
-            className="text-brand-primary font-semibold hover:text-brand-accent transition-colors"
+            className="text-brand-primary font-semibold hover:text-gray-700 transition-colors"
           >
             Dirección
           </Link>
@@ -105,7 +105,7 @@ export default async function PaymentPage() {
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <svg
-                    className="w-5 h-5 text-blue-600 mt-0.5 shrink-0"
+                    className="w-5 h-5 text-gray-700 mt-0.5 shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

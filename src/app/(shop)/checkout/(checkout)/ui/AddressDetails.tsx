@@ -31,7 +31,7 @@ export const AddressDetails = () => {
           </h2>
           <Link
             href="/checkout/address"
-            className="text-sm text-brand-accent hover:text-orange-600 font-medium transition-colors"
+            className="text-sm text-gray-700 hover:text-orange-600 font-medium transition-colors"
           >
             Agregar
           </Link>
@@ -51,7 +51,7 @@ export const AddressDetails = () => {
         </h2>
         <Link
           href="/checkout/address"
-          className="text-sm text-brand-accent hover:text-orange-600 font-medium transition-colors"
+          className="text-sm text-gray-700 hover:text-orange-600 font-medium transition-colors"
         >
           Cambiar
         </Link>
@@ -60,7 +60,7 @@ export const AddressDetails = () => {
       {shippingMethod === "pickup" ? (
         <div className="space-y-3 bg-blue-50 border border-blue-100 p-4 rounded-lg">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-700 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>

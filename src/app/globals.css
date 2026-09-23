@@ -21,7 +21,6 @@
   --destructive-foreground: hsl(0 85.7% 97.4%);
   --brand-primary: hsl(0 0% 100%);
   --brand-secondary: hsl(24 90% 3%);
-  --brand-accent: hsl(11 100% 50%);
 }
 
 .dark {
@@ -44,7 +43,6 @@
   --destructive-foreground: hsl(0 85.7% 97.4%);
   --brand-primary: hsl(0 0% 100%);
   --brand-secondary: hsl(24 90% 3%);
-  --brand-accent: hsl(353 95% 64%);
 }
 
 /* 2. Map variables to Tailwind utilities */
@@ -68,7 +66,6 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
-  --color-brand-accent: var(--brand-accent);
 }
 
 /* 3. Base styles */
