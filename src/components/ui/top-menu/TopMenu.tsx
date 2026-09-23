@@ -83,20 +83,20 @@ export const TopMenu = () => {
 
         {/* Cart, Profile Icons */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          <Link
-            href={totalItems === 0 && loaded ? "/empty" : "/cart"}
-            className="relative p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
-            aria-label={loaded && totalItems > 0 ? `Carrito con ${totalItems} artículos` : "Carrito vacío"}
-          >
-            {loaded && totalItems > 0 && (
-              <span
-                className={`fade-in absolute -top-1 -right-1 bg-black text-white text-xs px-1.5 min-w-5 h-5 rounded-full flex items-center justify-center font-bold ${totalItems > 99 ? "text-[10px] px-1" : ""}`}
-              >
-                {totalItems > 99 ? "99+" : totalItems}
-              </span>
-            )}
-            <IoCartOutline size={22} color="black"/>
-          </Link>
+           <Link
+             href={totalItems === 0 && loaded ? "/empty" : "/cart"}
+             className="relative p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
+             aria-label={loaded && totalItems > 0 ? `Carrito con ${totalItems} artículos` : "Carrito vacío"}
+           >
+             {loaded && totalItems > 0 && (
+               <span
+                 className={`fade-in absolute -top-1 -right-1 bg-black text-white text-xs px-1.5 min-w-5 h-5 rounded-full flex items-center justify-center font-bold ${totalItems > 99 ? "text-[10px] px-1" : ""}`}
+               >
+                 {totalItems > 99 ? "99+" : totalItems}
+               </span>
+             )}
+             <IoCartOutline size={22} color="black"/>
+           </Link>
 
           {/* Desktop User Menu */}
           <div className="hidden md:inline-block relative text-left min-w-[40px] h-[40px]" ref={userMenuRef}>
@@ -111,25 +111,25 @@ export const TopMenu = () => {
                   aria-label="Menú de usuario"
                 >
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-medium hidden lg:block text-black">
-                      Hola, {session?.user?.name?.split(' ')[0] || "Usuario"}
-                    </span>
-                    <IoPersonOutline size={22} color="black" />
-                    <IoChevronDownOutline 
-                      size={16} 
-                      className={`transition-transform duration-200 text-black ${isUserMenuOpen ? "rotate-180" : ""}`} 
-                    />
-                  </div>
+                     <span className="text-sm font-medium hidden lg:block text-black">
+                       Hola, {session?.user?.name?.split(' ')[0] || "Usuario"}
+                     </span>
+                     <IoPersonOutline size={22} color="black" />
+                     <IoChevronDownOutline 
+                       size={16} 
+                       className={`transition-transform duration-200 text-black ${isUserMenuOpen ? "rotate-180" : ""}`} 
+                     />
+                   </div>
                 </button>
               ) : (
                 <Link
-                  href="/login"
-                  className="flex items-center p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  aria-label="Ingresar a mi cuenta"
-                  title="Ingresar"
-                >
-                  <IoPersonOutline size={22} color="black"/>
-                </Link>
+                   href="/login"
+                   className="flex items-center p-2 rounded-full hover:bg-brand-secondary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                   aria-label="Ingresar a mi cuenta"
+                   title="Ingresar"
+                 >
+                   <IoPersonOutline size={22} color="black"/>
+                 </Link>
               )
             ) : (
               <div className="w-10 h-10 rounded-full animate-pulse bg-gray-200/60" />
@@ -212,7 +212,7 @@ export const TopMenu = () => {
             aria-label="Abrir menú de navegación lateral"
             aria-expanded="false"
           >
-            <IoMenu size={24} color="black"/>
+             <IoMenu size={24} color="black"/>
           </button>
         </div>
       </div>
