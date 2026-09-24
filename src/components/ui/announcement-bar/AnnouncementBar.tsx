@@ -4,7 +4,7 @@ import { FaTruck, FaShieldAlt } from "react-icons/fa";
 export const AnnouncementBar = () => {
   return (
     <div
-      className="bg-background text-foreground py-2.5 px-4 overflow-hidden relative border-b border-border flex items-center justify-center w-full"
+      className="bg-foreground text-background py-2.5 px-4 overflow-hidden relative border-b border-background/10 flex items-center justify-center w-full"
     >
       <div className="animate-sway text-[10px] sm:text-xs md:text-sm text-center whitespace-nowrap font-bold tracking-wider flex-nowrap w-max">
         <FaTruck className="inline text-primary mr-1.5 -mt-0.5" />
