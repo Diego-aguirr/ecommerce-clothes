@@ -11,11 +11,10 @@ import type { ProductWithVariants } from "@/actions/product/get-product-by-slug"
 interface Props {
   product: ProductWithVariants;
   titleFont: { className: string };
-  initialStock: number;
   productUrl: string;
 }
 
-export const ProductPageClient = ({ product, titleFont, initialStock, productUrl }: Props) => {
+export const ProductPageClient = ({ product, titleFont, productUrl }: Props) => {
   // Estado para el color seleccionado (afecta las imágenes)
   const [selectedColor, setSelectedColor] = useState<string>(
     product.variantsByColor[0]?.color || "default",
@@ -43,9 +42,6 @@ export const ProductPageClient = ({ product, titleFont, initialStock, productUrl
         {/* Col 2 — Info y compra */}
         <div className="flex flex-col gap-6 py-2">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">
-              Stock disponible: {initialStock} unidades
-            </p>
             <h1
               className={`${titleFont.className} antialiased font-bold text-2xl lg:text-3xl text-foreground leading-tight mt-2`}
             >
@@ -93,9 +89,6 @@ export const ProductPageClient = ({ product, titleFont, initialStock, productUrl
 
         <div className="flex flex-col gap-6 px-1">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">
-              Stock disponible: {initialStock} unidades
-            </p>
             <h1
               className={`${titleFont.className} antialiased font-bold text-2xl text-foreground leading-tight mt-2`}
             >

@@ -115,13 +115,10 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
         onSizeChanged={handleSizeChange}
       />
 
-      {/* Stock info */}
+      {/* Stock info — solo tras seleccionar el talle */}
       {selectedVariant && (
         <p className="text-sm text-muted-foreground">
           Stock disponible: <span className="font-semibold">{selectedVariant.stock} unidades</span>
-          {selectedVariant.sku && (
-            <span className="ml-2 text-muted-foreground">| SKU: {selectedVariant.sku}</span>
-          )}
         </p>
       )}
 
