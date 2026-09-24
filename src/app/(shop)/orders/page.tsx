@@ -36,7 +36,7 @@ export default async function OrdersPage({ searchParams }: Props) {
         </p>
         <Link
           href="/"
-          className="bg-mutedoreground hover:bg-muted-foreground text-background py-3 px-10 rounded-lg transition-all shadow-sm font-medium"
+          className="bg-foreground hover:bg-muted-foreground text-background py-3 px-10 rounded-lg transition-all shadow-sm font-medium"
         >
           Ir a la tienda
         </Link>
@@ -164,7 +164,7 @@ export default async function OrdersPage({ searchParams }: Props) {
               <div className="pt-2">
                 <Link
                   href={`/orders/${order.id}`}
-                  className="w-full block text-center bg-mutedoreground hover:bg-muted-foreground text-background py-2.5 rounded-lg shadow-sm font-medium text-sm transition-all"
+                  className="w-full block text-center bg-foreground hover:bg-muted-foreground text-background py-2.5 rounded-lg shadow-sm font-medium text-sm transition-all"
                 >
                   Ver detalle de orden
                 </Link>
