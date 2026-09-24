@@ -11,7 +11,8 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "seed": "tsx prisma/seed.ts",
-    "seed:prod": "tsx prisma/seed-prod.ts"
+    "seed:prod": "tsx prisma/seed-prod.ts",
+    "seed:users": "tsx prisma/seed-users.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

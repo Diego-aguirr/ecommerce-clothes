@@ -19,7 +19,7 @@ export const sendMagicLink = async (
     const { email } = parsed.data;
 
     const safeCallbackUrl = isLocalUrl(callbackUrl || "") ? callbackUrl : "/";
-    const result = await signIn("email", {
+    await signIn("email", {
       email: email.toLowerCase(),
       redirect: false,
       callbackUrl: safeCallbackUrl,
