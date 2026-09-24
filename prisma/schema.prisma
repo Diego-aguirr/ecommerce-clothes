@@ -187,16 +187,13 @@ model StockMovement {
 model User {
   id            String    @id @default(cuid())
   name          String   @default("")
-  email         String    @unique
+  email         String   @unique
   emailVerified DateTime?
-  password      String?
   image         String?
   role          Role      @default(user)
   isSuperAdmin  Boolean   @default(false)
-  lastLoginAt   DateTime?
 
   status    UserStatus @default(ACTIVE)
-  deletedAt DateTime?
 
   addresses           UserAddress[]
   accounts            Account[]
@@ -262,7 +259,6 @@ model UserAddress {
   phone       String
   dni         String
   description String?
-  sessionId   String?
 
   isDefault Boolean @default(false)
 

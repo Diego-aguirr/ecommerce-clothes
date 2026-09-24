@@ -40,7 +40,7 @@ export async function getUserAddressService(userId: string) {
 
   // Excluir campos internos
    
-  const { id, userId: _addressUserId, sessionId, createdAt, updatedAt, ...rest } = address;
+  const { id, userId: _addressUserId, createdAt, updatedAt, ...rest } = address;
   return {
     ...rest,
     apartment: rest.apartment ?? undefined,
