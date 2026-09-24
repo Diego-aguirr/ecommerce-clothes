@@ -326,7 +326,7 @@ className="text-sm font-medium text-foreground"
           <button
             type="submit"
             disabled={!isValid}
-            className={`w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-semibold rounded-lg text-white transition-all duration-300 shadow-sm hover:shadow-md ${!isValid ? "bg-muted cursor-not-allowed hover:bg-muted-foreground" : "bg-foreground hover:bg-muted-foreground"}`}
+            className={`w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-semibold rounded-lg transition-all duration-300 shadow-sm hover:shadow-md ${!isValid ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-foreground text-white hover:bg-muted-foreground"}`}
           >
             Continuar al Pago
           </button>
