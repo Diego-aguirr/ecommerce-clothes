@@ -231,7 +231,7 @@ export const PlaceOrder = () => {
           className={cn(
             "w-full bg-foreground text-background font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-sm hover:shadow-md hover:opacity-90",
             {
-              "opacity-50 cursor-not-allowed":
+              "opacity-70 cursor-not-allowed":
                 isPlacingOrder || productsInCart.length === 0,
               "hover:bg-muted-foreground": !isPlacingOrder && productsInCart.length > 0,
             },
