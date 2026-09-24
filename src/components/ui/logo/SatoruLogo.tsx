@@ -8,7 +8,7 @@ export const SatoruLogo = () => {
     >
       {/* Icono rústico — cuadrado plano */}
       <div className="relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-brand-secondary border-2 border-brand-secondary rounded-md select-none">
-        <span className="text-xl md:text-2xl font-black tracking-tighter text-foreground font-serif">
+        <span className="text-xl md:text-2xl font-black tracking-tighter text-background font-serif">
           S
         </span>
       </div>

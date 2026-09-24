@@ -43,14 +43,14 @@ export default async function PaymentPage() {
         <div className="flex justify-center items-center text-sm mb-8">
           <Link
             href="/cart"
-            className="text-brand-primary font-semibold hover:text-muted-foreground transition-colors"
+            className="text-foreground font-semibold hover:text-muted-foreground transition-colors"
           >
             Carrito
           </Link>
           <span className="mx-3 text-muted-foreground">›</span>
           <Link
             href="/checkout/address"
-            className="text-brand-primary font-semibold hover:text-muted-foreground transition-colors"
+            className="text-foreground font-semibold hover:text-muted-foreground transition-colors"
           >
             Dirección
           </Link>
@@ -61,10 +61,10 @@ export default async function PaymentPage() {
         <div className="max-w-4xl mx-auto">
           {/* Título principal */}
           <div className="text-center mb-8">
-<h1 className="text-3xl font-bold text-foreground mb-2">
-               Confirmar Pedido
-             </h1>
-             <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+              Confirmar Pedido
+            </h1>
+            <p className="text-muted-foreground">
               Revisa y confirma tu pedido antes de proceder
             </p>
           </div>

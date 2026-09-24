@@ -33,7 +33,7 @@ export const ProductPageClient = ({ product, titleFont, initialStock, productUrl
   return (
     <>
       {/* ── DESKTOP: Gallery adaptativo + Info ── */}
-      <div className="hidden md:grid md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_340px] gap-6 lg:gap-10">
+      <div className="hidden md:grid md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-6 lg:gap-10">
         {/* Col 1 — Gallery adaptativo (1, 2, o 3+ imágenes) */}
         <ProductImageGallery
           images={colorImages}
@@ -51,7 +51,7 @@ export const ProductPageClient = ({ product, titleFont, initialStock, productUrl
             >
               {product.title}
             </h1>
-            <p className="text-4xl font-light text-foreground mt-4 tracking-tight">
+            <p className="text-3xl lg:text-4xl font-medium text-foreground mt-4 tracking-tight">
               ${product.price.toLocaleString("es-AR")}
             </p>
           </div>
@@ -101,7 +101,7 @@ export const ProductPageClient = ({ product, titleFont, initialStock, productUrl
             >
               {product.title}
             </h1>
-            <p className="text-3xl font-light text-foreground mt-3">
+            <p className="text-2xl sm:text-3xl font-medium text-foreground mt-3">
               ${product.price.toLocaleString("es-AR")}
             </p>
           </div>

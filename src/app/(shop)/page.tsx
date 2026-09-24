@@ -29,11 +29,11 @@ export default async function HomePage({ searchParams }: Props) {
     await getPaginatedProductsWithImages({ page });
 
   return (
-    <>
-      <Title 
-        title="Descubrí tu estilo" 
-        subtitle="Explorá las últimas tendencias y llegadas exclusivas de temporada." 
-        className="mb-8" 
+    <div className="px-4 sm:px-0">
+      <Title
+        title="Descubrí tu estilo"
+        subtitle="Explorá las últimas tendencias y llegadas exclusivas de temporada."
+        className="mb-10"
       />
 
       {products.length === 0 ? (
@@ -45,6 +45,6 @@ export default async function HomePage({ searchParams }: Props) {
       )}
 
       <Pagination totalPages={totalPages} />
-    </>
+    </div>
   );
 }

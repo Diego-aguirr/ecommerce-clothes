@@ -5,7 +5,7 @@ import { useCartStore, useAddressStore } from "@/store";
 import { placeOrder } from "@/actions/order/place-order";
 import { createPreference } from "@/actions/payment/create-preference";
 import { useRouter } from "next/navigation";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 export const PlaceOrder = () => {
   const router = useRouter();
@@ -159,7 +159,7 @@ export const PlaceOrder = () => {
           <button
             type="button"
             onClick={() => setPaymentMethod("mercadopago")}
-            className={clsx(
+            className={cn(
               "w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
               {
 "border-primary bg-primary/10 ring-1 ring-primary": paymentMethod === "mercadopago",
@@ -168,7 +168,7 @@ export const PlaceOrder = () => {
             )}
           >
             <div
-              className={clsx(
+              className={cn(
                 "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
                 {
                   "border-primary": paymentMethod === "mercadopago",
@@ -191,7 +191,7 @@ export const PlaceOrder = () => {
           <button
             type="button"
             onClick={() => setPaymentMethod("cash")}
-            className={clsx(
+            className={cn(
               "w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
               {
 "border-primary bg-primary/10 ring-1 ring-primary": paymentMethod === "cash",
@@ -200,7 +200,7 @@ export const PlaceOrder = () => {
             )}
           >
             <div
-              className={clsx(
+              className={cn(
                 "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
                 {
                   "border-primary": paymentMethod === "cash",
@@ -228,8 +228,8 @@ export const PlaceOrder = () => {
         <button
           onClick={onPlaceOrder}
           disabled={isPlacingOrder || productsInCart.length === 0}
-          className={clsx(
-            "w-full bg-mutedoreground text-background font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-sm hover:shadow-md",
+          className={cn(
+            "w-full bg-foreground text-background font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-sm hover:shadow-md hover:opacity-90",
             {
               "opacity-50 cursor-not-allowed":
                 isPlacingOrder || productsInCart.length === 0,

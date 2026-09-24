@@ -138,12 +138,12 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
           type="button"
           onClick={handleAdd}
           disabled={!canAddToCart}
-          className={`w-full h-14 font-semibold text-base rounded-lg transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+          className={`w-full h-12 font-semibold text-[15px] rounded-lg transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
             added 
             ? 'bg-green-600 hover:bg-green-700 text-white focus-visible:ring-green-600' 
             : !canAddToCart
             ? 'bg-border text-muted-foreground cursor-not-allowed'
-            : 'bg-foreground text-white hover:bg-black active:scale-[0.98] focus-visible:ring-foreground'
+            : 'bg-foreground text-background hover:opacity-90 active:scale-[0.98] focus-visible:ring-foreground'
           }`}
         >
           {added 
@@ -159,7 +159,7 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
         {added && (
           <Link 
             href="/cart"
-            className="w-full h-14 bg-indigo-600 text-white font-bold text-base rounded-lg hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 flex items-center justify-center gap-2"
+            className="w-full h-12 bg-foreground text-background font-bold text-base rounded-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 flex items-center justify-center gap-2"
           >
             Ir a Pagar ➡️
           </Link>

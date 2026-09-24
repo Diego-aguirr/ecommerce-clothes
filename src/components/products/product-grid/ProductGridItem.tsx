@@ -18,12 +18,12 @@ export const ProductGridItem = ({ product }: Props) => {
   const currentSrc = hasError ? PLACEHOLDER : resolveImageSrc(displayImage);
 
   return (
-    <div className="rounded-lg overflow-hidden fade-in relative group flex flex-col">
+    <div className="rounded-xl overflow-hidden fade-in relative group flex flex-col bg-card border border-border/60 hover:shadow-md transition-shadow">
       <Link href={`/product/${product.slug}`}>
         <Image
           src={currentSrc}
           alt={product.title}
-          className="w-full aspect-[4/5] object-cover rounded-lg transition-transform duration-500 group-hover:scale-105"
+          className="w-full aspect-[4/5] object-cover rounded-t-xl transition-transform duration-500 group-hover:scale-105"
           width={400}
           height={500}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
