@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { inter } from "@/config/fonts";
-
-import "./globals.css"; // Re-adding the missing import
+import "./globals.css";
 import { Provider } from "@/components";
 
 export const metadata: Metadata = {
@@ -20,7 +19,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} antialiased text-gray-900 bg-white`}>
+      <body className={`${inter.className} antialiased text-foreground bg-background`}>
         <Provider>{children}</Provider>
       </body>
     </html>

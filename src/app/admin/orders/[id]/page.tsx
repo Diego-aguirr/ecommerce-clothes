@@ -38,10 +38,10 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Orden: {order.id}</h1>
         <div className="flex gap-2">
-          <span className={`px-4 py-2 rounded-lg font-bold ${order.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+          <span className={`px-4 py-2 rounded-lg font-bold ${order.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-muted text-foreground'}`}>
             PAGO: {order.status}
           </span>
-          <span className={`px-4 py-2 rounded-lg font-bold ${order.deliveryStatus === 'shipped' || order.deliveryStatus === 'delivered' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800'}`}>
+          <span className={`px-4 py-2 rounded-lg font-bold ${order.deliveryStatus === 'shipped' || order.deliveryStatus === 'delivered' ? 'bg-indigo-100 text-indigo-800' : 'bg-muted text-foreground'}`}>
             ENVÍO: {order.deliveryStatus}
           </span>
         </div>
@@ -50,35 +50,35 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="col-span-2 space-y-6">
           {/* Detalles de Productos */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-background rounded-lg shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4 border-b pb-2">Productos ({order.itemsInOrder})</h2>
             <div className="space-y-4">
               {order.OrderItem.map(item => (
-                <div key={item.id} className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                <div key={item.id} className="flex justify-between items-center bg-muted p-3 rounded">
                   <div>
-                    <p className="font-medium text-gray-900">{item.productName}</p>
-                    <p className="text-sm text-gray-500">Talle: {item.size} • Cantidad: {item.quantity}</p>
+                    <p className="font-medium text-foreground">{item.productName}</p>
+                    <p className="text-sm text-muted-foreground">Talle: {item.size} • Cantidad: {item.quantity}</p>
                   </div>
-                  <div className="font-bold text-gray-900 border-l pl-4">
+                  <div className="font-bold text-foreground border-l pl-4">
                     ${(item.price * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}
             </div>
             <div className="mt-4 pt-4 border-t flex flex-col gap-2">
-              <div className="flex justify-between text-gray-500">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal (Neto):</span>
                 <span>${order.subTotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-500">
+              <div className="flex justify-between text-muted-foreground">
                 <span>IVA (21% Incluido):</span>
                 <span>${order.tax.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-500">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Envío:</span>
                 <span>{order.shipping === 0 ? "Gratis" : `$${order.shipping}`}</span>
               </div>
-              <div className="flex justify-between text-xl font-bold text-gray-900 border-t pt-2 mt-2">
+              <div className="flex justify-between text-xl font-bold text-foreground border-t pt-2 mt-2">
                 <span>Total Facturado:</span>
                 <span>${order.total.toFixed(2)}</span>
               </div>
@@ -86,25 +86,25 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </div>
 
           {/* Estado Bancario Detallado */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-background rounded-lg shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4 border-b pb-2">Intentos de Pago (Gateway)</h2>
             {order.payments.length === 0 ? (
-              <p className="text-gray-500">Aún no se generó link de pago.</p>
+              <p className="text-muted-foreground">Aún no se generó link de pago.</p>
             ) : (
               <div className="space-y-3">
                 {order.payments.map((payment) => (
-                  <div key={payment.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-4 border rounded shadow-sm">
+                  <div key={payment.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-muted p-4 border rounded shadow-sm">
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold uppercase">{payment.provider}</span>
-                      <span className="text-xs text-gray-500">ID: {payment.providerPaymentId || "Sin procesar"}</span>
+                      <span className="text-xs text-muted-foreground">ID: {payment.providerPaymentId || "Sin procesar"}</span>
                     </div>
                     <div className="flex items-center gap-3 mt-2 sm:mt-0">
-                      <span className="font-bold text-gray-900">${Number(payment.amount).toFixed(2)}</span>
+                      <span className="font-bold text-foreground">${Number(payment.amount).toFixed(2)}</span>
                       <span className={`px-3 py-1 rounded w-fit text-xs font-bold text-white
                         ${payment.status === 'APPROVED' ? 'bg-green-600' :
                         payment.status === 'REJECTED' ? 'bg-red-600' : 
                         payment.status === 'PENDING' ? 'bg-orange-500' : 
-                        payment.status === 'CANCELLED' ? 'bg-gray-600' : 'bg-gray-800'}`}>
+                        payment.status === 'CANCELLED' ? 'bg-muted-foreground' : 'bg-foreground'}`}>
                         {payment.status}
                       </span>
                     </div>
@@ -133,67 +133,67 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </div>
 
           {/* Gestión Logística UI - Stepper Moderno */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold mb-6 text-gray-900 border-b pb-3">Estado de Preparación y Envío</h2>
+          <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
+            <h2 className="text-lg font-bold mb-6 text-foreground border-b pb-3">Estado de Preparación y Envío</h2>
             
             {/* Visual Stepper */}
             <div className="relative flex items-center justify-between w-full mb-8 px-2">
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-100 rounded-full z-0"></div>
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-muted rounded-full z-0"></div>
               
               <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full z-0 transition-all duration-500 ease-in-out bg-indigo-600" 
                 style={{ width: order.deliveryStatus === 'pending' ? '0%' : order.deliveryStatus === 'shipped' ? '50%' : '100%' }}>
               </div>
 
               {/* Step 1: Preparando */}
-              <div className="relative z-10 flex flex-col items-center gap-2 bg-white px-2">
+              <div className="relative z-10 flex flex-col items-center gap-2 bg-background px-2">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors
                   ${order.deliveryStatus === 'pending' ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-indigo-600 border-indigo-600 text-white'}`}>
                   <FiPackage size={18} />
                 </div>
-                <span className="text-xs font-bold text-gray-700">Preparando</span>
+                <span className="text-xs font-bold text-foreground">Preparando</span>
               </div>
 
               {/* Step 2: Despachado */}
-              <div className="relative z-10 flex flex-col items-center gap-2 bg-white px-2">
+              <div className="relative z-10 flex flex-col items-center gap-2 bg-background px-2">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors
-                  ${order.deliveryStatus === 'pending' ? 'bg-white border-gray-200 text-gray-300' : 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'}`}>
+                  ${order.deliveryStatus === 'pending' ? 'bg-background border-border text-muted-foreground' : 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'}`}>
                   <FiTruck size={18} />
                 </div>
-                <span className={`text-xs font-bold ${order.deliveryStatus === 'pending' ? 'text-gray-400' : 'text-gray-700'}`}>Despachado</span>
+                <span className={`text-xs font-bold ${order.deliveryStatus === 'pending' ? 'text-muted-foreground' : 'text-foreground'}`}>Despachado</span>
               </div>
 
               {/* Step 3: Entregado */}
-              <div className="relative z-10 flex flex-col items-center gap-2 bg-white px-2">
+              <div className="relative z-10 flex flex-col items-center gap-2 bg-background px-2">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors
-                  ${order.deliveryStatus === 'delivered' ? 'bg-green-500 border-green-500 text-white shadow-md shadow-green-200' : 'bg-white border-gray-200 text-gray-300'}`}>
+                  ${order.deliveryStatus === 'delivered' ? 'bg-green-500 border-green-500 text-white shadow-md shadow-green-200' : 'bg-background border-border text-muted-foreground'}`}>
                   <FiCheckCircle size={18} />
                 </div>
-                <span className={`text-xs font-bold ${order.deliveryStatus === 'delivered' ? 'text-green-600' : 'text-gray-400'}`}>Entregado</span>
+                <span className={`text-xs font-bold ${order.deliveryStatus === 'delivered' ? 'text-green-600' : 'text-muted-foreground'}`}>Entregado</span>
               </div>
             </div>
 
             {/* Operaciones de Formulario */}
-            <form action={markAsShipped} className="bg-gray-50 p-5 rounded-xl border border-gray-100 flex flex-col gap-4">
+            <form action={markAsShipped} className="bg-muted p-5 rounded-xl border border-border flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   1. Cargar Código de Seguimiento (Tracking)
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiTruck className="text-gray-400" />
+                    <FiTruck className="text-muted-foreground" />
                   </div>
                   <input 
                     type="text" 
                     name="trackingCode" 
                     defaultValue={order.trackingCode || ""}
-                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all"
+                    className="block w-full pl-10 pr-3 py-2.5 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all"
                     placeholder="Ej: Correo Argentino / Andreani..."
                   />
                 </div>
               </div>
               
-              <div className="flex items-center justify-between mt-2 pt-4 border-t border-gray-200 border-dashed">
-                <span className="text-sm font-medium text-gray-500">
+              <div className="flex items-center justify-between mt-2 pt-4 border-t border-border border-dashed">
+                <span className="text-sm font-medium text-muted-foreground">
                   {order.shippedAt ? `Salida confirmada: ${new Date(order.shippedAt).toLocaleString()}` : "Paquete sin mover."}
                 </span>
 
@@ -211,8 +211,8 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                       type="submit" 
                       disabled={!order.isPaid && order.status !== "paid"}
                       className={`px-5 py-2.5 rounded-lg shadow-sm text-white font-bold text-sm focus:outline-none transition-all flex items-center gap-2
-                        ${order.deliveryStatus === 'shipped' ? 'bg-gray-800 hover:bg-black' : 
-                          !order.isPaid && order.status !== "paid" ? 'bg-gray-300 cursor-not-allowed opacity-70' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg'}`}
+                        ${order.deliveryStatus === 'shipped' ? 'bg-foreground hover:bg-black' : 
+                          !order.isPaid && order.status !== "paid" ? 'bg-border cursor-not-allowed opacity-70' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg'}`}
                     >
                       {order.deliveryStatus === 'shipped' ? 'Actualizar N° Envío' : '➡️ Pasar a Despachado'}
                     </button>
@@ -231,15 +231,15 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
         <div className="space-y-6">
           {/* Cliente y Dirección */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-background rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-bold mb-4 border-b pb-2">Cliente y Destino</h2>
             <p className="font-bold">{order.user.name}</p>
-            <p className="text-gray-500 text-sm mb-4">{order.user.email}</p>
+            <p className="text-muted-foreground text-sm mb-4">{order.user.email}</p>
             
             {order.OrderAddress && (
-              <div className="text-sm text-gray-700 space-y-1 mt-4 pt-4 border-t border-gray-100">
+              <div className="text-sm text-foreground space-y-1 mt-4 pt-4 border-t border-border">
                 <div className="mb-3">
-                  <span className={`px-2.5 py-1 inline-flex text-xs font-bold uppercase rounded-md ${order.shippingMethod === 'pickup' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                  <span className={`px-2.5 py-1 inline-flex text-xs font-bold uppercase rounded-md ${order.shippingMethod === 'pickup' ? 'bg-primary/10 text-primary' : 'bg-orange-100 text-orange-800'}`}>
                     {order.shippingMethod === 'pickup' ? '🏪 Retiro en Local' : '🚚 Envío a Domicilio'}
                   </span>
                 </div>
@@ -265,19 +265,19 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </div>
 
           {/* Notas Operativas Server Action Form */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-background rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-bold mb-4 border-b pb-2">Notas Operativas (Interno)</h2>
             <form action={saveNotes} className="space-y-4">
               <textarea 
                 name="notes"
                 defaultValue={order.notes || ""}
                 rows={4}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border p-2"
+                className="w-full border-input rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border p-2"
                 placeholder="Notas internas para el equipo..."
               />
               <button 
                 type="submit" 
-                className="w-full bg-gray-800 text-white px-4 py-2 rounded shadow-sm hover:bg-gray-900 transition-colors"
+                className="w-full bg-foreground text-white px-4 py-2 rounded shadow-sm hover:bg-muted-foreground transition-colors"
               >
                 Guardar Notas
               </button>

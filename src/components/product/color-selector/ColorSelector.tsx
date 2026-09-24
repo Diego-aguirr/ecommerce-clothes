@@ -23,10 +23,10 @@ export const ColorSelector = ({ colors, selectedColor, onColorChange }: Props) =
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+        <span className="text-sm font-semibold uppercase tracking-wide text-foreground">
           Color
         </span>
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-muted-foreground">
           {colors.find((c) => c.color === selectedColor)?.label || selectedColor}
         </span>
       </div>
@@ -42,7 +42,7 @@ export const ColorSelector = ({ colors, selectedColor, onColorChange }: Props) =
             className={clsx(
               "group relative w-10 h-10 rounded-full transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
               {
-                "ring-2 ring-gray-900 ring-offset-2": colorOption.color === selectedColor,
+                "ring-2 ring-foreground ring-offset-2": colorOption.color === selectedColor,
                 "hover:scale-110": colorOption.color !== selectedColor,
               }
             )}
@@ -68,7 +68,7 @@ export const ColorSelector = ({ colors, selectedColor, onColorChange }: Props) =
             
             {/* Borde para colores claros */}
             <span 
-              className="absolute inset-0 rounded-full border-2 border-gray-200 group-hover:border-gray-300"
+              className="absolute inset-0 rounded-full border-2 border-border group-hover:border-border"
               aria-hidden="true"
             />
           </button>

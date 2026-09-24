@@ -4,17 +4,17 @@ import { BackToTop } from "./BackToTop";
 
 export const FooterTrustBar = () => {
   return (
-    <div className="mt-12 pt-8 border-t border-gray-100">
+    <div className="mt-12 pt-8 border-t border-border">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Copyright */}
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted-foreground">
           © {new Date().getFullYear()}{" "}
-          <span className="font-bold text-gray-900">SAURON</span>. Todos los
+          <span className="font-bold text-foreground">SAURON</span>. Todos los
           derechos reservados.
         </div>
 
         {/* Medios de pago + volver arriba */}
-        <div className="flex items-center gap-4 text-gray-400">
+        <div className="flex items-center gap-4 text-muted-foreground">
           <div className="flex items-center gap-1 text-xs font-medium mr-2">
             <FaLock className="text-green-600" aria-hidden="true" /> Compra Segura
           </div>

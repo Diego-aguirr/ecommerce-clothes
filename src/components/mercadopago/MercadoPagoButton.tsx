@@ -49,7 +49,7 @@ export const MercadoPagoButton = ({ orderId }: Props) => {
         disabled={loading}
         className={`w-full py-3.5 px-4 rounded-xl text-white font-bold transition-all flex justify-center items-center shadow-[0_2px_12px_rgba(0,0,0,0.06)] ${
           loading
-            ? "bg-gray-400 cursor-not-allowed"
+            ? "bg-muted cursor-not-allowed"
             : "bg-[#111] hover:bg-[#333] active:scale-[0.98]"
         }`}
       >

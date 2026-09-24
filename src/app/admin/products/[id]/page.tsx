@@ -40,13 +40,13 @@ export default async function EditProductPage({ params }: Props) {
       <div className="flex items-center gap-4 mb-8">
         <Link
           href="/admin/products"
-          className="text-sm text-gray-500 hover:text-gray-900 transition font-medium"
+          className="text-sm text-muted-foreground hover:text-foreground transition font-medium"
         >
           ← Volver a Productos
         </Link>
-        <span className="text-gray-300">|</span>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Editar: <span className="text-gray-500 font-medium">{product.title}</span>
+        <span className="text-muted-foreground">|</span>
+        <h1 className="text-2xl font-bold text-foreground">
+          Editar: <span className="text-muted-foreground font-medium">{product.title}</span>
         </h1>
       </div>
 

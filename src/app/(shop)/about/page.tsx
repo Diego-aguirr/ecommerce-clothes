@@ -6,11 +6,11 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl">
-      <h1 className="text-4xl font-black text-gray-900 mb-8 tracking-tight">
+      <h1 className="text-4xl font-black text-foreground mb-8 tracking-tight">
         Quiénes Somos
       </h1>
       
-      <div className="prose prose-lg text-gray-600">
+      <div className="prose prose-lg text-muted-foreground">
         <p className="mb-6">
           ¡Bienvenidos a <strong>SAURON</strong>! Somos una pequeña empresa familiar nacida y criada con mucha pasión. Lo que empezó como una idea entre charlas, hoy es el espacio donde acercamos las mejores tendencias en moda masculina y femenina.
         </p>
@@ -23,9 +23,9 @@ export default function AboutPage() {
           Nos podés encontrar en nuestro local físico ubicado en <strong>Av. Ejemplo 1234, Ciudad Autónoma</strong>. Nos encanta recibir a nuestros clientes, asesorarlos y que se lleven no solo una prenda, sino una experiencia de compra cercana y cálida, como solo una familia sabe dar.
         </p>
 
-        <div className="bg-blue-50 border-l-4 border-blue-600 p-6 my-8 rounded-r-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">La Visión SAURON</h2>
-          <p className="text-gray-700 italic">
+        <div className="bg-primary/5 border-l-4 border-primary p-6 my-8 rounded-r-lg">
+          <h2 className="text-xl font-bold text-foreground mb-2">La Visión SAURON</h2>
+          <p className="text-foreground italic">
             &quot;Queremos que cada persona que use SAURON sienta que lleva puesta una pieza exclusiva sin haber pagado de más.&quot;
           </p>
         </div>

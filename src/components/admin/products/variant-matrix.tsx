@@ -86,7 +86,7 @@ export function VariantMatrix({
 
   if (colors.length === 0 || sizes.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-400 text-sm">
+      <div className="text-center py-8 text-muted-foreground text-sm">
         Agregá al menos un color y una talla para ver la matriz de variantes.
       </div>
     );
@@ -97,11 +97,11 @@ export function VariantMatrix({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-foreground">
             {variants.length} de {totalVariants} variantes
           </span>
-          <span className="text-sm text-gray-500">
-            Stock total: <span className="font-semibold text-gray-900">{totalStock}</span>
+          <span className="text-sm text-muted-foreground">
+            Stock total: <span className="font-semibold text-foreground">{totalStock}</span>
           </span>
         </div>
 
@@ -110,15 +110,15 @@ export function VariantMatrix({
             <button
               type="button"
               onClick={selectAll}
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              className="text-xs text-primary font-medium"
             >
               Seleccionar todo
             </button>
-            <span className="text-gray-300">|</span>
+            <span className="text-border">|</span>
             <button
               type="button"
               onClick={selectNone}
-              className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+              className="text-xs text-muted-foreground hover:text-foreground font-medium"
             >
               Limpiar
             </button>
@@ -128,8 +128,8 @@ export function VariantMatrix({
 
       {/* Bulk stock controls */}
       {!readOnly && selectedCells.size > 0 && (
-        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <span className="text-sm text-blue-700 font-medium">
+        <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+          <span className="text-sm text-primary font-medium">
             {selectedCells.size} celdas seleccionadas
           </span>
           <input
@@ -137,12 +137,12 @@ export function VariantMatrix({
             min={0}
             value={bulkStock}
             onChange={(e) => setBulkStock(parseInt(e.target.value) || 0)}
-            className="w-20 px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-20 px-2 py-1 text-sm border border-primary/30 rounded focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <button
             type="button"
             onClick={applyBulkStock}
-            className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition"
+            className="px-3 py-1 bg-primary text-white text-sm font-medium rounded hover:bg-primary transition"
           >
             Aplicar stock
           </button>
@@ -150,33 +150,33 @@ export function VariantMatrix({
       )}
 
       {/* Matrix table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
+      <div className="overflow-x-auto border border-border rounded-lg">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase border-b">
+            <tr className="bg-muted">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase border-b">
                 Color
               </th>
               {sizes.map((size) => (
                 <th
                   key={size}
-                  className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase border-b"
+                  className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase border-b"
                 >
                   {size}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {colors.map((color) => (
-              <tr key={color.color} className="hover:bg-gray-50">
+              <tr key={color.color} className="hover:bg-muted">
                 <td className="px-4 py-3 border-r">
                   <div className="flex items-center gap-2">
                     <span
-                      className="w-5 h-5 rounded-full border border-gray-200 shrink-0"
+                      className="w-5 h-5 rounded-full border border-border shrink-0"
                       style={{ backgroundColor: color.hexCode }}
                     />
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-foreground">
                       {color.label}
                     </span>
                   </div>
@@ -191,7 +191,7 @@ export function VariantMatrix({
                     <td
                       key={size}
                       className={`px-3 py-2 text-center border-l ${
-                        isSelected ? "bg-blue-100" : ""
+                        isSelected ? "bg-primary/10" : ""
                       }`}
                     >
                       {exists ? (
@@ -203,8 +203,8 @@ export function VariantMatrix({
                                 onClick={() => toggleCell(cellKey)}
                                 className={`w-5 h-5 rounded border flex items-center justify-center transition ${
                                   isSelected
-                                    ? "bg-blue-500 border-blue-500 text-white"
-                                    : "border-gray-300 hover:border-blue-400"
+                                    ? "bg-primary border-primary text-white"
+                                    : "border-border hover:border-primary"
                                 }`}
                               >
                                 {isSelected && <FiCheck size={12} />}
@@ -223,13 +223,13 @@ export function VariantMatrix({
                               )
                             }
                             readOnly={readOnly}
-                            className={`w-full px-2 py-1 text-xs text-center border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                            className={`w-full px-2 py-1 text-xs text-center border rounded focus:outline-none focus:ring-1 focus:ring-primary ${
                               variant.stock === 0
                                 ? "border-red-300 bg-red-50"
                                 : variant.stock < 5
                                 ? "border-orange-300 bg-orange-50"
-                                : "border-gray-200"
-                            } ${readOnly ? "bg-gray-50" : ""}`}
+                                : "border-border"
+                            } ${readOnly ? "bg-muted" : ""}`}
                           />
                           {!readOnly && (
                             <input
@@ -238,14 +238,14 @@ export function VariantMatrix({
                               onChange={(e) =>
                                 updateSku(color.color, size, e.target.value)
                               }
-                              className="w-full px-1 py-0.5 text-[10px] text-center text-gray-400 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                              className="w-full px-1 py-0.5 text-[10px] text-center text-muted-foreground border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary font-mono"
                               title="SKU"
                             />
                           )}
                         </div>
                       ) : (
                         <div className="flex items-center justify-center h-10">
-                          <FiMinus size={14} className="text-gray-300" />
+                          <FiMinus size={14} className="text-border" />
                         </div>
                       )}
                     </td>
@@ -258,7 +258,7 @@ export function VariantMatrix({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <span className="w-3 h-3 rounded border border-red-300 bg-red-50" />
           Sin stock
@@ -268,7 +268,7 @@ export function VariantMatrix({
           Stock bajo (&lt;5)
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded border border-gray-200" />
+          <span className="w-3 h-3 rounded border border-border" />
           OK
         </span>
       </div>

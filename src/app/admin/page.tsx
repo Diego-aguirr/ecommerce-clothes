@@ -11,10 +11,10 @@ export default async function AdminDashboardPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          Bienvenido al Dashboard
-        </h1>
-        <p className="text-gray-500 mt-1">
+<h1 className="text-3xl font-bold tracking-tight text-foreground">
+           Bienvenido al Dashboard
+         </h1>
+         <p className="text-muted-foreground mt-1">
           Aquí tienes un resumen de rendimiento en tiempo real de tu tienda.
         </p>
       </div>
@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
           title="Órdenes Creadas Hoy"
           value={stats.todayOrders.toString()}
           icon={<FiShoppingCart size={24} />}
-          color="bg-blue-100 text-blue-600"
+          color="bg-primary/10 text-primary"
         />
         <StatCard
           title="Órdenes Pendientes"
@@ -47,17 +47,17 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="mt-12">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-6">
-          Acciones Recomendadas
-        </h2>
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 flex flex-col justify-center items-center text-center">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-5 text-gray-400 border border-gray-100 shadow-inner">
-            <FiBox size={32} />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
-            Todo en orden
-          </h3>
-          <p className="text-gray-500 max-w-md font-medium text-sm leading-relaxed">
+<h2 className="text-xl font-bold tracking-tight text-foreground mb-6">
+           Acciones Recomendadas
+         </h2>
+         <div className="bg-background rounded-2xl shadow-sm border border-border p-12 flex flex-col justify-center items-center text-center">
+           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-5 text-muted-foreground border border-border shadow-inner">
+             <FiBox size={32} />
+           </div>
+           <h3 className="text-xl font-bold text-foreground mb-2">
+             Todo en orden
+           </h3>
+           <p className="text-muted-foreground max-w-md font-medium text-sm leading-relaxed">
             Utiliza el panel lateral izquierdo para gestionar inventarios,
             bloquear usuarios, verificar pagos y autorizar despachos. Las
             auditorías están siendo registradas activamente.

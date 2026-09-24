@@ -29,22 +29,22 @@ export default async function HomePage({ searchParams }: Props) {
     await getPaginatedProductsWithImages({ page });
 
   return (
-    <>
-      <Title 
-        title="Descubrí tu estilo" 
-        subtitle="Explorá las últimas tendencias y llegadas exclusivas de temporada." 
-        className="mb-8" 
+    <div className="px-4 sm:px-0">
+      <Title
+        title="Descubrí tu estilo"
+        subtitle="Explorá las últimas tendencias y llegadas exclusivas de temporada."
+        className="mb-10"
       />
 
       {products.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-gray-500 text-lg">No se encontraron productos.</p>
+          <p className="text-muted-foreground text-lg">No se encontraron productos.</p>
         </div>
       ) : (
         <ProductGrid products={products} />
       )}
 
       <Pagination totalPages={totalPages} />
-    </>
+    </div>
   );
 }

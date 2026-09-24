@@ -34,7 +34,7 @@ export default async function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-muted py-8">
       <div className="container mx-auto px-4">
         {/* Header (Limpio) */}
         <div className="mt-4"></div>
@@ -43,28 +43,28 @@ export default async function PaymentPage() {
         <div className="flex justify-center items-center text-sm mb-8">
           <Link
             href="/cart"
-            className="text-brand-primary font-semibold hover:text-brand-accent transition-colors"
+            className="text-foreground font-semibold hover:text-muted-foreground transition-colors"
           >
             Carrito
           </Link>
-          <span className="mx-3 text-gray-400">›</span>
+          <span className="mx-3 text-muted-foreground">›</span>
           <Link
             href="/checkout/address"
-            className="text-brand-primary font-semibold hover:text-brand-accent transition-colors"
+            className="text-foreground font-semibold hover:text-muted-foreground transition-colors"
           >
             Dirección
           </Link>
-          <span className="mx-3 text-gray-400">›</span>
-          <span className="text-gray-500 font-bold">Confirmación</span>
+          <span className="mx-3 text-muted-foreground">›</span>
+          <span className="text-muted-foreground font-bold">Confirmación</span>
         </div>
 
         <div className="max-w-4xl mx-auto">
           {/* Título principal */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
               Confirmar Pedido
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Revisa y confirma tu pedido antes de proceder
             </p>
           </div>
@@ -77,20 +77,20 @@ export default async function PaymentPage() {
               <AddressDetails />
 
               {/* Información de pago */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  Método de Pago
-                </h2>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="font-medium">
-                      Seleccionar al confirmar
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Múltiples opciones
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600">
+<div className="bg-background rounded-xl shadow-sm border border-border p-6">
+                 <h2 className="text-xl font-bold text-foreground mb-4">
+                   Método de Pago
+                 </h2>
+                 <div className="space-y-3">
+                   <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                     <span className="font-medium">
+                       Seleccionar al confirmar
+                     </span>
+                     <span className="text-sm text-muted-foreground">
+                       Múltiples opciones
+                     </span>
+                   </div>
+                   <p className="text-sm text-muted-foreground">
                     Podrás elegir entre Mercado Pago, transferencia bancaria o
                     tarjeta de crédito después de confirmar tu pedido.
                   </p>
@@ -102,10 +102,10 @@ export default async function PaymentPage() {
             <div className="space-y-6">
               <PlaceOrder />
               {/* Información de contacto */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <svg
-                    className="w-5 h-5 text-blue-600 mt-0.5 shrink-0"
+<div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
+                 <div className="flex items-start gap-3">
+                   <svg
+                     className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -118,10 +118,10 @@ export default async function PaymentPage() {
                     />
                   </svg>
                   <div>
-                    <p className="text-sm text-blue-800 font-medium">
-                      ¿Necesitas ayuda?
-                    </p>
-                    <p className="text-sm text-blue-700 mt-1">
+<p className="text-sm text-primary font-medium">
+                       ¿Necesitas ayuda?
+                     </p>
+                     <p className="text-sm text-primary mt-1">
                       Contactanos por WhatsApp o al email{" "}
                       <span className="font-semibold">tuecommerce@email.com</span>
                     </p>

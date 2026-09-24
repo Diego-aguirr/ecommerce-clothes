@@ -5,7 +5,6 @@ import { Metadata } from "next";
 
 import { titleFont } from "@/config/fonts";
 import { getProductBySlug } from "@/actions/product/get-product-by-slug";
-import { getStockBySlug } from "@/actions/product/get-stock-by-slug";
 import { ProductPageClient } from "./ui/ProductPageClient";
 
 interface Props {
@@ -45,7 +44,6 @@ export default async function Page({ params }: Props) {
   
   if (!product) notFound();
 
-  const stock = await getStockBySlug(slug);
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://shop.builtbyaguirre.com";
   const productUrl = `${baseUrl}/product/${slug}`;
 
@@ -55,7 +53,6 @@ export default async function Page({ params }: Props) {
       <ProductPageClient 
         product={product}
         titleFont={titleFont}
-        initialStock={stock}
         productUrl={productUrl}
       />
     </main>

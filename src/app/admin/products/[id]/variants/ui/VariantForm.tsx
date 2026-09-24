@@ -74,7 +74,7 @@ export const VariantForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* SKU */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           SKU
         </label>
         <input
@@ -82,22 +82,22 @@ export const VariantForm = ({
           value={formData.sku}
           onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
           placeholder={generateSku(formData.color, formData.size)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent"
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Dejar vacío para generar automáticamente
         </p>
       </div>
 
       {/* Color */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Color
         </label>
         <select
           value={formData.color}
           onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent"
         >
           {existingColors.map((color) => (
             <option key={color.color} value={color.color}>
@@ -114,13 +114,13 @@ export const VariantForm = ({
 
       {/* Talla */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Talla
         </label>
         <select
           value={formData.size}
           onChange={(e) => setFormData({ ...formData, size: e.target.value as Size })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent"
         >
           {SIZE_ORDER.filter((size) => availableSizes.includes(size)).map((size) => (
             <option key={size} value={size}>
@@ -132,7 +132,7 @@ export const VariantForm = ({
 
       {/* Stock */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Stock Inicial
         </label>
         <input
@@ -140,7 +140,7 @@ export const VariantForm = ({
           min="0"
           value={formData.stock}
           onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent"
         />
       </div>
 
@@ -170,7 +170,7 @@ export const VariantForm = ({
       <button
         type="submit"
         disabled={isLoading || combinationExists || existingColors.length === 0}
-        className="w-full py-2.5 px-4 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-2.5 px-4 bg-foreground text-background text-sm font-semibold rounded-lg hover:bg-foreground transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? "Creando..." : "Crear Variante"}
       </button>

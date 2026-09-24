@@ -13,15 +13,15 @@ export default function GlobalError({
         <div className="min-h-screen flex items-center justify-center bg-black text-white">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">SAURON</h1>
-            <h2 className="text-lg font-medium text-gray-400 mb-2">
+            <h2 className="text-lg font-medium text-muted-foreground mb-2">
               Error crítico
             </h2>
-            <p className="text-gray-500 text-sm mb-6 max-w-md">
+            <p className="text-muted-foreground text-sm mb-6 max-w-md">
               La aplicación encontró un error inesperado.
             </p>
             <button
               onClick={reset}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary transition"
             >
               Recargar aplicación
             </button>

@@ -3,10 +3,10 @@ import { FaInstagram, FaWhatsapp, FaMapMarkerAlt } from "react-icons/fa";
 export const FooterSocialNetworks = () => {
   return (
     <div className="flex flex-col space-y-4">
-      <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">
+      <h3 className="font-bold text-foreground uppercase text-sm tracking-wider">
         Nuestras Redes
       </h3>
-      <div className="flex flex-col space-y-3 text-sm text-gray-600">
+      <div className="flex flex-col space-y-3 text-sm text-muted-foreground">
         {/* WhatsApp — solo texto informativo */}
         <div className="flex items-center">
           <FaWhatsapp className="w-5 h-5 mr-2 text-green-600" aria-hidden="true" />
@@ -20,9 +20,9 @@ export const FooterSocialNetworks = () => {
         </div>
 
         {/* Dirección — solo texto informativo */}
-        <div className="flex items-start text-gray-500">
+        <div className="flex items-start text-muted-foreground">
           <FaMapMarkerAlt
-            className="w-4 h-4 mr-2 mt-0.5 text-blue-600"
+            className="w-4 h-4 mr-2 mt-0.5 text-primary"
             aria-hidden="true"
           />
           <address className="not-italic">

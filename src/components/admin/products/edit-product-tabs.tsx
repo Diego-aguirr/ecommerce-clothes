@@ -141,7 +141,7 @@ export function EditProductTabs({
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-border">
         {TABS.map((tab) => (
           <button
             key={tab.key}
@@ -149,8 +149,8 @@ export function EditProductTabs({
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2.5 text-sm font-medium transition border-b-2 -mb-px ${
               activeTab === tab.key
-                ? "border-gray-900 text-gray-900"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "border-foreground text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {tab.label}
@@ -159,7 +159,7 @@ export function EditProductTabs({
       </div>
 
       {/* Tab content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-card rounded-2xl shadow-sm border border-muted p-6">
         {activeTab === "datos" && (
           <StepBasicData
             register={register}

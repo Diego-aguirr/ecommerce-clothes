@@ -58,36 +58,36 @@ export function AdminSidebar({
   const sidebarContent = (
     <>
       <div>
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-6 border-b border-muted">
           <div className="flex items-center justify-between">
             <Link
               href="/"
               onClick={() => setIsOpen(false)}
               className="inline-block transition-transform hover:scale-105 px-2"
             >
-              <h2 className="text-2xl font-black tracking-tighter text-gray-900">
-                STORE<span className="text-blue-600">.</span>
+              <h2 className="text-2xl font-black tracking-tighter text-foreground">
+                STORE<span className="text-primary">.</span>
               </h2>
             </Link>
             {/* Close button - mobile only */}
             <button
               onClick={() => setIsOpen(false)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
               aria-label="Cerrar menú"
             >
-              <FiX size={20} className="text-gray-500" />
+              <FiX size={20} className="text-muted-foreground" />
             </button>
           </div>
           <div className="mt-6 flex items-center gap-3 px-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700 font-bold text-xs uppercase border border-blue-100">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/5 text-primary font-bold text-xs uppercase border border-primary/10">
               {userRole.substring(0, 2)}
             </span>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-gray-800 capitalize leading-none">
+              <span className="text-sm font-bold text-foreground capitalize leading-none">
                 {userRole}
               </span>
               {isSuperAdmin && (
-                <span className="text-[10px] uppercase font-bold text-gray-400 mt-1 tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground mt-1 tracking-wider">
                   Super Admin
                 </span>
               )}
@@ -106,11 +106,11 @@ export function AdminSidebar({
                 aria-current={isActive ? "page" : undefined}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
                   isActive
-                    ? "bg-blue-50 text-blue-700 shadow-sm"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-primary/5 text-primary shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
-                <span aria-hidden="true" className={isActive ? "text-blue-600" : "text-gray-400"}>
+                <span aria-hidden="true" className={isActive ? "text-primary" : "text-muted-foreground"}>
                   {link.icon}
                 </span>
                 {link.name}
@@ -119,8 +119,8 @@ export function AdminSidebar({
           })}
 
           {isSuperAdmin && (
-            <div className="pt-6 mt-6 border-t border-gray-100">
-              <p className="text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest px-3" id="security-nav-heading">
+            <div className="pt-6 mt-6 border-t border-muted">
+              <p className="text-[10px] font-bold text-muted-foreground mb-3 uppercase tracking-widest px-3" id="security-nav-heading">
                 Seguridad
               </p>
               <nav aria-labelledby="security-nav-heading" className="space-y-1">
@@ -135,12 +135,12 @@ export function AdminSidebar({
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 ${
                         isActive
                           ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
                       <span
                         aria-hidden="true"
-                        className={isActive ? "text-indigo-600" : "text-gray-400"}
+                        className={isActive ? "text-indigo-600" : "text-muted-foreground"}
                       >
                         {link.icon}
                       </span>
@@ -154,10 +154,10 @@ export function AdminSidebar({
         </nav>
       </div>
 
-      <div className="p-4 border-t border-gray-100 text-center">
-        <p className="text-xs text-gray-400 font-medium">
+      <div className="p-4 border-t border-muted text-center">
+        <p className="text-xs text-muted-foreground font-medium">
           Salir a la{" "}
-          <Link href="/" onClick={() => setIsOpen(false)} className="text-blue-600 hover:underline">
+          <Link href="/" onClick={() => setIsOpen(false)} className="text-primary hover:underline">
             tienda virtual
           </Link>
         </p>
@@ -170,14 +170,14 @@ export function AdminSidebar({
       {/* Hamburger button - mobile only */}
       <button
         onClick={() => setIsOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-card rounded-lg shadow-md border border-border hover:bg-muted transition-colors"
         aria-label="Abrir menú"
       >
-        <FiMenu size={20} className="text-gray-700" />
+        <FiMenu size={20} className="text-foreground" />
       </button>
 
       {/* Desktop sidebar - always visible */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 shadow-sm flex-col justify-between shrink-0">
+      <aside className="hidden md:flex w-64 bg-card border-r border-border shadow-sm flex-col justify-between shrink-0">
         {sidebarContent}
       </aside>
 
@@ -191,7 +191,7 @@ export function AdminSidebar({
           />
 
           {/* Sidebar panel */}
-          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl flex flex-col">
+          <aside className="absolute left-0 top-0 h-full w-72 bg-card shadow-xl flex flex-col">
             {sidebarContent}
           </aside>
         </div>

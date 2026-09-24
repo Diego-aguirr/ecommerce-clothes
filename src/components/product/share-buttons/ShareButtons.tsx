@@ -53,7 +53,7 @@ export const ShareButtons = ({ title, slug, imageUrl, productUrl }: Props) => {
       {typeof navigator !== "undefined" && typeof navigator.share === "function" && (
         <button
           onClick={handleNativeShare}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-border rounded-lg text-sm font-medium text-foreground transition-colors"
           aria-label="Compartir"
         >
           <IoShareOutline size={18} />
@@ -77,7 +77,7 @@ export const ShareButtons = ({ title, slug, imageUrl, productUrl }: Props) => {
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors"
+        className="flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full transition-colors"
         aria-label="Compartir por Facebook"
       >
         <FaFacebookF size={16} />
@@ -100,7 +100,7 @@ export const ShareButtons = ({ title, slug, imageUrl, productUrl }: Props) => {
         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           copied
             ? "bg-green-100 text-green-700"
-            : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+            : "bg-secondary hover:bg-border text-foreground"
         }`}
         aria-label={copied ? "Link copiado" : "Copiar link"}
       >

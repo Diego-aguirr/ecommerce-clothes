@@ -35,7 +35,7 @@ export function StepVariants({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-muted-foreground">
           {variants.length} de {totalVariants} variantes — Seteá el stock para
           cada combinación de color × talla
         </span>
@@ -43,21 +43,21 @@ export function StepVariants({
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-gray-900">
+        <div className="p-3 bg-muted rounded-lg border border-border text-center">
+          <div className="text-2xl font-bold text-foreground">
             {colors.length}
           </div>
-          <div className="text-xs text-gray-500">Colores</div>
+          <div className="text-xs text-muted-foreground">Colores</div>
         </div>
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-gray-900">
+        <div className="p-3 bg-muted rounded-lg border border-border text-center">
+          <div className="text-2xl font-bold text-foreground">
             {sizes.length}
           </div>
-          <div className="text-xs text-gray-500">Tallas</div>
+          <div className="text-xs text-muted-foreground">Tallas</div>
         </div>
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-gray-900">{totalStock}</div>
-          <div className="text-xs text-gray-500">Stock total</div>
+        <div className="p-3 bg-muted rounded-lg border border-border text-center">
+          <div className="text-2xl font-bold text-foreground">{totalStock}</div>
+          <div className="text-xs text-muted-foreground">Stock total</div>
         </div>
       </div>
 
@@ -70,13 +70,13 @@ export function StepVariants({
       />
 
       {colors.length === 0 && (
-        <div className="text-center py-8 text-gray-400 text-sm">
+        <div className="text-center py-8 text-muted-foreground text-sm">
           Primero agregá colores en el paso anterior.
         </div>
       )}
 
       {colors.length > 0 && sizes.length === 0 && (
-        <div className="text-center py-8 text-gray-400 text-sm">
+        <div className="text-center py-8 text-muted-foreground text-sm">
           Seleccioná al menos una talla en el paso 1.
         </div>
       )}

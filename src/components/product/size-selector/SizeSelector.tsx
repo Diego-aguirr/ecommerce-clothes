@@ -20,7 +20,7 @@ export const SizeSelector = ({
 }: Props) => {
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+      <span className="text-sm font-semibold uppercase tracking-wide text-foreground">
         Talle
       </span>
       <div className="flex flex-wrap gap-2">
@@ -40,8 +40,8 @@ export const SizeSelector = ({
                 "min-w-[48px] h-12 px-4 flex items-center justify-center rounded-lg border font-semibold text-sm transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111] focus-visible:ring-offset-1 relative",
                 {
                   "bg-[#111] border-[#111] text-white shadow-sm": isSelected,
-                  "bg-white border-gray-200 text-gray-800 hover:border-gray-400 hover:shadow-sm": !isSelected && !isDisabled,
-                  "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed": isDisabled,
+                  "bg-card border-border text-foreground hover:border-foreground hover:shadow-sm": !isSelected && !isDisabled,
+                  "bg-secondary border-border text-muted-foreground cursor-not-allowed": isDisabled,
                 }
               )}
             >
@@ -54,7 +54,7 @@ export const SizeSelector = ({
         })}
       </div>
       {disabledSizes.length > 0 && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Algunas tallas pueden no estar disponibles para el color seleccionado
         </p>
       )}

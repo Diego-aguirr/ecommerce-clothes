@@ -96,8 +96,14 @@ export async function createMercadoPagoPreference(
 ) {
   const client = getMpClient();
   if (!client) {
+    // El detalle de configuración solo al log del server (nunca al cliente en prod)
+    console.error(
+      "[payments] MERCADOPAGO_ACCESS_TOKEN no está configurado. Definilo en .env.docker."
+    );
     throw new Error(
-      "MercadoPago no está configurado. Configurá MERCADOPAGO_ACCESS_TOKEN en .env.docker o usá el método de pago en efectivo/transferencia."
+      process.env.NODE_ENV === "production"
+        ? "El pago con MercadoPago no está disponible en este momento. Elegí transferencia o efectivo para continuar."
+        : "MercadoPago no está configurado. Configurá MERCADOPAGO_ACCESS_TOKEN en .env.docker o usá el método de pago en efectivo/transferencia."
     );
   }
 

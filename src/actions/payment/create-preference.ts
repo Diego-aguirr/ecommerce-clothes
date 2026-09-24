@@ -12,6 +12,20 @@ type CreatePreferenceResult =
   | { ok: false; message: string }
   | { ok: true; init_point: string | undefined; preferenceId: string | undefined };
 
+/**
+ * En producción, cualquier mensaje con indicadores de configuración interna
+ * (.env, tokens, URLs de desarrollo) se reemplaza por uno amigable.
+ * En desarrollo se pasa el mensaje original para depurar.
+ */
+function toUserFacingMessage(message: string): string {
+  if (process.env.NODE_ENV !== "production") return message;
+  if (/MERCADOPAGO_ACCESS_TOKEN|\.env|ngrok|APP_URL|stack|prisma/i.test(message)) {
+    console.error(`[payments] Error interno oculto del cliente: ${message}`);
+    return "El pago con MercadoPago no está disponible en este momento. Elegí transferencia o efectivo para continuar.";
+  }
+  return message;
+}
+
 export async function createPreference(orderId: string): Promise<CreatePreferenceResult> {
   try {
     // 1. Validar sesión
@@ -46,10 +60,11 @@ export async function createPreference(orderId: string): Promise<CreatePreferenc
   } catch (error) {
     return {
       ok: false,
-      message:
+      message: toUserFacingMessage(
         error instanceof Error
           ? error.message
-          : "No se pudo generar el link de pago de Mercado Pago",
+          : "No se pudo generar el link de pago de Mercado Pago"
+      ),
     };
   }
 }

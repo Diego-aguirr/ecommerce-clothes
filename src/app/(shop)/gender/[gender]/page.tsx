@@ -81,10 +81,10 @@ export default async function Page({ params, searchParams }: Props) {
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <span className="text-6xl mb-4">🛍️</span>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Próximamente
           </h2>
-          <p className="text-gray-500 max-w-md">
+          <p className="text-muted-foreground max-w-md">
             Estamos preparando productos increíbles para esta sección. ¡Volvé pronto!
           </p>
         </div>
