@@ -135,7 +135,7 @@ export function EditProductForm({
           disabled={isPending}
           className={`px-6 py-2 text-sm font-medium rounded-lg ${
             isPending
-              ? "bg-muted text-white"
+              ? "bg-muted text-muted-foreground"
               : "bg-foreground text-background hover:bg-foreground"
           } transition`}
         >

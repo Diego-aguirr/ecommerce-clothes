@@ -63,7 +63,7 @@ export const Pagination = ({ totalPages }: Props) => {
                 className={cn(
                   "page-link relative block py-1.5 px-3 border-0 outline-none transition-all duration-300 rounded text-muted-foreground focus:shadow-none",
                   {
-                    "bg-foreground text-white shadow-sm hover:text-white hover:bg-card": pageNumber === currentPage,
+                    "bg-foreground text-white shadow-sm hover:text-white hover:opacity-90": pageNumber === currentPage,
                     "hover:text-foreground hover:bg-muted": pageNumber !== currentPage,
                   }
                 )}

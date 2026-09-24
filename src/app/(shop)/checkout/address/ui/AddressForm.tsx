@@ -281,7 +281,7 @@ className="block text-sm font-medium text-foreground"
           <input
             type="checkbox"
             id="rememberAddress"
-            className="mr-2 h-4 w-4 text-brand-primary focus:ring-ring border-input rounded"
+            className="mr-2 h-4 w-4 text-foreground focus:ring-ring border-input rounded"
             {...register("rememberAddress")}
           />
           <label

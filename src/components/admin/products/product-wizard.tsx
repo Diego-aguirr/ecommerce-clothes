@@ -320,7 +320,7 @@ export function ProductWizard({ categories, product }: Props) {
               disabled={isPending || !canGoNext()}
               className={`px-6 py-2 text-sm font-medium rounded-lg ${
                 isPending || !canGoNext()
-                  ? "bg-muted text-white"
+                  ? "bg-muted text-muted-foreground"
                   : "bg-foreground text-white hover:bg-foreground"
               } transition`}
             >

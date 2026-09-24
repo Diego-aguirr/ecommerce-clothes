@@ -114,7 +114,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
 
         {/* Banner de instrucciones para pago en efectivo/transferencia */}
         {cashPayment && (
-          <div className="mt-6 mb-2 bg-mutedmber-50 border border-amber-200 rounded-xl p-5">
+          <div className="mt-6 mb-2 bg-amber-50 border border-amber-200 rounded-xl p-5">
             <h3 className="text-base font-bold text-amber-900 mb-2">
               Instrucciones de pago
             </h3>
@@ -221,7 +221,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
               <>
                 <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
                   <svg
-                    className="w-5 h-5 text-brand-primary"
+                    className="w-5 h-5 text-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -322,7 +322,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
                   <span>Transacción completada</span>
                 </div>
               ) : cashPayment ? (
-                <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-amber-800 bg-mutedmber-100 border border-amber-200 shadow-sm">
+                <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-amber-800 bg-amber-100 border border-amber-200 shadow-sm">
                   <IoCardOutline size={22} className="mr-2" />
                   <span>Pago pendiente — Efectivo / Transferencia</span>
                 </div>
