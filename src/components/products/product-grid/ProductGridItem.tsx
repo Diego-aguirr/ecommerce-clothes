@@ -42,7 +42,7 @@ export const ProductGridItem = ({ product }: Props) => {
 
       <div className="p-3 sm:p-4 flex flex-col gap-1 flex-1 justify-between">
         <div className="flex flex-col">
-          <Link className="font-medium text-sm sm:text-base text-gray-900 hover:text-[#111] transition-colors line-clamp-2" href={`/product/${product.slug}`}>
+          <Link className="font-medium text-sm sm:text-base text-foreground hover:text-muted-foreground transition-colors line-clamp-2" href={`/product/${product.slug}`}>
             {product.title}
           </Link>
           <span className="font-bold text-base sm:text-lg mt-1">${product.price.toLocaleString("es-AR")}</span>

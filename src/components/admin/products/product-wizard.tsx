@@ -242,16 +242,16 @@ export function ProductWizard({ categories, product }: Props) {
               disabled={idx > currentStep}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition ${
                 idx === currentStep
-                  ? "bg-gray-900 text-white"
+                  ? "bg-foreground text-white"
                   : idx < currentStep
                   ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-400"
+                  : "bg-secondary text-muted-foreground"
               }`}
             >
               {idx < currentStep ? (
                 <FiCheck size={14} />
               ) : (
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
+                <span className="w-5 h-5 rounded-full bg-background/20 flex items-center justify-center text-xs">
                   {idx + 1}
                 </span>
               )}
@@ -260,7 +260,7 @@ export function ProductWizard({ categories, product }: Props) {
             {idx < STEPS.length - 1 && (
               <div
                 className={`w-8 h-0.5 ${
-                  idx < currentStep ? "bg-green-300" : "bg-gray-200"
+                  idx < currentStep ? "bg-green-300" : "bg-border"
                 }`}
               />
             )}
@@ -269,7 +269,7 @@ export function ProductWizard({ categories, product }: Props) {
       </div>
 
       {/* Step content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 min-h-[300px]">
+      <div className="bg-card rounded-2xl shadow-sm border border-muted p-6 min-h-[300px]">
         {currentStep === 0 && (
           <StepBasicData
             register={register}
@@ -299,7 +299,7 @@ export function ProductWizard({ categories, product }: Props) {
         <button
           type="button"
           onClick={currentStep === 0 ? () => router.back() : goBack}
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          className="px-4 py-2 text-sm font-medium text-muted-foreground bg-card border border-border rounded-lg hover:bg-muted transition"
         >
           {currentStep === 0 ? "Cancelar" : "← Anterior"}
         </button>
@@ -310,7 +310,7 @@ export function ProductWizard({ categories, product }: Props) {
               type="button"
               onClick={goNext}
               disabled={!canGoNext()}
-              className="px-6 py-2 text-sm font-medium rounded-lg bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-6 py-2 text-sm font-medium rounded-lg bg-foreground text-white hover:bg-foreground disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               Siguiente →
             </button>
@@ -320,8 +320,8 @@ export function ProductWizard({ categories, product }: Props) {
               disabled={isPending || !canGoNext()}
               className={`px-6 py-2 text-sm font-medium rounded-lg ${
                 isPending || !canGoNext()
-                  ? "bg-gray-400 text-white"
-                  : "bg-gray-900 text-white hover:bg-gray-700"
+                  ? "bg-muted text-white"
+                  : "bg-foreground text-white hover:bg-foreground"
               } transition`}
             >
               {isPending

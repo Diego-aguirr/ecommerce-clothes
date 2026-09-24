@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
 import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import { generatePaginationNumbers } from "@/utils";
@@ -49,7 +49,7 @@ export const Pagination = ({ totalPages }: Props) => {
         <ul className="flex list-style-none">
           <li className="page-item">
             <Link
-              className="page-link relative block py-1.5 px-3 border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
+              className="page-link relative block py-1.5 px-3 border-0 bg-transparent outline-none transition-all duration-300 rounded text-muted-foreground hover:text-foreground hover:bg-muted focus:shadow-none"
               href={createPageUrl(currentPage - 1)}
             >
               <IoChevronBackOutline size={30} />
@@ -60,11 +60,11 @@ export const Pagination = ({ totalPages }: Props) => {
             <li key={`${pageNumber}-${index}`} className="page-item">
               <Link
                 href={createPageUrl(pageNumber)}
-                className={clsx(
-                  "page-link relative block py-1.5 px-3 border-0 outline-none transition-all duration-300 rounded text-gray-800 focus:shadow-none",
+                className={cn(
+                  "page-link relative block py-1.5 px-3 border-0 outline-none transition-all duration-300 rounded text-muted-foreground focus:shadow-none",
                   {
-                    "bg-[#111] text-white shadow-sm hover:text-white hover:bg-[#333]": pageNumber === currentPage,
-                    "hover:text-gray-800 hover:bg-gray-200": pageNumber !== currentPage,
+                    "bg-foreground text-white shadow-sm hover:text-white hover:bg-card": pageNumber === currentPage,
+                    "hover:text-foreground hover:bg-muted": pageNumber !== currentPage,
                   }
                 )}
               >
@@ -75,7 +75,7 @@ export const Pagination = ({ totalPages }: Props) => {
 
           <li className="page-item">
             <Link
-              className="page-link relative block py-1.5 px-3 border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
+              className="page-link relative block py-1.5 px-3 border-0 bg-transparent outline-none transition-all duration-300 rounded text-muted-foreground hover:text-foreground hover:bg-muted focus:shadow-none"
               href={createPageUrl(currentPage + 1)}
             >
               <IoChevronForwardOutline size={30} />

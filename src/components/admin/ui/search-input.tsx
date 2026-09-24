@@ -38,7 +38,7 @@ export function SearchInput({
     <div className="relative">
       <FiSearch
         size={16}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
       />
       <input
         type="text"
@@ -46,7 +46,7 @@ export function SearchInput({
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
         aria-label="Buscar"
-        className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+        className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
         disabled={isPending}
       />
     </div>

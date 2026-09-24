@@ -40,61 +40,61 @@ export default async function ProductColorsPage({ params }: Props) {
       <div className="flex items-center gap-4 mb-6">
         <Link
           href={`/admin/products/${id}`}
-          className="text-sm text-gray-500 hover:text-gray-900 transition font-medium"
+          className="text-sm text-muted-foreground hover:text-foreground transition font-medium"
         >
           ← Volver al Producto
         </Link>
-        <span className="text-gray-300">|</span>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Colores: <span className="text-gray-500 font-medium">{product.title}</span>
+        <span className="text-muted-foreground">|</span>
+        <h1 className="text-2xl font-bold text-foreground">
+          Colores: <span className="text-muted-foreground font-medium">{product.title}</span>
         </h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Columna izquierda: Formulario para crear color */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Nuevo Color</h2>
+          <div className="bg-background rounded-2xl shadow-sm border border-border p-6 sticky top-6">
+            <h2 className="text-lg font-bold text-foreground mb-4">Nuevo Color</h2>
             <ColorForm productId={id} />
           </div>
         </div>
 
         {/* Columna derecha: Lista de colores */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-900">
+          <div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+              <h2 className="text-lg font-bold text-foreground">
                 Colores Existentes ({colors.length})
               </h2>
               <Link
                 href={`/admin/products/${id}/variants`}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="text-sm text-primary font-medium"
               >
                 ← Gestionar Variantes
               </Link>
             </div>
 
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {colors.map((color) => (
-                <div key={color.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div key={color.id} className="p-6 hover:bg-muted transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
                       {/* Color swatch */}
                       {color.hexCode ? (
                         <span
-                          className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm"
+                          className="w-12 h-12 rounded-lg border border-border shadow-sm"
                           style={{ backgroundColor: color.hexCode }}
                         />
                       ) : (
-                        <span className="w-12 h-12 rounded-lg border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+                        <span className="w-12 h-12 rounded-lg border border-border bg-muted flex items-center justify-center text-muted-foreground text-xs">
           Sin color
                         </span>
                       )}
 
                       <div>
-                        <h3 className="font-semibold text-gray-900">{color.label}</h3>
-                        <p className="text-sm text-gray-500">Técnico: {color.color}</p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <h3 className="font-semibold text-foreground">{color.label}</h3>
+                        <p className="text-sm text-muted-foreground">Técnico: {color.color}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
                           {color._count.images} imágenes
                         </p>
                       </div>
@@ -114,7 +114,7 @@ export default async function ProductColorsPage({ params }: Props) {
                   {/* Imágenes del color */}
                   {color.images.length > 0 && (
                     <div className="mt-4 pl-16">
-                      <p className="text-xs font-medium text-gray-500 mb-2">Imágenes:</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Imágenes:</p>
                       <div className="flex gap-2 flex-wrap">
                         {color.images.map((img, idx) => (
                           <div key={img.id} className="relative group">
@@ -122,9 +122,9 @@ export default async function ProductColorsPage({ params }: Props) {
                             <img
                               src={img.url}
                               alt={`${color.label} ${idx + 1}`}
-                              className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                              className="w-16 h-16 object-cover rounded-lg border border-border"
                             />
-                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-gray-900 text-white text-xs rounded-full flex items-center justify-center">
+                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background text-xs rounded-full flex items-center justify-center">
                               {idx + 1}
                             </span>
                           </div>
@@ -134,8 +134,8 @@ export default async function ProductColorsPage({ params }: Props) {
                   )}
 
                   {/* Preview de cómo se ve en la tienda */}
-                  <div className="mt-4 pl-16 pt-4 border-t border-gray-100">
-                    <p className="text-xs text-gray-400">
+                  <div className="mt-4 pl-16 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground">
                       Vista en tienda: Selector de color mostrará &quot;{color.label}&quot; con este color
                     </p>
                   </div>
@@ -145,8 +145,8 @@ export default async function ProductColorsPage({ params }: Props) {
 
             {colors.length === 0 && (
               <div className="p-12 text-center">
-                <p className="text-gray-400 text-sm font-medium">No hay colores creados aún.</p>
-                <p className="text-gray-400 text-xs mt-2">
+                <p className="text-muted-foreground text-sm font-medium">No hay colores creados aún.</p>
+                <p className="text-muted-foreground text-xs mt-2">
                   Usa el formulario de la izquierda para crear el primero.
                 </p>
               </div>

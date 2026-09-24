@@ -48,39 +48,39 @@ export default async function AdminUsersPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-100">
-          <thead className="bg-gray-50">
+      <div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Usuario
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Rol
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Estado
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Acciones (Ban)
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Admin Promove
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-background divide-y divide-border">
             {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={user.id} className="hover:bg-muted transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-semibold text-foreground">
                     {user.name}
                   </div>
-                  <div className="text-xs text-gray-500">{user.email}</div>
+                  <div className="text-xs text-muted-foreground">{user.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-600"}`}
+                    className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-muted text-muted-foreground"}`}
                   >
                     {user.role} {user.isSuperAdmin && "👑"}
                   </span>
@@ -110,7 +110,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                     <input type="hidden" name="role" value={user.role === "admin" ? "user" : "admin"} />
                     <button
                       type="submit"
-                      className="cursor-pointer font-semibold transition px-3 py-1.5 rounded-lg text-xs bg-gray-900 text-white hover:bg-gray-700"
+                      className="cursor-pointer font-semibold transition px-3 py-1.5 rounded-lg text-xs bg-foreground text-background hover:bg-foreground"
                     >
                       {user.role === "admin" ? "Quitar Admin" : "Hacer Admin"}
                     </button>
@@ -122,7 +122,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
         </table>
 
         {users.length === 0 && (
-          <div className="p-12 text-center text-gray-400 text-sm font-medium">
+          <div className="p-12 text-center text-muted-foreground text-sm font-medium">
             No hay usuarios registrados.
           </div>
         )}

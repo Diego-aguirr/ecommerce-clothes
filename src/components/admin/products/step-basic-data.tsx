@@ -29,12 +29,12 @@ export function StepBasicData({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Título *
           </label>
           <input
             {...register("title")}
-            className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition"
+            className="w-full px-3 py-2 text-sm border-2 border-border rounded-lg outline-none focus:border-foreground transition"
             placeholder="Ej: Remera Negra"
           />
           {errors.title && (
@@ -43,14 +43,14 @@ export function StepBasicData({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Precio ($) *
           </label>
           <input
             type="number"
             step="0.01"
             {...register("price", { valueAsNumber: true })}
-            className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition"
+            className="w-full px-3 py-2 text-sm border-2 border-border rounded-lg outline-none focus:border-foreground transition"
           />
           {errors.price && (
             <span className="text-red-500 text-xs">{errors.price.message}</span>
@@ -59,13 +59,13 @@ export function StepBasicData({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Descripción *
         </label>
         <textarea
           {...register("description")}
           rows={3}
-          className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition"
+          className="w-full px-3 py-2 text-sm border-2 border-border rounded-lg outline-none focus:border-foreground transition"
           placeholder="Describe el producto..."
         />
         {errors.description && (
@@ -77,12 +77,12 @@ export function StepBasicData({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Categoría *
           </label>
           <select
             {...register("categoryId")}
-            className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition"
+            className="w-full px-3 py-2 text-sm border-2 border-border rounded-lg outline-none focus:border-foreground transition"
           >
             <option value="">Selecciona...</option>
             {categories.map((c) => (
@@ -99,12 +99,12 @@ export function StepBasicData({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Género *
           </label>
           <select
             {...register("gender")}
-            className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-gray-900 transition"
+            className="w-full px-3 py-2 text-sm border-2 border-border rounded-lg outline-none focus:border-foreground transition"
           >
             <option value="">Selecciona...</option>
             {ALL_GENDERS.map((g) => (
@@ -123,7 +123,7 @@ export function StepBasicData({
 
       {/* Tallas */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Tallas *
         </label>
         <div className="flex flex-wrap gap-2">
@@ -136,8 +136,8 @@ export function StepBasicData({
                 onClick={() => onToggleSize(size)}
                 className={`px-4 py-2 text-sm border-2 font-medium rounded-lg transition ${
                   isSelected
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                    ? "bg-foreground text-white border-foreground"
+                    : "bg-card text-muted-foreground border-border hover:border-foreground"
                 }`}
               >
                 {size}

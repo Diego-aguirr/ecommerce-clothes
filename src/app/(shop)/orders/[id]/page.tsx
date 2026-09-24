@@ -65,13 +65,13 @@ export default async function OrderPage({ params, searchParams }: Props) {
       <div className="flex flex-col w-full max-w-[1000px]">
         {/* Feedback Banner */}
         {isSuccess && !order.isPaid && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="text-sm font-semibold text-blue-900">Pago procesado</p>
-              <p className="text-sm text-blue-700 mt-0.5">Estamos confirmando tu pago. Esta página se actualizará automáticamente.</p>
+              <p className="text-sm font-semibold text-primary">Pago procesado</p>
+              <p className="text-sm text-primary mt-0.5">Estamos confirmando tu pago. Esta página se actualizará automáticamente.</p>
             </div>
           </div>
         )}
@@ -114,7 +114,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
 
         {/* Banner de instrucciones para pago en efectivo/transferencia */}
         {cashPayment && (
-          <div className="mt-6 mb-2 bg-amber-50 border border-amber-200 rounded-xl p-5">
+          <div className="mt-6 mb-2 bg-mutedmber-50 border border-amber-200 rounded-xl p-5">
             <h3 className="text-base font-bold text-amber-900 mb-2">
               Instrucciones de pago
             </h3>
@@ -122,7 +122,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
               Para completar tu compra, realizá una transferencia bancaria o
               aboná en efectivo al momento de retirar.
             </p>
-            <div className="text-sm text-amber-900 space-y-1 bg-white/60 rounded-lg p-3">
+            <div className="text-sm text-amber-900 space-y-1 bg-background/60 rounded-lg p-3">
               <p>
                 <span className="font-semibold">Orden:</span> #{id.split("-").at(-1)}
               </p>
@@ -147,7 +147,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         )}
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-6 mb-8 gap-4">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 antialiased">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground antialiased">
             Orden #{id.split("-").at(-1)}
           </h1>
 
@@ -169,14 +169,14 @@ export default async function OrderPage({ params, searchParams }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 lg:gap-12">
           {/* Columna Izquierda: Artículos */}
           <div className="flex flex-col gap-6">
-            <h2 className="text-xl font-semibold text-gray-900 border-b border-gray-100 pb-3">
+            <h2 className="text-xl font-semibold text-foreground border-b border-border pb-3">
               Artículos comprados
             </h2>
             <div className="flex flex-col gap-5">
               {order.OrderItem.map((item) => (
                 <div
                   key={item.product.slug + "-" + item.size}
-                  className="flex items-center gap-5 p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-center gap-5 p-4 rounded-xl border border-border bg-background shadow-sm hover:shadow-md transition-shadow"
                 >
                   <Image
                     src={item.product.ProductImage[0].url.startsWith('http') 
@@ -185,28 +185,28 @@ export default async function OrderPage({ params, searchParams }: Props) {
                     width={90}
                     height={90}
                     alt={item.product.title}
-                    className="rounded-lg object-cover bg-gray-50 aspect-square"
+                    className="rounded-lg object-cover bg-muted aspect-square"
                   />
 
                   <div className="flex-1 flex flex-col">
-                    <p className="font-semibold text-gray-900 leading-tight">
+                    <p className="font-semibold text-foreground leading-tight">
                       {item.product.title}
                     </p>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                         Talle: {item.size}
                       </span>
                       {item.color && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 capitalize">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground capitalize">
                           {item.color.replace(/_/g, " ")}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {currencyFormat(item.price)}{" "}
                       <span className="mx-1">×</span> {item.quantity} un.
                     </p>
-                    <p className="font-bold text-gray-900 mt-2">
+                    <p className="font-bold text-foreground mt-2">
                       {currencyFormat(item.price * item.quantity)}
                     </p>
                   </div>
@@ -216,10 +216,10 @@ export default async function OrderPage({ params, searchParams }: Props) {
           </div>
 
           {/* Columna Derecha: Tarjeta de Resumen y Dirección */}
-          <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 p-8 h-fit">
+          <div className="bg-background rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-border p-8 h-fit">
             {order.shippingMethod === "pickup" ? (
               <>
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
                   <svg
                     className="w-5 h-5 text-brand-primary"
                     fill="none"
@@ -235,26 +235,26 @@ export default async function OrderPage({ params, searchParams }: Props) {
                   </svg>
                   Retiro en local
                 </h2>
-                <div className="text-sm text-gray-600 space-y-1.5 mb-8 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                  <p className="font-semibold text-blue-900 text-base mb-2">
+                <div className="text-sm text-muted-foreground space-y-1.5 mb-8 bg-primary/5 p-4 rounded-lg border border-primary/10">
+                  <p className="font-semibold text-primary text-base mb-2">
                     ¡Tu pedido te espera!
                   </p>
-                  <p className="text-blue-800">
+                  <p className="text-primary">
                     Retira a nombre de: <strong>{address.fullname}</strong>
                   </p>
-                  <p className="text-blue-800">DNI: {address.dni}</p>
-                  <p className="text-blue-800 mt-2">
+                  <p className="text-primary">DNI: {address.dni}</p>
+                  <p className="text-primary mt-2">
                     📍 Dirigite a nuestro local central con tu DNI para retirar la compra.
                   </p>
                 </div>
               </>
             ) : (
               <>
-                <h2 className="text-lg font-bold text-gray-900 mb-4">
+                <h2 className="text-lg font-bold text-foreground mb-4">
                   Dirección de entrega
                 </h2>
-                <div className="text-sm text-gray-600 space-y-1.5 mb-8">
-                  <p className="font-semibold text-gray-900 text-base">
+                <div className="text-sm text-muted-foreground space-y-1.5 mb-8">
+                  <p className="font-semibold text-foreground text-base">
                     {address.fullname}
                   </p>
                   <p>
@@ -268,7 +268,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
                   <p>Tel: {address.phone}</p>
                   <p>DNI: {address.dni}</p>
                   {address.description && (
-                    <p className="pt-2 text-gray-500 italic">
+                    <p className="pt-2 text-muted-foreground italic">
                       &quot; {address.description} &quot;
                     </p>
                   )}
@@ -277,16 +277,16 @@ export default async function OrderPage({ params, searchParams }: Props) {
             )}
 
             {/* Divider */}
-            <div className="w-full h-px border-t border-dashed border-gray-200 mb-8" />
+            <div className="w-full h-px border-t border-dashed border-border mb-8" />
 
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
+            <h2 className="text-lg font-bold text-foreground mb-4">
               Resumen de cuenta
             </h2>
 
-            <div className="flex flex-col gap-3 text-sm text-gray-600">
+            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
               <div className="flex justify-between">
                 <span>Productos ({order.itemsInOrder})</span>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-foreground">
                   {currencyFormat(order.total)}
                 </span>
               </div>
@@ -296,21 +296,21 @@ export default async function OrderPage({ params, searchParams }: Props) {
                 {order.shippingMethod === "pickup" ? (
                   <span className="font-medium text-green-600">Gratis</span>
                 ) : (
-                  <span className="font-medium text-blue-600">
+                  <span className="font-medium text-primary">
                     A acordar con vendedor
                   </span>
                 )}
               </div>
 
-              <div className="flex justify-between items-center border-t border-gray-100 pt-4 mt-2">
-                <span className="text-base font-bold text-gray-900">
+              <div className="flex justify-between items-center border-t border-border pt-4 mt-2">
+                <span className="text-base font-bold text-foreground">
                   Total a pagar
                 </span>
-                <span className="text-2xl font-bold text-gray-900">
+                <span className="text-2xl font-bold text-foreground">
                   {currencyFormat(order.total)}
                 </span>
               </div>
-              <p className="text-xs text-gray-400 -mt-2">
+              <p className="text-xs text-muted-foreground -mt-2">
                 IVA incluido: {currencyFormat(order.total - order.total / 1.21)}
               </p>
             </div>
@@ -322,7 +322,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
                   <span>Transacción completada</span>
                 </div>
               ) : cashPayment ? (
-                <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-amber-800 bg-amber-100 border border-amber-200 shadow-sm">
+                <div className="flex items-center justify-center w-full rounded-xl py-3.5 px-4 text-sm font-bold text-amber-800 bg-mutedmber-100 border border-amber-200 shadow-sm">
                   <IoCardOutline size={22} className="mr-2" />
                   <span>Pago pendiente — Efectivo / Transferencia</span>
                 </div>

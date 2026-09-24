@@ -72,7 +72,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-muted-foreground">
           {colors.length} color{colors.length !== 1 && "es"} — Elegí los colores
           que tiene tu producto
         </span>
@@ -83,17 +83,17 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
         {colors.map((color) => (
           <div
             key={color.color}
-            className="flex items-center gap-2 pl-2 pr-1 py-1 bg-gray-50 rounded-lg border border-gray-200"
+            className="flex items-center gap-2 pl-2 pr-1 py-1 bg-muted rounded-lg border border-border"
           >
             <span
-              className="w-6 h-6 rounded-full border border-gray-200 shadow-sm"
+              className="w-6 h-6 rounded-full border border-border shadow-sm"
               style={{ backgroundColor: color.hexCode }}
             />
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-foreground">
                 {color.label}
               </span>
-              <span className="text-[10px] text-gray-400 font-mono">
+              <span className="text-[10px] text-muted-foreground font-mono">
                 {color.hexCode}
               </span>
             </div>
@@ -101,7 +101,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
               <button
                 type="button"
                 onClick={() => removeColor(color.color)}
-                className="ml-1 p-1 rounded hover:bg-gray-200 transition text-gray-400 hover:text-red-500"
+                className="ml-1 p-1 rounded hover:bg-border transition text-muted-foreground hover:text-red-500"
               >
                 <FiX size={14} />
               </button>
@@ -112,14 +112,14 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
 
       {/* Add color form */}
       {showForm ? (
-        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+        <div className="p-4 bg-muted rounded-xl border border-border space-y-3">
           {error && (
             <p className="text-red-500 text-xs">{error}</p>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
                 Nombre del color
               </label>
               <input
@@ -130,13 +130,13 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
                   setNewColor({ ...newColor, label: e.target.value });
                   setError(null);
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 autoFocus
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
                 Color HEX
               </label>
               <div className="flex gap-2">
@@ -146,7 +146,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
                   onChange={(e) =>
                     setNewColor({ ...newColor, hexCode: e.target.value })
                   }
-                  className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                  className="w-10 h-10 rounded-lg border border-border cursor-pointer"
                 />
                 <input
                   type="text"
@@ -158,7 +158,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
                       setNewColor({ ...newColor, hexCode: val });
                     }
                   }}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  className="flex-1 px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono"
                   maxLength={7}
                 />
               </div>
@@ -167,16 +167,16 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
 
           {/* Preview */}
           {newColor.label && HEX_REGEX.test(newColor.hexCode) && (
-            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center gap-3 p-3 bg-card rounded-lg border border-border">
               <span
-                className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm"
+                className="w-10 h-10 rounded-lg border border-border shadow-sm"
                 style={{ backgroundColor: newColor.hexCode }}
               />
               <div>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-foreground">
                   {newColor.label}
                 </span>
-                <span className="text-xs text-gray-400 ml-2 font-mono">
+                <span className="text-xs text-muted-foreground ml-2 font-mono">
                   {newColor.hexCode}
                 </span>
               </div>
@@ -187,7 +187,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
             <button
               type="button"
               onClick={addColor}
-              className="flex-1 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition"
+              className="flex-1 py-2 bg-foreground text-white text-sm font-medium rounded-lg hover:bg-foreground transition"
             >
               Agregar color
             </button>
@@ -198,7 +198,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
                 setError(null);
                 setNewColor({ color: "", label: "", hexCode: "#000000" });
               }}
-              className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-50 transition"
+              className="px-4 py-2 border border-border text-sm rounded-lg hover:bg-muted transition"
             >
               Cancelar
             </button>
@@ -208,7 +208,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition"
+          className="flex items-center gap-2 text-sm text-primary font-medium transition"
         >
           <FiPlus size={16} />
           Agregar color
@@ -216,7 +216,7 @@ export function StepColors({ colors, onChange }: StepColorsProps) {
       )}
 
       {colors.length === 0 && (
-        <div className="text-center py-6 text-gray-400 text-sm">
+        <div className="text-center py-6 text-muted-foreground text-sm">
           Agregá al menos un color para continuar.
         </div>
       )}

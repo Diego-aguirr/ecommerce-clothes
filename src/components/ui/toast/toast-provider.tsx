@@ -50,19 +50,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border text-sm font-medium animate-in slide-in-from-right-5 fade-in duration-300 ${
               t.type === "success"
-                ? "bg-green-50 text-green-800 border-green-200"
-                : "bg-red-50 text-red-800 border-red-200"
+                  ? "bg-muted text-foreground border-border"
+                  : "bg-destructive/10 text-destructive border-destructive/20"
             }`}
           >
             {t.type === "success" ? (
-              <FiCheckCircle size={16} className="text-green-600 shrink-0" />
+              <FiCheckCircle size={16} className="text-green-500 shrink-0" />
             ) : (
-              <FiAlertCircle size={16} className="text-red-600 shrink-0" />
+              <FiAlertCircle size={16} className="text-red-500 shrink-0" />
             )}
             <span>{t.message}</span>
             <button
               onClick={() => dismiss(t.id)}
-              className="ml-2 p-0.5 rounded hover:bg-black/5 transition-colors"
+              className="ml-2 p-0.5 rounded hover:bg-muted/5 transition-colors"
             >
               <FiX size={14} />
             </button>

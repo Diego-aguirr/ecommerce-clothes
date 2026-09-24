@@ -11,14 +11,14 @@ import { ProductIncard } from "./ui/ProductIncard";
 
 export default function CartPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Título principal */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Tu Carrito de Compra
           </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
+          <p className="text-muted-foreground text-sm sm:text-base">
             Revisá tus productos antes de continuar
           </p>
         </div>

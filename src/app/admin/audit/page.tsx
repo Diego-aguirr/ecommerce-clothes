@@ -25,42 +25,42 @@ export default async function AdminAuditPage({ searchParams }: Props) {
         <h1 className="text-2xl font-bold text-red-700">Logs de Auditoría (SuperAdmin)</h1>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-100 text-sm">
-          <thead className="bg-gray-50">
+<div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+         <table className="min-w-full divide-y divide-border text-sm">
+           <thead className="bg-muted">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Administrador</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Acción</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Entidad</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Target ID</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Metadata</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fecha</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Administrador</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acción</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Entidad</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Target ID</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Metadata</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
-            {logs.map((log) => (
-              <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
-                  {new Date(log.createdAt).toLocaleString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
-                  {log.adminName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-900 text-white">
-                    {log.action}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500 font-medium text-xs">
-                  {log.entity}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-400 text-xs">
-                  {log.targetId || "-"}
-                </td>
-                <td
-                  className="px-6 py-4 text-xs font-mono text-gray-400 max-w-xs truncate overflow-hidden"
-                  title={log.metadata ? JSON.stringify(log.metadata) : ""}
-                >
+<tbody className="bg-background divide-y divide-border">
+             {logs.map((log) => (
+               <tr key={log.id} className="hover:bg-muted transition-colors">
+                 <td className="px-6 py-4 whitespace-nowrap text-xs text-muted-foreground">
+                   {new Date(log.createdAt).toLocaleString()}
+                 </td>
+                 <td className="px-6 py-4 whitespace-nowrap font-bold text-foreground">
+                   {log.adminName}
+                 </td>
+                 <td className="px-6 py-4 whitespace-nowrap">
+                   <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-foreground text-background">
+                     {log.action}
+                   </span>
+                 </td>
+                 <td className="px-6 py-4 whitespace-nowrap text-muted-foreground font-medium text-xs">
+                   {log.entity}
+                 </td>
+                 <td className="px-6 py-4 whitespace-nowrap font-mono text-muted-foreground text-xs">
+                   {log.targetId || "-"}
+                 </td>
+                 <td
+                   className="px-6 py-4 text-xs font-mono text-muted-foreground max-w-xs truncate overflow-hidden"
+                   title={log.metadata ? JSON.stringify(log.metadata) : ""}
+                 >
                   {log.metadata ? JSON.stringify(log.metadata) : "N/A"}
                 </td>
               </tr>
@@ -69,7 +69,7 @@ export default async function AdminAuditPage({ searchParams }: Props) {
         </table>
 
         {logs.length === 0 && (
-          <div className="p-12 text-center text-gray-400 text-sm font-medium">
+          <div className="p-12 text-center text-muted-foreground text-sm font-medium">
             No hay registros de auditoría aún.
           </div>
         )}

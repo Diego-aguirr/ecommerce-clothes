@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 type ShippingMethod = "delivery" | "pickup";
 
@@ -17,13 +17,13 @@ const OPTIONS: {
     value: "delivery",
     label: "A domicilio",
     subtitle: "A acordar con vendedor",
-    subtitleClassName: "text-blue-600 font-medium",
+    subtitleClassName: "text-muted-foreground font-medium",
   },
   {
     value: "pickup",
     label: "Retiro en local",
     subtitle: "Gratis",
-    subtitleClassName: "text-green-600 font-medium",
+    subtitleClassName: "text-muted-foreground font-medium",
   },
 ];
 
@@ -33,7 +33,7 @@ export const ShippingMethodSelector = ({
 }: ShippingMethodSelectorProps) => {
   return (
     <div className="mb-6">
-      <span className="block text-sm font-medium text-gray-700 mb-3">
+      <span className="block text-sm font-medium text-muted-foreground mb-3">
         Método de entrega
       </span>
       <div className="grid grid-cols-2 gap-3">
@@ -42,11 +42,11 @@ export const ShippingMethodSelector = ({
           return (
             <label
               key={option.value}
-              className={clsx(
+className={cn(
                 "flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all text-center",
                 {
-                  "border-black bg-gray-50 ring-1 ring-black": isSelected,
-                  "border-gray-200 hover:bg-gray-50": !isSelected,
+                  "border-border bg-card ring-1 ring-border": isSelected,
+                  "border-border hover:bg-card": !isSelected,
                 },
               )}
             >
@@ -58,10 +58,10 @@ export const ShippingMethodSelector = ({
                 onChange={() => onChange(option.value)}
                 className="sr-only"
               />
-              <span className="font-semibold text-gray-900">
+              <span className="font-semibold text-foreground">
                 {option.label}
               </span>
-              <span className={clsx("text-xs mt-1", option.subtitleClassName)}>
+              <span className={cn("text-xs mt-1", option.subtitleClassName)}>
                 {option.subtitle}
               </span>
             </label>
@@ -70,7 +70,7 @@ export const ShippingMethodSelector = ({
       </div>
 
       {value === "delivery" && (
-        <div className="mt-3 p-3 bg-blue-50 text-blue-800 border border-blue-100 rounded-lg text-sm flex items-start">
+        <div className="mt-3 p-3 bg-muted text-muted-foreground border border-border rounded-lg text-sm flex items-start">
           <span className="mr-2">🚚</span>
           <span>
             Coordinaremos la empresa de transporte y el costo del envío
@@ -80,7 +80,7 @@ export const ShippingMethodSelector = ({
       )}
 
       {value === "pickup" && (
-        <div className="mt-3 p-3 bg-green-50 text-green-800 border border-green-100 rounded-lg text-sm flex items-start">
+        <div className="mt-3 p-3 bg-muted text-muted-foreground border border-border rounded-lg text-sm flex items-start">
           <span className="mr-2">📍</span>
           <span>
             Retirás tu pedido por nuestro local central. Te avisaremos cuando

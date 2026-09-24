@@ -24,24 +24,24 @@ export default async function CategoriesPage({ searchParams }: Props) {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Categorías</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Categorías</h1>
       </div>
 
       <CreateCategoryForm />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-100">
-          <thead className="bg-gray-50">
+      <div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Productos</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nombre</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Productos</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-background divide-y divide-border">
             {categories.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-6 py-12 text-center text-gray-400 text-sm font-medium">
+                <td colSpan={3} className="px-6 py-12 text-center text-muted-foreground text-sm font-medium">
                   No hay categorías creadas.
                 </td>
               </tr>
@@ -49,9 +49,9 @@ export default async function CategoriesPage({ searchParams }: Props) {
               categories.map((category) => {
                 const count = category._count?.Product || 0;
                 return (
-                  <tr key={category.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">{category.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                  <tr key={category.id} className="hover:bg-muted transition-colors">
+                    <td className="px-6 py-4 text-sm font-semibold text-foreground">{category.name}</td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
                       {count} producto{count !== 1 && "s"}
                     </td>
                     <td className="px-6 py-4 text-sm text-right">
@@ -65,7 +65,7 @@ export default async function CategoriesPage({ searchParams }: Props) {
         </table>
 
         {categories.length === 0 && (
-          <div className="p-12 text-center text-gray-400 text-sm font-medium">
+          <div className="p-12 text-center text-muted-foreground text-sm font-medium">
             No hay categorías creadas.
           </div>
         )}

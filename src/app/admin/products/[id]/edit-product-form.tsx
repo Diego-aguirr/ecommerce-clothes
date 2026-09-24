@@ -126,7 +126,7 @@ export function EditProductForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          className="px-4 py-2 text-sm font-medium text-muted-foreground bg-background border border-input rounded-lg hover:bg-muted transition"
         >
           Cancelar
         </button>
@@ -135,8 +135,8 @@ export function EditProductForm({
           disabled={isPending}
           className={`px-6 py-2 text-sm font-medium rounded-lg ${
             isPending
-              ? "bg-gray-400 text-white"
-              : "bg-gray-900 text-white hover:bg-gray-700"
+              ? "bg-muted text-white"
+              : "bg-foreground text-background hover:bg-foreground"
           } transition`}
         >
           {isPending ? "Guardando..." : "Guardar cambios"}

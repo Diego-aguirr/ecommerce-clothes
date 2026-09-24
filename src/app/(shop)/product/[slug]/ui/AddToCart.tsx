@@ -117,10 +117,10 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
 
       {/* Stock info */}
       {selectedVariant && (
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Stock disponible: <span className="font-semibold">{selectedVariant.stock} unidades</span>
           {selectedVariant.sku && (
-            <span className="ml-2 text-gray-400">| SKU: {selectedVariant.sku}</span>
+            <span className="ml-2 text-muted-foreground">| SKU: {selectedVariant.sku}</span>
           )}
         </p>
       )}
@@ -142,8 +142,8 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
             added 
             ? 'bg-green-600 hover:bg-green-700 text-white focus-visible:ring-green-600' 
             : !canAddToCart
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-gray-900 text-white hover:bg-black active:scale-[0.98] focus-visible:ring-gray-900'
+            ? 'bg-border text-muted-foreground cursor-not-allowed'
+            : 'bg-foreground text-white hover:bg-black active:scale-[0.98] focus-visible:ring-foreground'
           }`}
         >
           {added 
@@ -167,14 +167,14 @@ export const AddToCart = ({ product, variantsByColor, onColorChange }: Props) =>
       </div>
 
       {/* Shipping info */}
-      <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-3 text-sm text-gray-500">
+      <div className="flex flex-col gap-3 pt-4 border-t border-border">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <span className="text-lg" aria-hidden="true">
             🚚
           </span>
           <span>Envíos a todo el país</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-gray-500">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <span className="text-lg" aria-hidden="true">
             🏪
           </span>

@@ -46,21 +46,21 @@ export default async function ProductVariantsPage({ params }: Props) {
       <div className="flex items-center gap-4 mb-6">
         <Link
           href={`/admin/products/${id}`}
-          className="text-sm text-gray-500 hover:text-gray-900 transition font-medium"
+          className="text-sm text-muted-foreground hover:text-foreground transition font-medium"
         >
           ← Volver al Producto
         </Link>
-        <span className="text-gray-300">|</span>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Variantes: <span className="text-gray-500 font-medium">{product.title}</span>
+        <span className="text-muted-foreground">|</span>
+        <h1 className="text-2xl font-bold text-foreground">
+          Variantes: <span className="text-muted-foreground font-medium">{product.title}</span>
         </h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Columna izquierda: Formulario para crear variante */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Nueva Variante</h2>
+          <div className="bg-background rounded-2xl shadow-sm border border-border p-6 sticky top-6">
+            <h2 className="text-lg font-bold text-foreground mb-4">Nueva Variante</h2>
             <VariantForm 
               productId={id} 
               existingColors={colors} 
@@ -72,47 +72,47 @@ export default async function ProductVariantsPage({ params }: Props) {
 
         {/* Columna derecha: Tabla de variantes */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-900">
+          <div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+              <h2 className="text-lg font-bold text-foreground">
                 Variantes Existentes ({variants.length})
               </h2>
               <Link
                 href={`/admin/products/${id}/colors`}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="text-sm text-primary font-medium"
               >
                 Gestionar Colores →
               </Link>
             </div>
 
             {variantsByColor.map((colorGroup) => (
-              <div key={colorGroup.color} className="border-b border-gray-100 last:border-0">
-                <div className="px-6 py-3 bg-gray-50 flex items-center gap-3">
+              <div key={colorGroup.color} className="border-b border-border last:border-0">
+                <div className="px-6 py-3 bg-muted flex items-center gap-3">
                   {colorGroup.hexCode && (
                     <span
-                      className="w-6 h-6 rounded-full border border-gray-200"
+                      className="w-6 h-6 rounded-full border border-border"
                       style={{ backgroundColor: colorGroup.hexCode }}
                     />
                   )}
-                  <h3 className="font-semibold text-gray-700">{colorGroup.label}</h3>
-                  <span className="text-xs text-gray-400">({colorGroup.variants.length} variantes)</span>
+                  <h3 className="font-semibold text-foreground">{colorGroup.label}</h3>
+                  <span className="text-xs text-muted-foreground">({colorGroup.variants.length} variantes)</span>
                 </div>
 
-                <table className="min-w-full divide-y divide-gray-100">
-                  <thead className="bg-gray-50/50">
+                <table className="min-w-full divide-y divide-border">
+                  <thead className="bg-muted/50">
                     <tr>
-                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">SKU</th>
-                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Talla</th>
-                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Stock</th>
-                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
-                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-muted-foreground uppercase">SKU</th>
+                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-muted-foreground uppercase">Talla</th>
+                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-muted-foreground uppercase">Stock</th>
+                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-muted-foreground uppercase">Estado</th>
+                      <th scope="col" className="px-6 py-2 text-left text-xs font-semibold text-muted-foreground uppercase">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
+                  <tbody className="bg-background divide-y divide-border">
                     {colorGroup.variants.map((variant) => (
-                      <tr key={variant.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-3 text-sm font-medium text-gray-900">{variant.sku}</td>
-                        <td className="px-6 py-3 text-sm text-gray-500">{variant.size}</td>
+                      <tr key={variant.id} className="hover:bg-muted transition-colors">
+                        <td className="px-6 py-3 text-sm font-medium text-foreground">{variant.sku}</td>
+                        <td className="px-6 py-3 text-sm text-muted-foreground">{variant.size}</td>
                         <td className="px-6 py-3">
                           <span className={`text-sm font-semibold ${variant.stock === 0 ? 'text-red-600' : variant.stock < 5 ? 'text-orange-600' : 'text-green-600'}`}>
                             {variant.stock} uds.
@@ -127,7 +127,7 @@ export default async function ProductVariantsPage({ params }: Props) {
                           <div className="flex items-center gap-3 text-sm">
                             <Link
                               href={`/admin/products/${id}/variants/${variant.id}/edit`}
-                              className="text-blue-600 hover:text-blue-800 font-medium"
+                              className="text-primary font-medium"
                             >
                               Editar
                             </Link>
@@ -147,7 +147,7 @@ export default async function ProductVariantsPage({ params }: Props) {
                 </table>
 
                 {colorGroup.variants.length === 0 && (
-                  <div className="px-6 py-4 text-sm text-gray-400">
+                  <div className="px-6 py-4 text-sm text-muted-foreground">
                     No hay variantes para este color
                   </div>
                 )}
@@ -156,8 +156,8 @@ export default async function ProductVariantsPage({ params }: Props) {
 
             {variants.length === 0 && (
               <div className="p-12 text-center">
-                <p className="text-gray-400 text-sm font-medium">No hay variantes creadas aún.</p>
-                <p className="text-gray-400 text-xs mt-2">Usa el formulario de la izquierda para crear la primera.</p>
+                <p className="text-muted-foreground text-sm font-medium">No hay variantes creadas aún.</p>
+                <p className="text-muted-foreground text-xs mt-2">Usa el formulario de la izquierda para crear la primera.</p>
               </div>
             )}
           </div>

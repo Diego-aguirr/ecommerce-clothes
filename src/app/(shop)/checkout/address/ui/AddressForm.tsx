@@ -93,7 +93,7 @@ export default function AddressForm({
       <div>
         <label
           htmlFor="fullname"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-foreground"
         >
           Nombre y Apellido
         </label>
@@ -102,7 +102,7 @@ export default function AddressForm({
           id="fullname"
           placeholder="Juan Pérez"
           required
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+          className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
           {...register("fullname", { required: true })}
         />
       </div>
@@ -113,9 +113,9 @@ export default function AddressForm({
           {/* Dirección */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label
+<label
                 htmlFor="street"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-foreground"
               >
                 Calle y Número
               </label>
@@ -124,23 +124,23 @@ export default function AddressForm({
                 id="street"
                 placeholder="Av. Corrientes 1234"
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+                className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
                 {...register("street", { required: isDelivery })}
               />
             </div>
             <div>
               <label
                 htmlFor="apartment"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Piso, Depto, Timbre{" "}
-                <span className="text-gray-500 font-normal">(Opcional)</span>
+className="block text-sm font-medium text-foreground"
+               >
+                 Piso, Depto, Timbre{" "}
+                <span className="text-muted-foreground font-normal">(Opcional)</span>
               </label>
               <input
                 type="text"
                 id="apartment"
                 placeholder="5B"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+                className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
                 {...register("apartment")}
               />
             </div>
@@ -151,32 +151,32 @@ export default function AddressForm({
             <div>
               <label
                 htmlFor="zip"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Código Postal
+className="block text-sm font-medium text-foreground"
+               >
+                 Código Postal
               </label>
               <input
                 type="text"
                 id="zip"
                 placeholder="C1043AAS"
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+                className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
                 {...register("zip", { required: isDelivery })}
               />
             </div>
             <div>
               <label
                 htmlFor="city"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Ciudad
+className="block text-sm font-medium text-foreground"
+               >
+                 Ciudad
               </label>
               <input
                 type="text"
                 id="city"
                 placeholder="Resistencia"
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+                className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
                 {...register("city", { required: isDelivery })}
               />
             </div>
@@ -186,14 +186,14 @@ export default function AddressForm({
           <div>
             <label
               htmlFor="province"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Provincia
+className="block text-sm font-medium text-foreground"
+             >
+               Provincia
             </label>
             <select
               id="province"
               required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+              className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
               {...register("provinceId", { required: isDelivery })}
             >
               <option value="">Selecciona una provincia</option>
@@ -212,19 +212,19 @@ export default function AddressForm({
         <div>
           <label
             htmlFor="phone"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Teléfono
+className="block text-sm font-medium text-foreground"
+           >
+             Teléfono
           </label>
           <input
             type="tel"
             id="phone"
             placeholder="11 2345-6789"
             required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+            className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
             {...register("phone", { required: true })}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             {isDelivery
               ? "Para que el repartidor pueda contactarte"
               : "Para avisarte cuando tu pedido esté listo"}
@@ -233,19 +233,19 @@ export default function AddressForm({
         <div>
           <label
             htmlFor="dni"
-            className="block text-sm font-medium text-gray-700"
-          >
-            DNI
+className="block text-sm font-medium text-foreground"
+           >
+             DNI
           </label>
           <input
             type="text"
             id="dni"
             placeholder="12.345.678"
             required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300"
+            className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300"
             {...register("dni", { required: true })}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Requerido para la facturación
           </p>
         </div>
@@ -256,19 +256,19 @@ export default function AddressForm({
         <div>
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Descripción adicional{" "}
-            <span className="text-gray-500 font-normal">(Opcional)</span>
+className="block text-sm font-medium text-foreground"
+           >
+             Descripción adicional{" "}
+            <span className="text-muted-foreground font-normal">(Opcional)</span>
           </label>
           <textarea
             id="description"
             placeholder="Ej: Casa con reja negra, timbre roto, dejar paquete en portería..."
             rows={3}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-gray-700 focus:border-gray-700 transition-all duration-300 resize-none"
+            className="mt-1 block w-full border-input rounded-md shadow-sm p-3 focus:ring-ring focus:border-ring transition-all duration-300 resize-none"
             {...register("description")}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Información adicional que ayude al repartidor a encontrar tu
             domicilio
           </p>
@@ -281,42 +281,42 @@ export default function AddressForm({
           <input
             type="checkbox"
             id="rememberAddress"
-            className="mr-2 h-4 w-4 text-brand-primary focus:ring-gray-700 border-gray-300 rounded"
+            className="mr-2 h-4 w-4 text-brand-primary focus:ring-ring border-input rounded"
             {...register("rememberAddress")}
           />
           <label
             htmlFor="rememberAddress"
-            className="text-sm font-medium text-gray-700"
-          >
-            Recordar dirección?
+className="text-sm font-medium text-foreground"
+           >
+             Recordar dirección?
           </label>
         </div>
       )}
 
       {/* Sección de Confianza / Seguridad */}
-      <div className="flex flex-wrap justify-center items-center gap-6 py-6 border-t border-gray-100 bg-gray-50/50 rounded-b-lg">
-        <div className="flex items-center text-gray-500 text-xs">
+      <div className="flex flex-wrap justify-center items-center gap-6 py-6 border-t border-border bg-muted/50 rounded-b-lg">
+        <div className="flex items-center text-muted-foreground text-xs">
           <FaShieldAlt className="text-green-600 mr-2" size={16} />
           <span>Compra 100% Segura</span>
         </div>
-        <div className="flex items-center text-gray-500 text-xs">
-          <FaLock className="text-gray-400 mr-2" size={14} />
+        <div className="flex items-center text-muted-foreground text-xs">
+          <FaLock className="text-muted-foreground mr-2" size={14} />
           <span>Datos Protegidos</span>
         </div>
-        <div className="flex items-center text-gray-500 text-xs">
-          <FaCheckCircle className="text-blue-500 mr-2" size={14} />
+        <div className="flex items-center text-muted-foreground text-xs">
+          <FaCheckCircle className="text-primary mr-2" size={14} />
           <span>Garantía Satoru</span>
         </div>
       </div>
 
       {/* Botones de navegación */}
-      <div className="pt-8 border-t border-gray-200">
+      <div className="pt-8 border-t border-border">
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
           {/* Botones izquierda */}
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <a
               href="/cart"
-              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300 hover:border-gray-400"
+              className="inline-flex items-center justify-center px-6 py-3 border border-input text-sm font-medium rounded-lg text-foreground bg-background hover:bg-muted transition-all duration-300 hover:border-muted-foreground"
             >
               ← Volver al carrito
             </a>
@@ -326,7 +326,7 @@ export default function AddressForm({
           <button
             type="submit"
             disabled={!isValid}
-            className={`w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-semibold rounded-lg text-white transition-all duration-300 shadow-sm hover:shadow-md ${!isValid ? "bg-gray-400 cursor-not-allowed hover:bg-gray-400" : "bg-black hover:bg-gray-900"}`}
+            className={`w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-semibold rounded-lg text-white transition-all duration-300 shadow-sm hover:shadow-md ${!isValid ? "bg-muted cursor-not-allowed hover:bg-muted-foreground" : "bg-mutedoreground hover:bg-muted-foreground"}`}
           >
             Continuar al Pago
           </button>

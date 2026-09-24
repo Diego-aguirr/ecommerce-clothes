@@ -29,7 +29,7 @@ export const WhatsappButton = () => {
       {/* Burbuja de chat animada */}
       <div
         className={`
-          relative bg-white text-gray-800 p-4 rounded-2xl rounded-br-md shadow-lg 
+          relative bg-card text-foreground p-4 rounded-2xl rounded-br-md shadow-lg 
           max-w-[280px] transition-all duration-500 ease-out transform
           ${showBubble 
             ? 'opacity-100 translate-y-0 scale-100' 
@@ -40,7 +40,7 @@ export const WhatsappButton = () => {
         {/* Botón cerrar */}
         <button
           onClick={handleClose}
-          className="absolute -top-2 -right-2 w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-500 text-xs transition-colors"
+          className="absolute -top-2 -right-2 w-6 h-6 bg-muted hover:bg-muted/80 rounded-full flex items-center justify-center text-foreground text-xs transition-colors"
           aria-label="Cerrar mensaje"
         >
           ✕
@@ -51,15 +51,15 @@ export const WhatsappButton = () => {
             <IoLogoWhatsapp className="text-white text-xl" />
           </div>
           <div>
-            <p className="font-semibold text-sm text-gray-900 mb-1">SAURON Store</p>
-            <p className="text-sm text-gray-600 leading-relaxed">
+<p className="font-semibold text-sm text-foreground mb-1">SAURON Store</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
               ¿En qué podemos ayudarte? 😊
             </p>
           </div>
         </div>
         
         {/* Flecha de la burbuja */}
-        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white rotate-45" />
+        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card rotate-45" />
       </div>
 
       {/* Botón de WhatsApp con animación de pulso */}

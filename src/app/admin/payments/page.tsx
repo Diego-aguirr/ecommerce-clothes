@@ -31,28 +31,28 @@ export default async function AdminPaymentsPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-100 text-sm">
-          <thead className="bg-gray-50">
+      <div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+        <table className="min-w-full divide-y divide-border text-sm">
+          <thead className="bg-muted">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Proveedor / ID</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Monto</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Orden Vinculada</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fecha</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Proveedor / ID</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Monto</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Orden Vinculada</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-background divide-y divide-border">
             {payments.map((payment) => (
-              <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs">
+              <tr key={payment.id} className="hover:bg-muted transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap text-muted-foreground text-xs">
                   {new Date(payment.createdAt).toLocaleString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="block font-semibold text-gray-900 capitalize">{payment.provider}</span>
-                  <span className="block text-xs font-mono text-gray-400">{payment.providerPaymentId || "Sin ID"}</span>
+                  <span className="block font-semibold text-foreground capitalize">{payment.provider}</span>
+                  <span className="block text-xs font-mono text-muted-foreground">{payment.providerPaymentId || "Sin ID"}</span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap font-semibold text-foreground">
                   ${payment.amount.toFixed(2)} {payment.currency}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -62,7 +62,7 @@ export default async function AdminPaymentsPage({ searchParams }: Props) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="block font-mono text-xs text-indigo-600">{payment.order?.id?.split("-")[0]}...</span>
-                  <span className="block text-xs text-gray-500">{payment.order?.user?.email}</span>
+                  <span className="block text-xs text-muted-foreground">{payment.order?.user?.email}</span>
                 </td>
               </tr>
             ))}
@@ -70,7 +70,7 @@ export default async function AdminPaymentsPage({ searchParams }: Props) {
         </table>
 
         {payments.length === 0 && (
-          <div className="p-12 text-center text-gray-400 text-sm font-medium">
+          <div className="p-12 text-center text-muted-foreground text-sm font-medium">
             No hay pagos registrados.
           </div>
         )}

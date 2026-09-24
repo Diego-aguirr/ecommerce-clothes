@@ -53,7 +53,7 @@ export const ColorForm = ({ productId }: Props) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Nombre mostrado */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Nombre visible
         </label>
         <input
@@ -69,16 +69,16 @@ export const ColorForm = ({ productId }: Props) => {
           }}
           placeholder="ej: Negro"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent"
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Nombre que verán los clientes
         </p>
       </div>
 
       {/* Nombre técnico */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Nombre técnico
         </label>
         <input
@@ -87,16 +87,16 @@ export const ColorForm = ({ productId }: Props) => {
           onChange={(e) => setFormData({ ...formData, color: e.target.value })}
           placeholder="ej: negro"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent"
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Identificador único (ej: negro, azul_marino)
         </p>
       </div>
 
       {/* Código de color */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Color (hex)
         </label>
         <div className="flex gap-2">
@@ -104,7 +104,7 @@ export const ColorForm = ({ productId }: Props) => {
             type="color"
             value={formData.hexCode}
             onChange={(e) => setFormData({ ...formData, hexCode: e.target.value })}
-            className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+            className="w-12 h-10 rounded border border-input cursor-pointer"
           />
           <input
             type="text"
@@ -112,23 +112,23 @@ export const ColorForm = ({ productId }: Props) => {
             onChange={(e) => setFormData({ ...formData, hexCode: e.target.value })}
             placeholder="#000000"
             pattern="^#[0-9A-Fa-f]{6}$"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent uppercase"
+            className="flex-1 px-3 py-2 border border-input rounded-lg text-sm focus:ring-2 focus:ring-foreground focus:border-transparent uppercase"
           />
         </div>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Color que se mostrará en el selector
         </p>
       </div>
 
       {/* Preview */}
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <p className="text-xs font-medium text-gray-500 mb-2">Vista previa:</p>
+      <div className="p-4 bg-muted rounded-lg">
+        <p className="text-xs font-medium text-muted-foreground mb-2">Vista previa:</p>
         <div className="flex items-center gap-3">
           <span
-            className="w-8 h-8 rounded-full border border-gray-200"
+            className="w-8 h-8 rounded-full border border-border"
             style={{ backgroundColor: formData.hexCode }}
           />
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-foreground">
             {formData.label || "Nombre del color"}
           </span>
         </div>
@@ -151,7 +151,7 @@ export const ColorForm = ({ productId }: Props) => {
       <button
         type="submit"
         disabled={isLoading || !formData.label || !formData.color}
-        className="w-full py-2.5 px-4 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-2.5 px-4 bg-foreground text-background text-sm font-semibold rounded-lg hover:bg-foreground transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? "Creando..." : "Crear Color"}
       </button>

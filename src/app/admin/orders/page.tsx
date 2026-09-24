@@ -27,36 +27,36 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Órdenes</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Órdenes</h1>
         <div className="w-full sm:w-64">
           <SearchInput placeholder="Buscar por cliente, email o ID..." />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-100">
-          <thead className="bg-gray-50">
+      <div className="bg-background rounded-2xl shadow-sm border border-border overflow-hidden">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID / Fecha</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cliente</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pago</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado Logístico</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acción</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">ID / Fecha</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cliente</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pago</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado Logístico</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acción</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-background divide-y divide-border">
             {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <div className="font-medium text-xs font-mono text-gray-400">{order.id.split("-")[0]}...</div>
-                  <div className="text-sm text-gray-700">{new Date(order.createdAt).toLocaleDateString()}</div>
+              <tr key={order.id} className="hover:bg-muted transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                  <div className="font-medium text-xs font-mono text-muted-foreground">{order.id.split("-")[0]}...</div>
+                  <div className="text-sm text-foreground">{new Date(order.createdAt).toLocaleDateString()}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-semibold text-gray-900">{order.user?.name || "Sin nombre"}</div>
-                  <div className="text-xs text-gray-500">{order.user?.email || "Sin email"}</div>
+                  <div className="text-sm font-semibold text-foreground">{order.user?.name || "Sin nombre"}</div>
+                  <div className="text-xs text-muted-foreground">{order.user?.email || "Sin email"}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-foreground">
                   ${order.total.toFixed(2)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -74,7 +74,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
 
                     if (!lastPayment) {
                       return (
-                        <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                        <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-muted text-muted-foreground">
                           Iniciada
                         </span>
                       );
@@ -97,7 +97,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                     }
 
                     return (
-                      <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                      <span className="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full bg-muted text-muted-foreground">
                         Abandonada / Cancelada
                       </span>
                     );
@@ -105,10 +105,10 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col gap-1 items-start">
-                    <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${order.deliveryStatus === "shipped" || order.deliveryStatus === "delivered" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"}`}>
+                    <span className={`px-2.5 py-1 inline-flex text-xs font-semibold rounded-full ${order.deliveryStatus === "shipped" || order.deliveryStatus === "delivered" ? "bg-indigo-100 text-indigo-700" : "bg-muted text-muted-foreground"}`}>
                       {order.deliveryStatus}
                     </span>
-                    <span className={`px-2 py-0.5 inline-flex text-[10px] font-bold uppercase rounded-md ${order.shippingMethod === 'pickup' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-orange-50 text-orange-700 border border-orange-200'}`}>
+                    <span className={`px-2 py-0.5 inline-flex text-[10px] font-bold uppercase rounded-md ${order.shippingMethod === 'pickup' ? 'bg-primary/5 text-primary border border-primary/20' : 'bg-orange-50 text-orange-700 border border-orange-200'}`}>
                       {order.shippingMethod === 'pickup' ? '🏪 Retiro' : '🚚 Domicilio'}
                     </span>
                   </div>
@@ -116,7 +116,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <Link
                     href={`/admin/orders/${order.id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 transition"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-semibold rounded-lg hover:bg-foreground transition"
                   >
                     <FiEye size={12} /> Detalle
                   </Link>
@@ -127,7 +127,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
         </table>
 
         {orders.length === 0 && (
-          <div className="p-12 text-center text-gray-400 text-sm font-medium">
+          <div className="p-12 text-center text-muted-foreground text-sm font-medium">
             No hay órdenes registradas aún.
           </div>
         )}

@@ -16,10 +16,10 @@ export const OrderItems = () => {
   if (productsInCart.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500 mb-4">Tu carrito está vacío</p>
+        <p className="text-muted-foreground mb-4">Tu carrito está vacío</p>
         <Link
           href="/"
-          className="text-brand-primary font-semibold hover:text-gray-700 transition-colors"
+          className="text-foreground font-semibold hover:text-muted-foreground transition-colors"
         >
           Agregar productos
         </Link>
@@ -28,15 +28,15 @@ export const OrderItems = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Tu Pedido</h2>
+    <div className="bg-background rounded-xl shadow-sm border border-border p-6">
+      <h2 className="text-xl font-bold text-foreground mb-4">Tu Pedido</h2>
       <div className="space-y-4">
         {productsInCart.map((item) => (
           <div
             key={`${item.slug}-${item.size}`}
-            className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-b-0 last:pb-0"
+            className="flex items-center gap-4 pb-4 border-b border-border last:border-b-0 last:pb-0"
           >
-            <div className="w-16 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
+            <div className="w-16 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0 relative">
               <Image
                 src={item.image?.startsWith('http') ? item.image : `/products/${item.image}`}
                 alt={item.title}
@@ -46,27 +46,27 @@ export const OrderItems = () => {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 text-sm truncate">
+              <h3 className="font-semibold text-foreground text-sm truncate">
                 {item.title}
               </h3>
               <div className="flex flex-wrap gap-1 mt-1">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   Talle: {item.size}
                 </span>
                 {item.color && (
                   <>
-                    <span className="text-xs text-gray-500">•</span>
-                    <span className="text-xs text-gray-500 capitalize">
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <span className="text-xs text-muted-foreground capitalize">
                       {item.color.replace(/_/g, " ")}
                     </span>
                   </>
                 )}
-                <span className="text-xs text-gray-500">•</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">•</span>
+                <span className="text-xs text-muted-foreground">
                   Cant: {item.quantity}
                 </span>
               </div>
-              <p className="text-sm font-medium text-gray-900 mt-1">
+              <p className="text-sm font-medium text-foreground mt-1">
                 ${(item.price * item.quantity).toLocaleString()}
               </p>
             </div>

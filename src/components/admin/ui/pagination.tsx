@@ -40,22 +40,22 @@ function PaginationInner({ total, pageSize, currentPage }: PaginationProps) {
 
   const base =
     "inline-flex items-center justify-center h-9 min-w-[36px] px-3 rounded-lg text-sm font-semibold transition-all duration-150 select-none";
-  const active = `${base} bg-gray-900 text-white shadow-sm`;
-  const inactive = `${base} bg-white border border-gray-200 text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 cursor-pointer`;
-  const disabledCls = `${base} bg-gray-50 border border-gray-100 text-gray-300 cursor-not-allowed pointer-events-none`;
-  const ellipsisCls = `${base} border-0 text-gray-400 cursor-default pointer-events-none`;
+  const active = `${base} bg-foreground text-white shadow-sm`;
+  const inactive = `${base} bg-card border border-border text-muted-foreground hover:bg-foreground hover:text-white hover:border-foreground cursor-pointer`;
+  const disabledCls = `${base} bg-muted border border-muted text-border cursor-not-allowed pointer-events-none`;
+  const ellipsisCls = `${base} border-0 text-muted-foreground cursor-default pointer-events-none`;
 
   return (
     <nav
       aria-label="Paginación"
-      className="flex items-center justify-between pt-4 border-t border-gray-100 mt-2"
+      className="flex items-center justify-between pt-4 border-t border-muted mt-2"
     >
       {/* Info de registros */}
-      <p className="text-xs text-gray-400 font-medium hidden sm:block">
-        Página <span className="text-gray-700 font-bold">{currentPage}</span> de{" "}
-        <span className="text-gray-700 font-bold">{totalPages}</span>
+      <p className="text-xs text-muted-foreground font-medium hidden sm:block">
+        Página <span className="text-foreground font-bold">{currentPage}</span> de{" "}
+        <span className="text-foreground font-bold">{totalPages}</span>
         {" · "}
-        <span className="text-gray-700 font-bold">{total}</span> registros
+        <span className="text-foreground font-bold">{total}</span> registros
       </p>
 
       <div className="flex items-center gap-1.5 ml-auto">

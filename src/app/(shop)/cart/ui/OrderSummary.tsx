@@ -16,32 +16,32 @@ export const OrderSummary = () => {
   const ivaIncluido = total - total / (1 + IVA_RATE);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 sticky top-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">
+    <div className="bg-background rounded-lg shadow-sm border border-border p-6 sticky top-6">
+      <h2 className="text-xl font-bold text-foreground mb-6">
         Resumen del Pedido
       </h2>
 
       <div className="space-y-3 mb-6">
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-muted-foreground">
           <span>
             Subtotal ({itemsInCart} producto{itemsInCart !== 1 ? "s" : ""})
           </span>
           <span className="font-medium">{currencyFormat(subTotal)}</span>
         </div>
 
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-muted-foreground">
           <span>Envío</span>
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-foreground">
             Retiro gratis / Envío a acordar
           </span>
         </div>
 
-        <div className="border-t border-gray-200 pt-3">
-          <div className="flex justify-between text-lg font-bold text-gray-900">
-            <span>Total</span>
-            <span>{currencyFormat(total)}</span>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">
+<div className="border-t border-border pt-3">
+           <div className="flex justify-between text-lg font-bold text-foreground">
+             <span>Total</span>
+             <span>{currencyFormat(total)}</span>
+           </div>
+           <p className="text-xs text-muted-foreground mt-1">
             IVA incluido: {currencyFormat(ivaIncluido)}
           </p>
         </div>
@@ -50,7 +50,7 @@ export const OrderSummary = () => {
       <div className="space-y-3">
         <Link
           href="/checkout/address"
-          className="w-full bg-gray-900 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-800 transition-all duration-300 flex items-center justify-center"
+          className="w-full bg-mutedoreground text-background font-semibold py-3 px-6 rounded-lg hover:bg-muted-foreground transition-all duration-300 flex items-center justify-center"
         >
           <IoCard className="w-5 h-5 mr-2" />
           Finalizar Compra
@@ -58,15 +58,15 @@ export const OrderSummary = () => {
 
         <Link
           href="/"
-          className="w-full border border-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center"
+          className="w-full border border-input text-foreground font-medium py-3 px-6 rounded-lg hover:bg-muted transition-all duration-300 flex items-center justify-center"
         >
           <IoArrowBack className="w-5 h-5 mr-2" />
           Seguir Comprando
         </Link>
       </div>
 
-      <div className="mt-6 pt-6 border-t border-gray-100">
-        <div className="space-y-2 text-sm text-gray-600">
+      <div className="mt-6 pt-6 border-t border-border">
+        <div className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <IoShieldCheckmark className="w-4 h-4 text-green-500 shrink-0" />
             <span>Devolución gratuita 30 días</span>

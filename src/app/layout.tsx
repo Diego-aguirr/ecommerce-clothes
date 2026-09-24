@@ -19,7 +19,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} antialiased text-gray-900 bg-white`}>
+      <body className={`${inter.className} antialiased text-foreground bg-background`}>
         <Provider>{children}</Provider>
       </body>
     </html>

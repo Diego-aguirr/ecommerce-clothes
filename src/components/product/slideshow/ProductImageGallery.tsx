@@ -101,7 +101,7 @@ function TwoImageLayout({ images, title }: { images: string[]; title: string }) 
                 "relative w-[72px] h-[72px] shrink-0 overflow-hidden rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111]",
                 selectedIndex === idx
                   ? "border-[#111] opacity-100 shadow-sm"
-                  : "border-transparent opacity-50 hover:opacity-75 hover:border-gray-200",
+                  : "border-transparent opacity-50 hover:opacity-75 hover:border-border",
               ].join(" ")}
             >
               <GalleryImage
@@ -178,7 +178,7 @@ function MultiImageLayout({ images, title }: { images: string[]; title: string }
                 "relative w-[72px] h-[72px] shrink-0 overflow-hidden rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111]",
                 selectedIndex === idx
                   ? "border-[#111] opacity-100 shadow-sm"
-                  : "border-transparent opacity-50 hover:opacity-75 hover:border-gray-200",
+                  : "border-transparent opacity-50 hover:opacity-75 hover:border-border",
               ].join(" ")}
             >
               <GalleryImage
@@ -266,7 +266,7 @@ function FullscreenModal({
     >
       {/* Close button */}
       <button
-        className="absolute top-5 right-5 text-white text-4xl leading-none hover:text-gray-300 transition-colors z-10"
+        className="absolute top-5 right-5 text-white text-4xl leading-none hover:text-border transition-colors z-10"
         onClick={onClose}
         aria-label="Cerrar"
       >
@@ -277,7 +277,7 @@ function FullscreenModal({
       {images.length > 1 && (
         <>
           <button
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-5xl leading-none hover:text-gray-300 transition-colors z-10 p-2"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-5xl leading-none hover:text-border transition-colors z-10 p-2"
             onClick={(e) => {
               e.stopPropagation();
               handlePrev();
@@ -287,7 +287,7 @@ function FullscreenModal({
             ‹
           </button>
           <button
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-5xl leading-none hover:text-gray-300 transition-colors z-10 p-2"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-5xl leading-none hover:text-border transition-colors z-10 p-2"
             onClick={(e) => {
               e.stopPropagation();
               handleNext();

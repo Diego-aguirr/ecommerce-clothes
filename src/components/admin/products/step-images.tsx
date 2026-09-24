@@ -58,7 +58,7 @@ export function StepImages({ images, onChange }: StepImagesProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-muted-foreground">
           {images.length} imagen{images.length !== 1 && "es"} — La primera será
           la principal
         </span>
@@ -74,21 +74,21 @@ export function StepImages({ images, onChange }: StepImagesProps) {
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-xl p-8 text-center transition ${
           dragOver
-            ? "border-blue-400 bg-blue-50"
-            : "border-gray-200 hover:border-gray-300"
+            ? "border-primary bg-primary/5"
+            : "border-border hover:border-border"
         }`}
       >
         {uploading ? (
           <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm text-gray-500">Subiendo...</span>
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm text-muted-foreground">Subiendo...</span>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <FiImage size={32} className="text-gray-300" />
-            <p className="text-sm text-gray-500">
+            <FiImage size={32} className="text-border" />
+            <p className="text-sm text-muted-foreground">
               Arrastrá una imagen aquí o{" "}
-              <label className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">
+              <label className="text-primary font-medium cursor-pointer">
                 seleccioná un archivo
                 <input
                   type="file"
@@ -98,7 +98,7 @@ export function StepImages({ images, onChange }: StepImagesProps) {
                 />
               </label>
             </p>
-            <p className="text-xs text-gray-400">PNG, JPG hasta 5MB</p>
+            <p className="text-xs text-muted-foreground">PNG, JPG hasta 5MB</p>
           </div>
         )}
       </div>
@@ -109,7 +109,7 @@ export function StepImages({ images, onChange }: StepImagesProps) {
           {images.map((img, idx) => (
             <div
               key={img.publicId}
-              className="relative group aspect-square rounded-lg border border-gray-200 overflow-hidden"
+              className="relative group aspect-square rounded-lg border border-border overflow-hidden"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -125,7 +125,7 @@ export function StepImages({ images, onChange }: StepImagesProps) {
                     <button
                       type="button"
                       onClick={() => moveImage(idx, idx - 1)}
-                      className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:bg-white text-xs font-bold"
+                      className="w-7 h-7 bg-background/90 rounded-full flex items-center justify-center text-foreground hover:bg-card text-xs font-bold"
                     >
                       ←
                     </button>
@@ -141,7 +141,7 @@ export function StepImages({ images, onChange }: StepImagesProps) {
                     <button
                       type="button"
                       onClick={() => moveImage(idx, idx + 1)}
-                      className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:bg-white text-xs font-bold"
+                      className="w-7 h-7 bg-background/90 rounded-full flex items-center justify-center text-foreground hover:bg-card text-xs font-bold"
                     >
                       →
                     </button>
@@ -151,7 +151,7 @@ export function StepImages({ images, onChange }: StepImagesProps) {
 
               {/* Badge */}
               {idx === 0 && (
-                <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-gray-900 text-white text-[10px] font-bold rounded">
+                <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-foreground text-white text-[10px] font-bold rounded">
                   Principal
                 </span>
               )}

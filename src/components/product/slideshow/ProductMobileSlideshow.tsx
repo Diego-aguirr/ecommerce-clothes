@@ -57,7 +57,7 @@ export const ProductMobileSlideshow = ({
       {safeImages.length > 1 && (
         <div className="flex justify-center gap-2 mt-3">
           {safeImages.map((_, idx) => (
-            <div key={idx} className="w-2 h-2 rounded-full bg-gray-300" />
+            <div key={idx} className="w-2 h-2 rounded-full bg-border" />
           ))}
         </div>
       )}

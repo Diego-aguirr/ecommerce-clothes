@@ -108,7 +108,7 @@ export const FormRegister = () => {
         disabled={isGooglePending}
         onClick={handleGoogleSignIn}
         className="
-          w-full rounded-md border border-neutral-300 bg-white py-2.5 text-sm font-medium
+          w-full rounded-md border border-neutral-300 bg-background py-2.5 text-sm font-medium
           text-neutral-800 transition-colors hover:bg-neutral-100
           focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
           disabled:opacity-60 disabled:cursor-not-allowed
