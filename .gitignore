@@ -81,6 +81,9 @@ skills-lock.json
 # ─── SDD artifacts (no subir al repo) ───
 openspec/
 
+# ─── ODD feature tracking (no subir al repo) ───
+odd/
+
 # ─── Drafts & posts (no subir al repo) ───
 linkedin-post.txt
 arquitectura-auditoria.txt

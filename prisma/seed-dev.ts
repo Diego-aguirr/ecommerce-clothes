@@ -86,6 +86,24 @@ const users = [
     isSuperAdmin: false,
     status: "ACTIVE" as const,
   },
+  {
+    id: "usr_diego_001",
+    name: "Diego Alexis Aguirre",
+    email: "diegoalexisaguirre2@gmail.com",
+    emailVerified: new Date(),
+    role: "admin" as const,
+    isSuperAdmin: true,
+    status: "ACTIVE" as const,
+  },
+  {
+    id: "usr_blocked_001",
+    name: "Blocked Test",
+    email: "blocked@test.com",
+    emailVerified: new Date(),
+    role: "user" as const,
+    isSuperAdmin: false,
+    status: "BLOCKED" as const,
+  },
 ];
 
 // ═════════════════════════════════════════════════════════════════

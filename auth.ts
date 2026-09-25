@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Email from "next-auth/providers/email";
 import { sendEmail } from "@/lib/mailer";
 import { magicLinkEmailTemplate } from "@/lib/magic-link-email";
+import { isStatusActive } from "@/lib/auth-status";
 
 if (!process.env.AUTH_SECRET) {
   if (process.env.NODE_ENV === "production") {
@@ -42,6 +43,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           magicLinkUrl: url,
         });
 
+        if (process.env.NODE_ENV !== "production") {
+          console.log(`🔗 [dev] Magic link para ${identifier}: ${url}`);
+        }
+
         await sendEmail({
           to: identifier,
           subject: "Tu link para iniciar sesión",
@@ -59,11 +64,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
-          select: { id: true, emailVerified: true },
+          select: { id: true, emailVerified: true, status: true },
         });
 
         // No existe → rechazar silenciosamente (respuesta uniforme por seguridad)
         if (!existingUser) return false;
+
+        // BLOCKED ≡ desconocido: misma respuesta uniforme, sin disclosure
+        if (!isStatusActive(existingUser.status)) return false;
 
         // Asignar el id correcto para que el JWT lo use
         user.id = existingUser.id;
@@ -80,6 +88,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       // No existing user — let adapter create everything normally
       if (!existingUser) return true;
+
+      // BLOCKED: reject before the hasGoogle shortcut and before any
+      // Account link write — covers linked AND not-yet-linked cases.
+      if (!isStatusActive(existingUser.status)) return false;
 
       // Already has Google linked — nothing to do
       const hasGoogle = existingUser.accounts.some(
@@ -114,7 +126,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id;
         token.role = user.role ?? "user";
         token.isSuperAdmin = user.isSuperAdmin ?? false;
+        return token; // sign-in: status already enforced by signIn callback
       }
+
+      // Refresh path: re-check status on every session read so a mid-session
+      // block takes effect before token expiry. Returning null clears the cookie.
+      const userId = (token.id ?? token.sub) as string | undefined;
+      if (!userId) return null;
+      const dbUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { status: true },
+      });
+      if (!isStatusActive(dbUser?.status)) return null;
       return token;
     },
 
