@@ -42,10 +42,10 @@ Prisma → PostgreSQL
    - El estado de pago reside en `OrderStatus` (`pending`, `paid`, `cancelled`) y se asocia al checkout o confirmaciones de cobro de pasarela (ej. MercadoPago) o aprobación manual de admin (efectivo/transferencia).
    - Para pagos manuales (cash/transfer), el admin aprueba mediante `actions/admin/orders.ts` → `approveManualPayment()`, que llama a `order.service.ts` → `approveCashPaymentService()`.
    - El estado de envío es totalmente independiente y reside en `DeliveryStatus` (`pending`, `shipped`, `delivered`).
-   - Las manipulaciones del estado de envío se realizan desde `order.service.ts` → `updateDeliveryStatus`.
+   - Las manipulaciones del estado de envío se realizan desde la Server Action `actions/admin/orders.ts` → `updateDeliveryStatus()`, que delega a `order.service.ts` → `updateOrderDeliveryStatusService()`.
 
 2. **Control de Inventario (Stock Panel)**:
-   - Todo movimiento de stock usa `product.service.ts` → `adjustStock()`.
+   - Todo movimiento de stock manual usa la Server Action `actions/admin/products.ts` → `adjustStock()`, que delega a `product.service.ts` → `adjustProductStockService()`.
    - Las ventas confirmadas (MP webhook o admin approval) usan `order.service.ts` → `confirmPaymentAndUpdateStock()`.
    - Estas actualizaciones crean registros trazables en `StockMovement`.
 
@@ -65,9 +65,9 @@ Siguiendo la arquitectura Server-First:
 | Archivo | Responsabilidad |
 |---------|-----------------|
 | `actions/admin/*.ts` | Thin orchestrators (auth + validación + delegación) |
-| `services/order.service.ts` | Lógica de órdenes (createOrder, updateStatus, etc.) |
+| `services/order.service.ts` | Lógica de órdenes (createOrder, updateOrderPaymentStatusService, updateOrderDeliveryStatusService, confirmPaymentAndUpdateStock, etc.) |
 | `services/product.service.ts` | Lógica de productos (CRUD, stock, paginación) |
-| `services/user.service.ts` | Lógica de usuarios (toggleBlock, updateRole) |
+| `services/user.service.ts` | Lógica de usuarios (toggleUserBlockService, updateUserRoleService) |
 | `services/category.service.ts` | Lógica de categorías (CRUD) |
 | `services/color.service.ts` | Lógica de colores (CRUD) |
 | `services/variant.service.ts` | Lógica de variantes (CRUD) |

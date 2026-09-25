@@ -4,7 +4,7 @@
 Sistema de Órdenes
 
 ## Función
-Gestiona la creación, consulta y gestión de órdenes de compra. Incluye la creación atómica con decremento de stock, snapshots de precio, y estados de entrega.
+Gestiona la creación, consulta y gestión de órdenes de compra. Incluye la creación atómica de la orden (sin tocar stock), la confirmación de pago con decremento de stock, snapshots de precio, y estados de entrega.
 
 ## Importancia
 🔴 **CRÍTICO** — Las órdenes son la transacción principal del negocio.
@@ -67,12 +67,15 @@ Gestiona la creación, consulta y gestión de órdenes de compra. Incluye la cre
 2. action place-order.ts
 3. Validar sesión (requireSession)
 4. Validar items con Zod
-5. order.service.ts → crear Order + OrderItem + OrderAddress
-6. Crear Payment (status: CREATED)
-7. Decrementar stock atómicamente
-8. Registrar StockMovement por cada item
-9. Crear preferencia de MercadoPago
-10. Retornar init_point (URL de pago)
+5. order.service.ts → crear Order + OrderItem + OrderAddress (transacción)
+6. Crear Payment (status: CREATED) — fin de `placeOrder`, retorna `{ order, payment }`
+7. (post-orden) action `src/actions/payment/create-preference.ts` → preferencia MP → init_point
+8. Redirect a MercadoPago
+
+El stock NO se toca en la creación: el decremento atómico y el `StockMovement`
+(`type: "sale"`) se escriben dentro de `confirmPaymentAndUpdateStock()`
+(`order.service.ts`), invocada desde el webhook de MP o desde la aprobación
+manual de admin (efectivo/transferencia).
 ```
 
 ## Snapshot de Precio

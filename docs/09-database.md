@@ -75,7 +75,7 @@ Province (1) ──→ (N) OrderAddress
 | Modelo | Índice | Propósito |
 |--------|--------|-----------|
 | Product | gender | Filtrado por género |
-| ProductVariant | productId, sku, color, isActive | Búsquedas frecuentes |
+| ProductVariant | `@@unique([productId, size, color])` + 4 índices simples (`productId`, `sku`, `color`, `isActive`) | Unicidad de variante y búsquedas frecuentes |
 | ProductColor | productId | Filtrado por producto |
 | Order | userId, orderNumber | Búsquedas por usuario |
 | OrderItem | orderId, productId, variantId | Joins frecuentes |
@@ -83,10 +83,12 @@ Province (1) ──→ (N) OrderAddress
 
 ## Reglas de Importación
 
-- **NUNCA** importar tipos de Prisma en componentes `.tsx`
-- **NUNCA** importar `src/generated/prisma/` en actions
+Son **reglas objetivo**; hoy el código todavía las viola en varios lugares:
+
+- **NUNCA** importar tipos de Prisma en componentes `.tsx` → hoy lo hacen `product-wizard.tsx`, `step-basic-data.tsx`, `edit-product-tabs.tsx`, `VariantForm.tsx`, `edit-product-form.tsx` y `(shop)/gender/[gender]/page.tsx`
+- **NUNCA** importar `src/generated/prisma/` en actions → hoy lo hacen `actions/admin/orders.ts`, `actions/admin/products.ts`, `actions/admin/users.ts` y `actions/product/product-pagination.ts`
 - **SIEMPRE** usar DTOs o interfaces propias
-- **Services** son los ÚNICOS que importan Prisma
+- **Services** deberían ser los **ÚNICOS** que importan Prisma → también lo hacen `api/webhooks/mercadopago/route.ts`, `api/checkout/start/route.ts`, `lib/admin/audit-logger.ts` y varias páginas de `app/admin/`
 
 ## Requiere Revisión
 

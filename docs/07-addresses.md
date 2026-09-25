@@ -23,14 +23,13 @@ Gestiona las direcciones guardadas de los usuarios y el catálogo de provincias 
 | `src/actions/address/get-user-address.ts` | Obtener direcciones del usuario |
 | `src/actions/address/set-user-address.ts` | Crear/editar dirección |
 | `src/actions/address/delete-user-address.ts` | Eliminar dirección |
-| `src/actions/provincies/get-provincies.ts` | Obtener provincias |
-| `src/actions/provincies/ensure-provinces.ts` | Asegurar que existan |
+| `src/actions/provincies/get-provincies.ts` | Obtener provincias (seed automático vía `ensureProvincesExistService()` en `province.service.ts`) |
 
 ### Pages
 | Ruta | Función |
 |------|---------|
-| `(shop)/profile/page.tsx` | Perfil con direcciones |
-| `(shop)/checkout/address/page.tsx` | Selección de dirección |
+| `(shop)/profile/page.tsx` | Perfil (nombre, email, rol, id, expiración de sesión) — sin UI de direcciones |
+| `(shop)/checkout/address/page.tsx` | Selección de dirección (única UI para gestionar direcciones) |
 
 ### Components
 | Archivo | Función |
@@ -72,7 +71,7 @@ Gestiona las direcciones guardadas de los usuarios y el catálogo de provincias 
 
 ## Provincias
 
-Las provincias se seedean con `ensure-provinces.ts`. Son datos estáticos de Argentina.
+Las provincias se seedean con `ensureProvincesExistService()` (`src/services/province.service.ts`, llamado desde `getProvincesService()`) y con `pnpm seed:prod` (`prisma/seed-prod.ts`). Son datos estáticos de Argentina.
 
 ## Requiere Revisión
 

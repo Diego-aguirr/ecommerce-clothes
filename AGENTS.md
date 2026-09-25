@@ -10,40 +10,39 @@ Start here for cross-project norms.
 
 This repository is a domain-driven ecommerce platform built as a **modular monolith** with a unified services layer.
 
-- Each component has an `AGENTS.md` file with specific guidelines (e.g., `api/AGENTS.md`, `src/AGENTS.md`).
+- Folder-specific guidelines live in: `src/AGENTS.md`, `src/app/admin/AGENTS.md`, `src/app/api/AGENTS.md`.
 
 ## Available Skills
 
 Use these skills for detailed patterns on-demand:
 
+> **Availability:** `skills/` is gitignored and **not present in the repo** — the old `[SKILL.md](skills/...)` links were broken in any fresh clone. These skills exist only where an agent environment installs them locally; if your environment doesn't have a skill, fall back to this file.
+
 ### Generic Skills (Any Project)
 
-| Skill        | Description                                 | URL                                    |
-| ------------ | ------------------------------------------- | -------------------------------------- |
-| `typescript` | Const types, flat interfaces, utility types | [SKILL.md](skills/typescript/SKILL.md) |
-| `react-19`   | No useMemo/useCallback, React Compiler      | [SKILL.md](skills/react-19/SKILL.md)   |
-| `nextjs-15`  | App Router, Server Actions, streaming       | [SKILL.md](skills/nextjs-15/SKILL.md)  |
-| `tailwind-4` | cn() utility, no var() in className         | [SKILL.md](skills/tailwind-4/SKILL.md) |
-| `playwright` | Page Object Model, MCP workflow, selectors  | [SKILL.md](skills/playwright/SKILL.md) |
-| `zod-4`      | New API (z.email(), z.uuid())               | [SKILL.md](skills/zod-4/SKILL.md)      |
-| `zustand-5`  | Persist, selectors, slices                  | [SKILL.md](skills/zustand-5/SKILL.md)  |
+| Skill        | Description                                 | Disponibilidad           |
+| ------------ | ------------------------------------------- | ------------------------ |
+| `typescript` | Const types, flat interfaces, utility types | Local (fuera del repo)   |
+| `react-19`   | No useMemo/useCallback, React Compiler      | Local (fuera del repo)   |
+| `nextjs-15`  | App Router, Server Actions, streaming       | Local (fuera del repo)   |
+| `tailwind-4` | cn() utility, no var() in className         | Local (fuera del repo)   |
+| `zod-4`      | New API (z.email(), z.uuid())               | Local (fuera del repo)   |
+| `zustand-5`  | Persist, selectors, slices                  | Local (fuera del repo)   |
 
 ### Auto-invoke Skills
 
-When performing these actions, ALWAYS invoke the corresponding skill FIRST:
+When performing these actions, ALWAYS invoke the corresponding skill FIRST (when available):
 
 | Action                                                                                | Skill              |
 | ------------------------------------------------------------------------------------- | ------------------ |
 | App Router / Server Actions                                                           | `nextjs-15`        |
 | Creating Zod schemas                                                                  | `zod-4`            |
-| Handling database transactions, queries, or Prisma schema changes                     | `prisma-7`         |
-| Working with Authentication (NextAuth v5 / Auth.js)                                   | `nextauth-5`       |
-| Working with payments, webhooks, or generating checkout links                         | `mercadopago`      |
 | Using Zustand stores                                                                  | `zustand-5`        |
 | Working with Tailwind classes                                                         | `tailwind-4`       |
 | Writing React components                                                              | `react-19`         |
 | Writing TypeScript types/interfaces                                                   | `typescript`       |
-| Writing Playwright E2E tests                                                          | `playwright`       |
+
+> Not available as skills (removed): `playwright` (Playwright no es dependencia del proyecto — sin config ni tests), `prisma-7`, `nextauth-5`, `mercadopago` (nunca existieron en `skills/`).
 
 ---
 
@@ -51,7 +50,7 @@ When performing these actions, ALWAYS invoke the corresponding skill FIRST:
 
 This repository is a production-grade ecommerce platform built with:
 
-- Next.js 15 App Router
+- Next.js 16 App Router
 - React 19
 - TypeScript strict mode
 - Prisma 7 ORM
@@ -99,7 +98,7 @@ This project follows the **Modular Monolith** architectural pattern:
 │  Services (business logic)                      │
 │  • Lógica de negocio                            │
 │  • Queries Prisma                               │
-│  • server-only (11/11)                          │
+│  • server-only (12/12)                          │
 └──────────────────┬──────────────────────────────┘
                    │ consulta
 ┌──────────────────▼──────────────────────────────┐
@@ -223,6 +222,8 @@ Never create new architectural patterns.
 
 - Auth system = NextAuth v5.
 - Agents must: use server session helpers, never decode tokens manually, never store auth state client-side
+- **No password login** — only Magic Link (Email) + Google OAuth. There is no logout action (client-side `signOut` from next-auth/react).
+- **`User.status` rule (fail-closed):** only `ACTIVE` users may access. `BLOCKED`/`DELETED` are rejected in `auth.ts` at `signIn` and re-checked on every JWT refresh (a mid-session block clears the cookie). Services/actions must respect status — use `isStatusActive()` from `lib/auth-status.ts`; never assume a valid session implies an active user.
 
 ---
 
@@ -346,14 +347,14 @@ If unsure where code belongs:
 ```
 src/
 ├── actions/              - [Server Actions (thin orchestrators)]
-│   ├── auth/             - [Auth actions: login, register, logout]
+│   ├── auth/             - [Auth actions: magic link, register, Google (logout = client-side signOut)]
 │   ├── order/            - [Order actions: place, get, list]
 │   ├── product/          - [Product actions: get, paginate]
+│   ├── category/         - [Category actions: get]
 │   ├── address/          - [Address actions: get, set, delete]
-│   ├── provincies/       - [Province actions: ensure, get]
+│   ├── provincies/       - [Province actions: get]
 │   ├── payment/          - [Payment actions: create preference]
-│   ├── admin/            - [Admin actions: CRUD for all domains]
-│   └── index.ts          - [Re-exports]
+│   └── admin/            - [Admin actions: CRUD for all domains]
 ├── app/                  - [Pages and Routes]
 │   ├── (auth)/           - [Auth routes: login, register]
 │   ├── (shop)/           - [Shop routes: products, cart, checkout, orders, payments]
@@ -374,13 +375,21 @@ src/
 ├── interfaces/           - [Type contracts and data interfaces]
 ├── lib/                  - [Shared utilities and Prisma client]
 │   ├── admin/            - [Admin utilities: auth-utils, audit-logger]
-│   ├── api/              - [API utilities]
 │   ├── schemas/          - [Zod schemas]
 │   ├── storage/          - [Storage utilities]
-│   └── validations/      - [Validation schemas]
+│   ├── validations/      - [Validation schemas]
+│   ├── prisma.ts         - [Prisma client singleton]
+│   ├── auth-status.ts    - [Fail-closed User.status gate]
+│   ├── mailer.ts         - [Resend email client]
+│   ├── mercadopago.ts    - [MercadoPago client]
+│   ├── errors.ts         - [Unified error handler]
+│   ├── html-escape.ts    - [XSS escaping for emails]
+│   ├── url.ts            - [isLocalUrl — open redirect guard]
+│   ├── magic-link-email.ts | image-utils.ts | utils.ts | zod.ts
 ├── seed/                 - [Seed scripts for database]
-├── services/             - [Business logic layer (server-only)]
+├── services/             - [Business logic layer (server-only · 12 services)]
 │   ├── address.service.ts
+│   ├── admin.service.ts
 │   ├── auth.service.ts
 │   ├── category.service.ts
 │   ├── color.service.ts
@@ -407,8 +416,8 @@ src/
 pnpm install && pnpm run dev      # Start dev server
 pnpm run build                     # Production build
 npx tsc --noEmit                   # TypeScript check
-pnpm run lint:fix                  # Fix lint issues
+pnpm run lint                      # ESLint (no auto-fix script exists)
 pnpm run test                      # Vitest (watch mode)
 pnpm run test:run                  # Vitest (single run)
-pnpm run test:coverage             # Vitest with coverage
+# pnpm run test:coverage           # ⚠️ FALLA: @vitest/coverage-v8 NO está instalado (instalar dep antes de usar)
 ```

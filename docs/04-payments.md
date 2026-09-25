@@ -25,7 +25,7 @@ Gestiona la integración con MercadoPago: creación de preferencias de pago, pro
 | Archivo | Función |
 |---------|---------|
 | `src/app/api/webhooks/mercadopago/route.ts` | Webhook de confirmación de pago |
-| `src/app/api/checkout/start/route.ts` | Iniciar checkout |
+| `src/app/api/checkout/start/route.ts` | Gate de verificación de email (sesión + `emailVerified` → `{ ok: true }`). Sin callers — endpoint legacy |
 
 ### Config
 | Archivo | Función |
@@ -61,14 +61,15 @@ Gestiona la integración con MercadoPago: creación de preferencias de pago, pro
 4. MercadoPago retorna init_point (URL de pago)
 5. Usuario paga en MercadoPago
 6. MercadoPago envía webhook a /api/webhooks/mercadopago
-7. Webhook: verificar firma HMAC
-8. Webhook: fetch estado real desde MP
-9. Webhook: validar monto contra DB
-10. Webhook: idempotencia (no duplicar)
-11. Webhook: si APPROVED → transacción atómica:
-    - Decrementar stock
-    - Registrar StockMovement
-    - Marcar orden como pagada
+7. Webhook: verificar firma HMAC (antes de la transacción)
+8. Webhook: todo lo demás corre dentro de UNA sola `prisma.$transaction`:
+   - fetch estado real desde MP (`Payment.get`)
+   - validar monto contra DB
+   - idempotencia (no duplicar)
+   - si APPROVED → `confirmPaymentAndUpdateStock()`:
+     - Decrementar stock
+     - Registrar StockMovement
+     - Marcar orden como pagada
 ```
 
 ## Seguridad del Webhook
