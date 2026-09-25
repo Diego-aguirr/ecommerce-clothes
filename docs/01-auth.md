@@ -14,13 +14,13 @@ Gestiona registro, login por magic link y Google OAuth, sesiones y verificación
 ### Services
 | Archivo | Función |
 |---------|---------|
-| `src/services/auth.service.ts` | Registro de usuarios, validación de credenciales |
+| `src/services/auth.service.ts` | Registro de usuarios (sin password), lookup de usuarios para magic link |
 
 ### Actions
 | Archivo | Función |
 |---------|---------|
 | `src/actions/auth/register.ts` | Registro con Zod validation |
-| `src/actions/auth/login.ts` | Login con credenciales |
+| `src/actions/auth/login.ts` | Envío de magic link (respuesta uniforme: no revela si el email existe) |
 | `src/actions/auth/google.ts` | OAuth con Google |
 
 ### API Routes
@@ -28,6 +28,7 @@ Gestiona registro, login por magic link y Google OAuth, sesiones y verificación
 |---------|---------|
 | `src/app/api/auth/[...nextauth]/route.ts` | NextAuth handler |
 | `src/app/api/auth/magic-link/route.ts` | Redirect legacy de links viejos |
+| `src/app/api/auth/verify/route.ts` | Stub degradación — redirect legacy (la verificación ocurre al iniciar sesión) |
 
 ### Pages
 | Ruta | Función |
@@ -50,15 +51,28 @@ Gestiona registro, login por magic link y Google OAuth, sesiones y verificación
 4. Redirect a login — el magic link verifica el email al iniciar sesión
 ```
 
-## Flujo de Login
+## Flujo de Login (Magic Link)
 
 ```
-1. Usuario ingresa credenciales
-2. action login.ts → NextAuth signIn
-3. NextAuth verifica password (bcrypt)
-4. Crear Session
+1. Usuario ingresa su email en LoginForm (campo email únicamente — no hay campo password)
+2. action login.ts (sendMagicLink) → NextAuth signIn("email")
+3. NextAuth envía el magic link por email (Resend vía lib/mailer, TTL 5 min)
+4. Usuario clickea el link → NextAuth valida el token y crea Session (JWT)
 5. Redirect a home
 ```
+
+> **No existe login por password**: no hay Credentials provider, el usuario nunca define
+> una contraseña y no existe flujo de "olvidé mi password". Los únicos providers son
+> **Magic Link (email)** y **Google OAuth**.
+
+## Enforcement de `User.status` (fail-closed)
+
+- **Al iniciar sesión (callback `signIn` en `auth.ts`)**: Email y Google rechazan usuarios con
+  status distinto de `ACTIVE`. `BLOCKED`/`DELETED` se tratan como desconocidos: respuesta
+  uniforme, sin disclosure.
+- **En cada refresh del JWT (callback `jwt`)**: se relee `User.status` de la DB; si dejó de estar
+  `ACTIVE`, el callback devuelve `null` y **se limpia la cookie** — un bloqueo a mitad de sesión
+  surte efecto antes de que expire el token.
 
 ## Flujo Google OAuth
 
@@ -74,10 +88,10 @@ Gestiona registro, login por magic link y Google OAuth, sesiones y verificación
 
 ## Configuración
 
-- **Providers**: Google OAuth + Credentials
+- **Providers**: Google OAuth + Email (magic link) — sin Credentials, sin passwords
 - **Secret**: `NEXTAUTH_SECRET` en .env
 - **URL**: `NEXTAUTH_URL` en .env
-- **Auto-link**: Si un usuario se registró con credenciales y después usa Google con el mismo email, se linkea automáticamente (evita OAuthAccountNotLinked)
+- **Auto-link**: Si un usuario se registró por magic link y después usa Google con el mismo email, se linkea automáticamente (evita OAuthAccountNotLinked)
 
 ## Requiere Revisión
 

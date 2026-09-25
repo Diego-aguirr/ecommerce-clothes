@@ -1,6 +1,6 @@
 # E-Commerce
 
-Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 15 App Router, React 19, TypeScript strict mode, Prisma 7, PostgreSQL y NextAuth v5.
+Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 16 App Router, React 19, TypeScript strict mode, Prisma 7, PostgreSQL y NextAuth v5.
 
 ---
 
@@ -8,11 +8,11 @@ Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 
 
 | Capa     | Tecnología                                           |
 | -------- | ---------------------------------------------------- |
-| Frontend | Next.js 15 (App Router) · React 19 · Tailwind CSS v4 |
+| Frontend | Next.js 16 (App Router) · React 19 · Tailwind CSS v4 |
 | State    | Zustand v5 (carrito global)                          |
 | Forms    | React Hook Form + Zod v4                             |
 | Backend  | TypeScript strict · Prisma 7 ORM                     |
-| Database | PostgreSQL 15 (Docker local / Neon producción)       |
+| Database | PostgreSQL 16 (Docker local / Neon producción)       |
 | Auth     | NextAuth v5 (Google OAuth + Magic Links)              |
 | Pagos    | MercadoPago                                          |
 | Imágenes | Cloudinary                                           |
@@ -37,6 +37,8 @@ Server Components
 
 ### 1. Clonar e instalar dependencias
 
+> **Requisitos:** Node **24.x** y pnpm **>=10** (definidos en `package.json` → `engines`). Verificá con `node -v` y `pnpm -v` antes de instalar.
+
 ```bash
 git clone <tu-repositorio>
 cd new-ecommerce-java
@@ -53,7 +55,11 @@ cp .env.templete .env.docker
 
 Editá `.env.docker` y completá todas las variables requeridas. El archivo ya viene con la `DATABASE_URL` apuntando al servicio `db` de Docker, así que no necesitás cambiarla.
 
-> **Requeridas:** `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`.
+> **Requeridas:** `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`.
+>
+> **Recomendadas (según feature):** `APP_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME` (fallback "Satoru Store"), `MERCADOPAGO_WEBHOOK_SECRET` (si falta, la verificación de firma del webhook queda **deshabilitada** porque el código cae a `""`), `MERCADOPAGO_PUBLIC_KEY`.
+>
+> **Cloudinary:** `CLOUDINARY_URL` **o** bien las tres variables separadas `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` (opcionales comentadas en `.env.templete`).
 
 #### Sin Docker
 
@@ -63,7 +69,9 @@ cp .env.templete .env
 
 Editá `.env` y completá todas las variables requeridas, incluyendo `DATABASE_URL` con tu PostgreSQL local.
 
-> **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`.
+> **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`.
+>
+> **Recomendadas (según feature):** `APP_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME`, `MERCADOPAGO_WEBHOOK_SECRET` (sin ella el webhook no valida firmas), `MERCADOPAGO_PUBLIC_KEY`.
 
 ### 3. Levantar el entorno completo
 
@@ -76,7 +84,13 @@ sup          # o: docker compose -f docker-compose.yml -f docker-compose.dev.yml
 Abrí [http://localhost:3000](http://localhost:3000).
 
 > **Nota:** La primera vez tarda en buildear. Las siguientes es instantáneo por los volumes.
-> **Migraciones:** El entrypoint de desarrollo aplica `prisma migrate deploy` automáticamente al iniciar.
+>
+> **Migraciones + seed en cada boot:** El entrypoint de desarrollo (`scripts/docker-dev-entrypoint.sh`) corre automáticamente:
+>
+> 1. `npx prisma migrate deploy`
+> 2. `npx tsx prisma/seed-dev.ts` — **DESTRUCTIVO**: borra catálogo (products, variants, colors, images), usuarios, órdenes, pagos, categorías y provincias, y reescribe el catálogo local de **8 productos** + usuarios de test en **cada restart del contenedor**. Cualquier cambio local en esos datos se pierde al reiniciar.
+>
+> ⚠️ **Caveat en fresh clone:** `scripts/` está en `.gitignore` y **no se sube al repo**, así que `docker-compose.dev.yml` ejecuta `sh scripts/docker-dev-entrypoint.sh` con un archivo que no existe → el quickstart con `sup` **falla en un clone nuevo** hasta que copies/restaures el script (pedirlo al maintainer) o levantás sin entrypoint.
 
 ---
 
@@ -121,6 +135,8 @@ alias dcdev='docker compose -f docker-compose.yml -f docker-compose.dev.yml'
 alias dcprod='docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod'
 ```
 
+> ⚠️ **`dcprod`:** requiere `.env.prod`, archivo que **no existe en el repo y nunca estuvo documentado**. Sin él, cualquier comando `dcprod`/`pup`/`pdown` falla. Crealo localmente antes de usarlo (no commitearlo).
+
 ### SAURON Dev
 
 ```bash
@@ -163,12 +179,29 @@ alias gb='git branch'
 ### Atajos combinados
 
 ```bash
-# Reset completo de DB
+# ⚠️ DESTRUCTIVO — Reset completo de DB
 alias dbreset='sdown && sup && sleep 3 && sexec npx prisma migrate deploy && sexec npx tsx prisma/seed.ts'
+```
 
+> 🛑 **`dbreset` borra TODO**: orders, payments, users, categories, provinces y todo el catálogo, y recrea los usuarios de test (`superadmin@test.com`, `admin@test.com`, `user@test.com`, `blocked@test.com`, etc.). **Nunca correrlo contra una DB con datos reales.**
+>
+> Además `prisma/seed.ts` referencia imágenes de `img/products/`, que está en `.gitignore` → **en un fresh clone el seed falla o crea productos sin imágenes** hasta que exista ese directorio.
+
+```bash
 # Build limpio local
 alias clean='rm -rf .next node_modules && pnpm install && pnpm run build'
 ```
+
+---
+
+## Seeds
+
+| Comando | Qué hace | Seguridad |
+| ------- | -------- | --------- |
+| `pnpm seed` (`prisma/seed.ts`) | **DESTRUCTIVO**: borra users, orders, payments, categorías, provincias y catálogo completo, y reescribe el catálogo con imágenes de **Cloudinary** + usuarios de test | Solo local: bloquea con `exit 1` si `NODE_ENV=production` o si `DATABASE_URL` apunta a `neon.tech`. En Docker: `docker exec <container> npx tsx prisma/seed.ts` |
+| `pnpm seed:users` (`prisma/seed-users.ts`) | **Idempotente** (upsert, nunca borra): crea/actualiza el super admin `diegoalexisaguirre2@gmail.com` + `user@test.com` + `blocked@test.com` (status `BLOCKED`) | Local only: bloquea production, Neon y cualquier URL no-local (`exit 1`) |
+| `pnpm seed:prod` (`prisma/seed-prod.ts`) | Solo provincias + categorías (datos base). **Único seed pensado para producción** | Idempotente: salta si ya hay datos |
+| `npx tsx prisma/seed-dev.ts` | Catálogo local de **8 productos** con imágenes de `public/products/` + usuarios de test. **Se corre solo en cada boot del contenedor dev** (entrypoint) | Local only (bloquea production/Neon/no-local). ⚠️ **Borra catálogo, usuarios, órdenes y pagos en cada restart** |
 
 ---
 
@@ -177,9 +210,11 @@ alias clean='rm -rf .next node_modules && pnpm install && pnpm run build'
 ```
 src/
 ├── actions/            # Server Actions (thin orchestrators)
-│   ├── auth/           # Login, register, logout
+│   ├── auth/           # Magic link, register, Google
 │   ├── order/          # Place, get, list
 │   ├── product/        # Get, paginate
+│   ├── category/       # Get categorías
+│   ├── provincies/     # Get provincias
 │   ├── address/        # CRUD direcciones
 │   ├── admin/          # CRUD dominios (admin)
 │   └── payment/        # Payment actions: MP preference, admin approval
@@ -189,16 +224,33 @@ src/
 │   ├── admin/          # Panel de administración
 │   └── api/            # API endpoints y webhooks
 ├── components/         # UI Components (React)
-│   ├── ui/             # Componentes genéricos
+│   ├── ui/             # Componentes genéricos (hand-rolled)
+│   ├── admin/          # Componentes del panel admin
 │   ├── product/        # Componentes de producto
+│   ├── products/       # Listado de productos
+│   ├── mercadopago/    # MercadoPagoButton
 │   └── provider/       # Context Providers (client)
-├── services/           # Business logic (server-only)
+├── services/           # Business logic (server-only · 12 services)
 ├── store/              # Client-side state (Zustand)
+│   ├── address/        # useAddressStore
 │   ├── cart/           # useCartStore
 │   └── ui/             # useUIStore
-├── lib/                # Utilidades compartidas
+├── lib/                # Utilidades compartidas (16 entradas)
+│   ├── admin/          # auth-utils (requireAdmin), audit-logger
+│   ├── schemas/        # Zod schemas
+│   ├── storage/        # Storage utilities
+│   ├── validations/    # Validation schemas
+│   ├── prisma.ts       # Cliente Prisma singleton
+│   ├── mailer.ts       # Cliente Resend (emails)
+│   ├── auth-status.ts  # Gate fail-closed de User.status
+│   ├── errors.ts       # Error handler unificado
 │   ├── html-escape.ts  # XSS escaping para emails
-│   └── url.ts          # isLocalUrl (open redirect guard)
+│   ├── mercadopago.ts  # Cliente MercadoPago
+│   ├── url.ts          # isLocalUrl (open redirect guard)
+│   └── ...             # utils.ts, zod.ts, magic-link-email.ts, image-utils.ts
+├── config/             # Configuración
+├── generated/prisma/   # Auto-generado por Prisma
+├── types/              # Global type definitions
 ├── interfaces/         # Type contracts
 ├── hooks/              # Custom hooks
 ├── seed/               # Seed scripts
@@ -313,6 +365,31 @@ Usá la URL HTTPS de Ngrok para configurar los webhooks en tu pasarela de pagos.
 
 ---
 
+## Producción (deploy)
+
+Deploy en **Vercel** (config en [`vercel.json`](./vercel.json)):
+
+- `buildCommand`: **`npx prisma generate && next build --turbopack`** — solo genera el cliente Prisma y buildea. **No se corren migraciones ni seeds en el deploy.**
+- `installCommand`: `pnpm install --frozen-lockfile`
+
+Reglas de producción:
+
+- 🛑 **NUNCA** correr `pnpm seed` ni `pnpm seed:users` contra Neon: ambos scripts tienen guards que los frenan con `exit 1` si `NODE_ENV=production` o si `DATABASE_URL` apunta a `neon.tech`. No intentar bypassearlos.
+- **Migraciones:** `npx prisma migrate deploy` debe correrse **manualmente** contra Neon cada vez que cambia el schema (hoy hay 19 migraciones en `prisma/migrations/`, todas aplicadas).
+- **Seed en prod:** si hace falta datos base, solo `pnpm seed:prod` (provincias + categorías). Nunca `seed` ni `seed:users`.
+- **Imágenes:** en producción se sirven desde **Cloudinary**. `public/products/` está en `.gitignore` y existe solo para dev local (seed-dev).
+
+### Estado de usuarios (BLOCKED)
+
+`User.status` (`ACTIVE` / `BLOCKED` / `DELETED`) se valida en [`auth.ts`](./auth.ts) en dos puntos:
+
+1. **`signIn` callback** — magic link y Google: un usuario `BLOCKED` no puede iniciar sesión (respuesta uniforme, sin revelar por qué).
+2. **`jwt` callback (refresh)** — se re-consulta el status en cada lectura de sesión: si el usuario es bloqueado a mitad de sesión, `return null` **limpia la cookie** antes de que expire el token.
+
+Fail-closed: solo `ACTIVE` tiene acceso (`isStatusActive()` en `src/lib/auth-status.ts`). Services y actions deben respetar este estado — no asumir que una sesión válida implica un usuario activo.
+
+---
+
 ## Variables de Entorno
 
 Ver [`.env.templete`](./.env.templete) para la lista completa y documentación de cada variable.
@@ -325,6 +402,7 @@ La documentación detallada de cada dominio se encuentra en [`docs/`](./docs/):
 
 | Archivo                  | Contenido                         |
 | ------------------------ | --------------------------------- |
+| `00-proyecto-overview.md`| Overview general del proyecto     |
 | `01-auth.md`             | Sistema de autenticación          |
 | `02-products.md`         | Catálogo de productos y variantes |
 | `03-orders.md`           | Gestión de órdenes                |

@@ -7,7 +7,9 @@ Cuando un usuario paga en MercadoPago, MP nos manda un POST a `/api/webhooks/mer
 MP firma cada webhook con un secreto que tenemos en `MERCADOPAGO_WEBHOOK_SECRET`. Nosotros tomamos el body crudo, calculamos el HMAC SHA256 con nuestro secreto, y lo comparo contra el `x-signature` que viene en el header. Uso `timingSafeEqual` para que no sea vulnerable a timing attacks.
 
 En **producción**: si la firma no coincide, rechazo con 401. Punto.
-En **desarrollo**: solo logueo un warning y dejo pasar para poder testear con el sandbox de MP.
+En **desarrollo**: si la firma no coincide, la salteo silenciosamente y sigo (no hay ningún `console.*` en el route) para poder testear con el sandbox de MP.
+
+Detalle no obvio: si `MERCADOPAGO_WEBHOOK_SECRET` no está seteado, `verifySignature` devuelve `false` sin más → en producción TODOS los webhooks caen en 401, y en desarrollo todos pasan.
 
 ## 2. ¿Qué nos llegó?
 

@@ -1,6 +1,6 @@
 # Ecommerce API Agent — Ruleset Oficial
 
-Stack obligatorio: Next.js 15 App Router · Prisma 7 · Zod 4 · NextAuth v5 · TypeScript strict
+Stack obligatorio: Next.js 16 App Router · Prisma 7 · Zod 4 · NextAuth v5 · TypeScript strict
 
 ## Architecture
 
@@ -22,9 +22,8 @@ Prisma → PostgreSQL
 |--------|-------|
 | Crear endpoint API | `nextjs-15` |
 | Validar input | `zod-4` |
-| Query DB | `prisma-7` |
-| Auth check | `nextauth-5` |
-| Testing endpoint | `playwright` |
+
+> Not available as skills (removed): `prisma-7`, `nextauth-5`, `playwright` (nunca existieron en `skills/`).
 
 ## CRITICAL RULES — NO NEGOCIABLES
 

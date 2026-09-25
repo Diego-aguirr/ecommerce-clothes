@@ -1,28 +1,30 @@
 # Agents UI - AI Agent Ruleset
 
-> **Skills Reference**: For detailed patterns, use these skills:
- > - [`typescript`](../skills/typescript/SKILL.md) - Const types, flat interfaces
- > - [`react-19`](../skills/react-19/SKILL.md) - No useMemo/useCallback, compiler
- > - [`nextjs-15`](../skills/nextjs-15/SKILL.md) - App Router, Server Actions
- > - [`tailwind-4`](../skills/tailwind-4/SKILL.md) - cn() utility, no var() in className
- > - [`zod-4`](../skills/zod-4/SKILL.md) - New API (z.email(), z.uuid())
- > - [`zustand-5`](../skills/zustand-5/SKILL.md) - Selectors, persist middleware
+> **Skills Reference**: For detailed patterns, use these skills — installed locally in
+> agent environments, **not in the repo** (`skills/` is gitignored, so the old
+> `../skills/...` links were broken in any fresh clone). If your environment doesn't
+> have a skill, fall back to this file.
+> - `typescript` - Const types, flat interfaces
+> - `react-19` - No useMemo/useCallback, compiler
+> - `nextjs-15` - App Router, Server Actions
+> - `tailwind-4` - cn() utility, no var() in className
+> - `zod-4` - New API (z.email(), z.uuid())
+> - `zustand-5` - Selectors, persist middleware
 
 ### Auto-invoke Skills
 
-When performing these actions, ALWAYS invoke the corresponding skill FIRST:
+When performing these actions, ALWAYS invoke the corresponding skill FIRST (when available):
 
 | Action | Skill |
 |--------|-------|
 | App Router / Server Actions | `nextjs-15` |
-| Building AI chat features | `ai-sdk-5` |
 | Creating Zod schemas | `zod-4` |
-| Creating/modifying services | `prisma-7` |
 | Using Zustand stores | `zustand-5` |
 | Working with Tailwind classes | `tailwind-4` |
-| Writing Playwright E2E tests | `playwright` |
 | Writing React components | `react-19` |
 | Writing TypeScript types/interfaces | `typescript` |
+
+> Not available as skills (removed): `prisma-7`, `playwright` (Playwright no es dependencia del proyecto — sin config ni tests), `nextauth-5`, `mercadopago` (nunca existieron en `skills/`). Tampoco hay skill de AI — el proyecto no tiene features de AI.
 
 ---
 
@@ -140,7 +142,7 @@ UI components → components/ui/ (generic) | components/{domain}/ (domain-specif
 ### Component Placement
 
 ```
-New/Existing UI? → Tailwind + components/ui/ or components/{domain}/ (NEVER HeroUI for new code)
+New/Existing UI? → Tailwind + components/ui/ or components/{domain}/ (hand-rolled, no UI framework)
 Used 1 feature? → keep local in feature directory | Used 2+? → components/{domain}/
 Needs state/hooks? → "use client" | Server component? → No directive
 ```
@@ -228,11 +230,9 @@ const useStore = create(
 
 ## TECH STACK
 
-Next.js 15 | React 19 | TypeScript strict | Prisma 7 | PostgreSQL (Neon)
-Tailwind 4 | shadcn/ui | Zod 4 | React Hook Form | Zustand 5 | NextAuth v5
+Next.js 16 | React 19 | TypeScript strict | Prisma 7 | PostgreSQL (Neon)
+Tailwind 4 | Zod 4 | React Hook Form | Zustand 5 | NextAuth v5
 MercadoPago (payments) | Cloudinary (images)
-
-> **Note**: HeroUI exists in `components/ui/` as legacy code. Do NOT add new components there.
 
 ---
 
@@ -241,14 +241,14 @@ MercadoPago (payments) | Cloudinary (images)
 ```
 src/
 ├── actions/              - [Server Actions (thin orchestrators)]
-│   ├── auth/             - [Auth: login, register, logout]
+│   ├── auth/             - [Auth: magic link, register, Google (logout = client-side signOut)]
 │   ├── order/            - [Orders: place, get, list]
 │   ├── product/          - [Products: get, paginate]
+│   ├── category/         - [Categories: get]
 │   ├── address/          - [Addresses: get, set, delete]
-│   ├── provincies/       - [Provinces: ensure, get]
+│   ├── provincies/       - [Provinces: get]
 │   ├── payment/          - [Payments: create preference]
-│   ├── admin/            - [Admin: CRUD all domains]
-│   └── index.ts          - [Re-exports]
+│   └── admin/            - [Admin: CRUD all domains]
 ├── app/                  - [Pages and Routes]
 │   ├── (auth)/           - [Auth routes: login, register]
 │   ├── (shop)/           - [Shop routes: products, cart, checkout, orders, payments]
@@ -276,8 +276,9 @@ src/
 │   ├── url.ts            - [isLocalUrl — open redirect guard]
 │   └── validations/      - [Validation schemas]
 ├── seed/                 - [Seed scripts for database]
-├── services/             - [Business logic layer (server-only)]
+├── services/             - [Business logic layer (server-only · 12 services)]
 │   ├── address.service.ts
+│   ├── admin.service.ts
 │   ├── auth.service.ts
 │   ├── category.service.ts
 │   ├── color.service.ts
@@ -304,10 +305,10 @@ src/
 pnpm install && pnpm run dev      # Start dev server
 pnpm run build                     # Production build
 npx tsc --noEmit                   # TypeScript check
-pnpm run lint:fix                  # Fix lint issues
+pnpm run lint                      # ESLint (no auto-fix script exists)
 pnpm run test                      # Vitest (watch mode)
 pnpm run test:run                  # Vitest (single run)
-pnpm run test:coverage             # Vitest with coverage
+# pnpm run test:coverage           # ⚠️ FALLA: @vitest/coverage-v8 NO está instalado (instalar dep antes de usar)
 ```
 
 ---

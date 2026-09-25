@@ -22,13 +22,20 @@ Dashboard completo para gestionar productos, variantes, colores, órdenes, usuar
 | `src/actions/admin/categories.ts` | CRUD categorías |
 | `src/actions/admin/upload.ts` | Subida de imágenes |
 
+### Services
+| Archivo | Función |
+|---------|---------|
+| `src/services/admin.service.ts` | Backing de cada lista paginada y del dashboard: `getDashboardStats`, `getPaginatedProductsAdmin`, `getPaginatedOrdersAdmin`, `getPaginatedPaymentsAdmin`, `getPaginatedUsersAdmin`, `getPaginatedAuditLogs` |
+
 ### Components
 | Archivo | Función |
 |---------|---------|
 | `src/components/admin/ui/admin-sidebar.tsx` | Sidebar del admin |
 | `src/components/admin/ui/pagination.tsx` | Paginación admin |
 | `src/components/admin/dashboard/stat-card.tsx` | Tarjetas de estadísticas |
-| `src/components/admin/products/product-form.tsx` | Formulario de producto |
+| `src/components/admin/products/product-wizard.tsx` | Wizard de creación (steps `step-*.tsx`) |
+| `src/components/admin/products/edit-product-tabs.tsx` | Tabs del formulario de edición |
+| `src/app/admin/products/[id]/edit-product-form.tsx` | Formulario de edición (page-level) |
 | `src/components/admin/products/product-thumbnail.tsx` | Thumbnail de producto |
 
 ### Pages
@@ -52,18 +59,17 @@ Dashboard completo para gestionar productos, variantes, colores, órdenes, usuar
 
 ## Seguridad
 
-- Todas las actions admin usan `requireAdmin()` que verifica:
-  1. Sesión activa
-  2. Usuario existe en DB
-  3. Rol es `admin`
-- Si no pasa → retorna `{ ok: false, error: "Unauthorized" }`
+- Las actions admin usan `requireAdmin()` — excepto `src/actions/admin/users.ts`, que usa `requireSuperAdmin()`, y las páginas `admin/users`, `admin/payments`, `admin/audit`, que se protegen a nivel de página con `requireSuperAdmin()`. Verifica:
+  1. Sesión activa (`session.user`)
+  2. Rol es `admin` (`requireSuperAdmin()` exige además `isSuperAdmin`)
+- **No consulta la DB**: solo lee `session.user` / `session.user.role` (`src/lib/admin/auth-utils.ts`)
+- Si no pasa → **lanza** `unauthorized()` (401) o `forbidden()` (403) de `next/navigation` — no retorna `{ ok: false }`
 
 ## Funcionalidades
 
 ### Dashboard
-- Estadísticas de ventas
-- Últimas órdenes
-- Productos con stock bajo
+- 4 stat cards (`getDashboardStats`): `totalRevenue`, `todayOrders`, `pendingOrders`, `productsCount`
+- (No hay widget de "Últimas órdenes" ni de "stock bajo")
 
 ### Productos
 - Crear/editar/eliminar productos
@@ -79,7 +85,7 @@ Dashboard completo para gestionar productos, variantes, colores, órdenes, usuar
 
 ### Usuarios
 - Lista de usuarios
-- Cambio de estado (ACTIVE/BLOCKED/DELETED)
+- Cambio de estado (ACTIVE/BLOCKED — `toggleUserBlockService` solo alterna esos dos; `DELETED` no existe en el flujo)
 - Asignación de roles
 
 ### Auditoría

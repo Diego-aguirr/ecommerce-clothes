@@ -2,18 +2,18 @@
 
 ## Qué es
 
-Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 15. Single deployable unit con dominios separados y una capa unificada de services.
+Plataforma e-commerce completa construida como **Modular Monolith** con Next.js 16. Single deployable unit con dominios separados y una capa unificada de services.
 
 ## Stack
 
 | Capa | Tecnología |
 |------|-----------|
-| Frontend | Next.js 15 (App Router), React 19, Tailwind CSS 4 |
+| Frontend | Next.js 16 (App Router), React 19, Tailwind CSS 4 |
 | State | Zustand 5 (carrito global) |
 | Forms | React Hook Form + Zod 4 |
 | Backend | TypeScript strict, Prisma 7 |
 | DB | PostgreSQL (Neon) |
-| Auth | NextAuth v5 (Google + credenciales) |
+| Auth | NextAuth v5 (Google + magic link por email) |
 | Pagos | MercadoPago |
 | Imágenes | Cloudinary |
 
@@ -160,5 +160,5 @@ Server Components
 pnpm install && pnpm run dev      # Dev server
 pnpm run build                     # Build producción
 npx tsc --noEmit                   # Type check
-pnpm run lint:fix                  # Fix lint
+pnpm run lint                      # ESLint (no auto-fix script)
 ```

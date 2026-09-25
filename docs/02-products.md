@@ -38,10 +38,11 @@ Gestiona el catálogo completo: productos, variantes (talla+color), colores, im�
 | `src/components/product/size-selector/SizeSelector.tsx` | Selector de tallas |
 | `src/components/product/color-selector/ColorSelector.tsx` | Selector de colores |
 | `src/components/product/quantity-selector/QuantitySelector.tsx` | Selector de cantidad |
-| `src/components/product/slideshow/ProductSlideshow.tsx` | Slideshow de imágenes |
+| `src/components/product/slideshow/ProductImageGallery.tsx` | Galería de imágenes (desktop) |
 | `src/components/product/slideshow/ProductMobileSlideshow.tsx` | Slideshow mobile |
-| `src/components/product/stock-label/StockLabel.tsx` | Label de stock |
-| `src/components/admin/products/product-form.tsx` | Formulario admin |
+| `src/components/admin/products/product-wizard.tsx` | Wizard de creación admin (steps `step-*.tsx`) |
+| `src/components/admin/products/edit-product-tabs.tsx` | Tabs de edición admin |
+| `src/app/admin/products/[id]/edit-product-form.tsx` | Formulario de edición admin (page-level) |
 | `src/components/admin/products/product-thumbnail.tsx` | Thumbnail admin |
 
 ### Pages
@@ -73,7 +74,7 @@ Gestiona el catálogo completo: productos, variantes (talla+color), colores, im�
 3. Crear Product en DB
 4. Crear ProductImage (upload a Cloudinary)
 5. Crear ProductVariant por cada talla+color
-6. Crear StockMovement por cada variante
+6. Crear StockMovement por cada variante (solo si `variantData.stock > 0`)
 7. revalidatePath → actualizar cache
 ```
 
