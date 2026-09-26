@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { Payment } from "mercadopago";
 import { getMpClient } from "@/lib/mercadopago";
@@ -7,27 +6,7 @@ import { PaymentStatus } from "@/generated/prisma/enums";
 import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
 import { confirmPaymentAndUpdateStock } from "@/services/order.service";
-
-// ---------------------------------------------------------------------------
-// Verify MP signature (HMAC SHA256)
-// ---------------------------------------------------------------------------
-function verifySignature(request: NextRequest, body: string): boolean {
-  const signature = request.headers.get("x-signature") ?? "";
-  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "";
-  if (!secret) return false;
-
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(body)
-    .digest("hex");
-
-  const sigBuf = Buffer.from(signature, "hex");
-  const expBuf = Buffer.from(expected, "hex");
-
-  if (sigBuf.length !== expBuf.length) return false;
-
-  return crypto.timingSafeEqual(sigBuf, expBuf);
-}
+import { verifyMpSignature } from "@/lib/mercadopago-signature";
 
 // ---------------------------------------------------------------------------
 // MAIN WEBHOOK
@@ -35,8 +14,13 @@ function verifySignature(request: NextRequest, body: string): boolean {
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
-  // Verificación de firma
-  const isValidSignature = verifySignature(req, rawBody);
+  // Verificación de firma (manifest HMAC, no el body — ver lib/mercadopago-signature.ts)
+  const isValidSignature = verifyMpSignature({
+    header: req.headers.get("x-signature"),
+    dataId: req.nextUrl.searchParams.get("data.id"),
+    requestId: req.headers.get("x-request-id"),
+    secret: process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "",
+  });
 
   if (!isValidSignature) {
     if (process.env.NODE_ENV === "production") {
