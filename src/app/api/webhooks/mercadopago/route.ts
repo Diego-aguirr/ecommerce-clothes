@@ -7,7 +7,12 @@ import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
 import { confirmPaymentAndUpdateStock } from "@/services/order.service";
 import { verifyMpSignature } from "@/lib/mercadopago-signature";
-import { amountsMatch, currenciesMatch } from "@/lib/mercadopago-webhook-decision";
+import {
+  amountsMatch,
+  currenciesMatch,
+  decideWebhookOutcome,
+  WebhookDecisionKind,
+} from "@/lib/mercadopago-webhook-decision";
 
 // ---------------------------------------------------------------------------
 // MAIN WEBHOOK
@@ -58,15 +63,11 @@ export async function POST(req: NextRequest) {
     try {
       mpResponse = await paymentClient.get({ id: payload.data.id });
     } catch {
-      await tx.paymentLog.create({
-        data: {
-          provider: "mercadopago",
-          event: "mp_fetch_error",
-          rawData: payload,
-        },
-      });
-
-      return { ok: true }; // evitar retries infinitos
+      // El log se escribe FUERA de la transacción (ver abajo): adentro el
+      // rollback lo borraría. Devuelvo un resultado discriminado y respondo
+      // non-2xx para que MP reintente (backoff acotado 15min → 96h, no
+      // infinito) en vez de perder el evento con un 200 silencioso.
+      return { kind: WebhookDecisionKind.MP_FETCH_ERROR, webhook: payload };
     }
 
     const {
@@ -104,9 +105,16 @@ export async function POST(req: NextRequest) {
       throw new Error("Invalid provider");
     }
 
-    // antifraude
+    // antifraude: approved pero sin liquidar → non-2xx + log duradero fuera
+    // de la transacción para que MP reintente hasta acreditar.
     if (mpStatus === "approved" && status_detail !== "accredited") {
-      return { ok: true, message: "Not accredited yet" };
+      return {
+        kind: WebhookDecisionKind.NOT_ACCREDITED,
+        webhook: payload,
+        paymentId: payment.id,
+        mpStatus,
+        mpStatusDetail: status_detail,
+      };
     }
 
     // validación monto (tolerante a ruido Float: ver lib/mercadopago-webhook-decision.ts)
@@ -158,7 +166,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (updated.count === 0) {
-      return { ok: true, message: "Already processed (race safe)" };
+      // Duplicado: respondo 200, pero el log `duplicate` con
+      // providerPaymentId se escribe fuera de la transacción para que un
+      // doble cobro quede visible en la DB (antes: cero trazas).
+      return {
+        kind: WebhookDecisionKind.DUPLICATE,
+        webhook: payload,
+        paymentId: payment.id,
+      };
     }
 
     // confirmar orden
@@ -192,6 +207,18 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: false, error: "Amount mismatch" }, { status: 500 });
+  }
+
+  // Fetch fallido / no acreditado / duplicado: log duradero FUERA de la
+  // transacción (adentro el rollback lo borraría) y respuesta decidida en
+  // lib/mercadopago-webhook-decision.ts (cubierta por tests puros).
+  // El chequeo por valor (y no solo `"kind" in result`) es necesario porque
+  // los retornos `{ ok, message }` quedan con `kind?: undefined` en la unión.
+  if ("kind" in result && result.kind !== undefined) {
+    const decision = decideWebhookOutcome(result);
+    await prisma.paymentLog.create({ data: decision.logPayload });
+
+    return NextResponse.json(decision.response, { status: decision.httpStatus });
   }
 
   return NextResponse.json(result, { status: 200 });
