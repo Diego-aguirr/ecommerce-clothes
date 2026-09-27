@@ -7,6 +7,7 @@ import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
 import { confirmPaymentAndUpdateStock } from "@/services/order.service";
 import { verifyMpSignature } from "@/lib/mercadopago-signature";
+import { amountsMatch, currenciesMatch } from "@/lib/mercadopago-webhook-decision";
 
 // ---------------------------------------------------------------------------
 // MAIN WEBHOOK
@@ -108,21 +109,20 @@ export async function POST(req: NextRequest) {
       return { ok: true, message: "Not accredited yet" };
     }
 
-    // validación monto
+    // validación monto (tolerante a ruido Float: ver lib/mercadopago-webhook-decision.ts)
     if (
-      Number(transaction_amount) !== Number(payment.amount) ||
-      currency_id !== payment.currency
+      !amountsMatch(transaction_amount, payment.amount) ||
+      !currenciesMatch(currency_id, payment.currency)
     ) {
-      await tx.paymentLog.create({
-        data: {
-          paymentId: payment.id,
-          provider: "mercadopago",
-          event: "amount_mismatch",
-          rawData: { mp: JSON.parse(JSON.stringify(mpResponse)), db: payment },
-        },
-      });
-
-      throw new Error("Amount mismatch");
+      // No tirar adentro de la transacción: el rollback borraría el log y el
+      // throw quedaría sin registrar. Se devuelve un resultado discriminado y
+      // el log se escribe FUERA de la transacción (ver abajo).
+      return {
+        kind: "amount_mismatch" as const,
+        paymentId: payment.id,
+        mp: JSON.parse(JSON.stringify(mpResponse)),
+        db: payment,
+      };
     }
 
     // map status (FIJO OBLIGATORIO: Usar nombres estrictos del enum de Prisma)
@@ -178,6 +178,21 @@ export async function POST(req: NextRequest) {
 
     return { ok: true };
   });
+
+  // Monto/currency distinto: log duradero FUERA de la transacción + non-2xx
+  // para que MercadoPago reintente (el pago no se procesó).
+  if ("kind" in result && result.kind === "amount_mismatch") {
+    await prisma.paymentLog.create({
+      data: {
+        paymentId: result.paymentId,
+        provider: "mercadopago",
+        event: "amount_mismatch",
+        rawData: { mp: result.mp, db: result.db },
+      },
+    });
+
+    return NextResponse.json({ ok: false, error: "Amount mismatch" }, { status: 500 });
+  }
 
   return NextResponse.json(result, { status: 200 });
 }
