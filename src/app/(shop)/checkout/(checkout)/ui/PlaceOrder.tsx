@@ -83,9 +83,6 @@ export const PlaceOrder = () => {
         return;
       }
 
-      // 🧹 Limpiar Carrito
-      clearCart();
-
       if (paymentMethod === "mercadopago") {
         // Crear preferencia MP y redirigir directamente
         const preferenceResp = await createPreference(resp.order!.id);
@@ -101,9 +98,14 @@ export const PlaceOrder = () => {
           setErrorMessage("No se recibió el link de pago de Mercado Pago");
           return;
         }
+        
+        // 🧹 Limpiar Carrito SOLO después de que createPreference tenga éxito
+        clearCart();
+        
         window.location.href = preferenceResp.init_point;
       } else {
-        // Efectivo/Transferencia: redirigir a la página de la orden
+        // Efectivo/Transferencia: limpiar carrito y redirigir a la página de la orden
+        clearCart();
         router.replace(`/orders/${resp.order!.id}`);
       }
     } catch (error) {

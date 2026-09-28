@@ -14,17 +14,53 @@ import {
   WebhookDecisionKind,
 } from "@/lib/mercadopago-webhook-decision";
 
+import { Prisma } from "@/generated/prisma-v2/client";
+
+// ---------------------------------------------------------------------------
+// IDEMPOTENCY KEY: data.id + x-request-id (MP at-least-once delivery)
+// ---------------------------------------------------------------------------
+async function checkIdempotency(
+  tx: Prisma.TransactionClient,
+  dataId: string | null,
+  requestId: string | null,
+): Promise<{ isDuplicate: boolean; key: string } | null> {
+  if (!dataId || !requestId) return null;
+
+  const key = `mp:${dataId}:${requestId}`;
+
+  // Try to claim the idempotency key (atomic upsert with unique constraint)
+  try {
+    await tx.idempotencyKey.create({
+      data: {
+        key,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h TTL
+      },
+    });
+    return { isDuplicate: false, key };
+  } catch (e: unknown) {
+    // P2002 = unique constraint violation = already processed
+    if (e instanceof Error && "code" in e && e.code === "P2002") {
+      return { isDuplicate: true, key };
+    }
+    throw e;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // MAIN WEBHOOK
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
+  // Extraer idempotency key components ANTES de cualquier lógica
+  const dataId = req.nextUrl.searchParams.get("data.id");
+  const requestId = req.headers.get("x-request-id");
+
   // Verificación de firma (manifest HMAC, no el body — ver lib/mercadopago-signature.ts)
   const isValidSignature = verifyMpSignature({
     header: req.headers.get("x-signature"),
-    dataId: req.nextUrl.searchParams.get("data.id"),
-    requestId: req.headers.get("x-request-id"),
+    dataId,
+    requestId,
     secret: process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "",
   });
 
@@ -32,6 +68,24 @@ export async function POST(req: NextRequest) {
     if (process.env.NODE_ENV === "production") {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
+  }
+
+  // IDEMPOTENCY: check + claim key ANTES de la transacción (nivel webhook)
+  // Usamos transacción separada solo para la clave (no bloquea la tx principal)
+  const idempotency = await prisma.$transaction(async (tx) => {
+    return checkIdempotency(tx, dataId, requestId);
+  });
+
+  if (idempotency?.isDuplicate) {
+    // Ya procesado: log duplicado fuera de tx principal y 200
+    await prisma.paymentLog.create({
+      data: {
+        provider: "mercadopago",
+        event: "duplicate",
+        rawData: { key: idempotency.key, dataId, requestId },
+      },
+    });
+    return NextResponse.json({ ok: true, message: "Already processed" }, { status: 200 });
   }
 
   // Validar payload
