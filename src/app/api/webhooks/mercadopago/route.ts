@@ -5,7 +5,7 @@ import { getMpClient } from "@/lib/mercadopago";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
-import { confirmPaymentAndUpdateStock } from "@/services/order.service";
+import { confirmPaymentAndUpdateStock, releaseStockReservation } from "@/services/order.service";
 import { verifyMpSignature } from "@/lib/mercadopago-signature";
 import {
   amountsMatch,
@@ -230,9 +230,12 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    // confirmar orden
+    // confirmar orden o liberar reserva según estado
     if (newStatus === PaymentStatus.APPROVED) {
       await confirmPaymentAndUpdateStock(tx, payment.orderId);
+    } else if (newStatus === PaymentStatus.REJECTED || newStatus === PaymentStatus.CANCELLED) {
+      // T7: Liberar reserva de stock si el pago falla
+      await releaseStockReservation(payment.orderId);
     }
 
     // log completo
