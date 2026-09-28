@@ -91,10 +91,11 @@ Abrí [http://localhost:3000](http://localhost:3000).
 
 > **Nota:** La primera vez tarda en buildear. Las siguientes es instantáneo por los volumes.
 >
-> **Migraciones + seed en cada boot:** El entrypoint de desarrollo (`scripts/docker-dev-entrypoint.sh`) corre automáticamente:
+> **Entrypoint de desarrollo** (`scripts/docker-dev-entrypoint.sh`) corre automáticamente en cada boot:
 >
-> 1. `npx prisma migrate deploy`
-> 2. `npx tsx prisma/seed-dev.ts` — **DESTRUCTIVO**: borra catálogo (products, variants, colors, images), usuarios, órdenes, pagos, categorías y provincias, y reescribe el catálogo local de **8 productos** + usuarios de test en **cada restart del contenedor**. Cualquier cambio local en esos datos se pierde al reiniciar.
+> 1. `npx prisma generate` — **después del volume mount** (fix: evita error `Module not found: @/generated/prisma/client`)
+2. `npx prisma migrate deploy`
+3. `npx tsx prisma/seed-dev.ts` — **DESTRUCTIVO**: borra catálogo (products, variants, colors, images), usuarios, órdenes, pagos, categorías y provincias, y reescribe el catálogo local de **8 productos** + usuarios de test en **cada restart del contenedor**. Cualquier cambio local en esos datos se pierde al reiniciar.
 >
 > ⚠️ **Caveat en fresh clone:** `scripts/` está en `.gitignore` y **no se sube al repo**, así que `docker-compose.dev.yml` ejecuta `sh scripts/docker-dev-entrypoint.sh` con un archivo que no existe → el quickstart con `sup` **falla en un clone nuevo** hasta que copies/restaures el script (pedirlo al maintainer) o levantás sin entrypoint.
 
@@ -330,12 +331,18 @@ Carrito → Dirección → Checkout → Confirmar → Pago
 3. Usuario paga en MP
 4. Webhook confirma → orden pagada + stock descontado
 
-### Efectivo / Transferencia
+### Efectivo / Transferencia (Pago Offline)
 1. Usuario selecciona "Efectivo/Transferencia" en checkout
-2. Clic "Finalizar Compra" → crea orden → muestra instrucciones
-3. Usuario paga (transferencia o efectivo al retirar)
-4. Admin entra al panel → órdenes → "Confirmar pago recibido"
-5. Orden pagada + stock descontado
+2. Clic "Finalizar Compra" → crea orden con estado `CREATED` + payment `CREATED` → muestra instrucciones bancarias / datos para transferencia
+3. Usuario realiza la transferencia o paga en efectivo al retirar
+4. **Comunicación cliente-admin**: El cliente ve en su detalle de orden (`/orders/[id]`) el estado "Pago pendiente" y las instrucciones. Puede contactar al admin via email/WhatsApp (configurable en `MAIL_FROM` / variables de entorno).
+5. **Admin panel** (`/admin/orders`): Lista todas las órdenes con pago `cash`/`transfer` en estado `CREATED`/`PENDING`. Filtros por estado de pago y método.
+6. **Autorización de pago**:
+   - **Admin**: Puede ver órdenes pendientes de confirmación
+   - **Super Admin** (`isSuperAdmin: true`): Tiene acción **"Confirmar pago recibido"** → llama a `approveCashPaymentService` → valida que sea pago `cash`, no esté ya pagado, actualiza payment a `APPROVED` + confirma orden + descuenta stock (transactional)
+7. Una vez confirmado: orden → `paid`, payment → `APPROVED`, stock descontado, email de confirmación al cliente
+
+> **Nota**: Actualmente la acción "Confirmar pago recibido" solo la puede ejecutar un **Super Admin**. Pendiente: permitir a Admin regular confirmar (ver sección "Pendientes / Roadmap").
 
 ---
 
@@ -419,6 +426,32 @@ La documentación detallada de cada dominio se encuentra en [`docs/`](./docs/):
 | `08-uploads.md`          | Gestión de imágenes               |
 | `09-database.md`         | Schema y modelos de datos         |
 | `mercadopago-webhook.md` | Detalle técnico del webhook       |
+
+---
+
+## Roadmap / Pendientes
+
+### Pagos Efectivo/Transferencia
+- [ ] **Admin regular pueda confirmar pagos** (hoy solo Super Admin)
+- [ ] Notificación email automática al admin cuando hay orden `cash` pendiente
+- [ ] Vista cliente: botón "Ya realicé la transferencia" → notifica al admin
+- [ ] Expiración automática de órdenes `cash` pendientes (configurable, ej. 48h)
+
+### Admin Panel
+- [ ] Dashboard con métricas de ventas, órdenes pendientes, stock bajo
+- [ ] Exportar órdenes a CSV/Excel
+- [ ] Gestión de usuarios: bloquear/desbloquear, cambiar roles
+
+### Técnico
+- [ ] Tests de integración para webhooks (actualmente excluidos por `vitest.config.ts` exclude `src/app/**`)
+- [ ] Rate limiting en endpoints públicos (checkout, webhooks)
+- [ ] Logging estructurado (JSON) + correlation IDs
+- [ ] Health check endpoint (`/api/health`)
+
+### UX/UI
+- [ ] PWA support (offline cart, install prompt)
+- [ ] Dark mode toggle persistente
+- [ ] Skeleton loaders en páginas críticas
 
 ---
 

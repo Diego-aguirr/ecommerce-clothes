@@ -22,7 +22,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/.next
     command: sh scripts/docker-dev-entrypoint.sh
     depends_on:
       db:
