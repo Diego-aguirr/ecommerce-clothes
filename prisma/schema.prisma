@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma-v2"
 }
 
 datasource db {
@@ -50,6 +50,8 @@ enum PaymentStatus {
   APPROVED
   REJECTED
   CANCELLED
+  REFUNDED
+  CHARGED_BACK
 }
 
 enum DeliveryStatus {
@@ -390,6 +392,16 @@ model PaymentLog {
   rawData  Json
 
   createdAt DateTime @default(now())
+}
+
+model IdempotencyKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
 }
 
 model AuditLog {

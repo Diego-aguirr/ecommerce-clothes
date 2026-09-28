@@ -15,8 +15,10 @@
 
 import prisma from "@/lib/prisma";
 import "server-only";
-import { OrderStatus, DeliveryStatus, Size } from "@/generated/prisma/client";
-import type { Prisma } from "@/generated/prisma/client";
+import { getMpClient } from "@/lib/mercadopago";
+import { Payment } from "mercadopago";
+import { OrderStatus, DeliveryStatus, Size } from "@/generated/prisma-v2/client";
+import type { Prisma } from "@/generated/prisma-v2/client";
 import { provinces } from "@/seed/seed-province";
 
 // ── Types ──
@@ -155,7 +157,101 @@ function calculateTotals(
 }
 
 /**
- * Crea la orden con su pago asociado dentro de una transacción.
+ * Reserva stock para los items de la orden (decrementa stock + crea movimiento "reserved").
+ * Se ejecuta DENTRO de la transacción de creación de orden (T7).
+ */
+async function reserveStock(
+  tx: Prisma.TransactionClient,
+  items: OrderProductInput[],
+  variants: { id: string; color: string; size: string }[],
+  orderId: string,
+) {
+  for (const item of items) {
+    const variant = variants.find((v) => v.id === item.variantId);
+    if (!variant) continue;
+
+    // Validación extra: double-check stock dentro de la tx (race-safe)
+    const currentVariant = await tx.productVariant.findUnique({
+      where: { id: variant.id },
+      select: { stock: true },
+    });
+
+    if (!currentVariant || currentVariant.stock < item.quantity) {
+      const product = await tx.product.findUnique({ where: { id: item.productId }, select: { title: true } });
+      throw new Error(`Stock insuficiente para ${product?.title || "producto"} - ${variant.color} - Talle ${variant.size}`);
+    }
+
+    // Decrementar stock atómicamente
+    await tx.productVariant.update({
+      where: { id: variant.id },
+      data: { stock: { decrement: item.quantity } },
+    });
+
+    // Log de movimiento tipo "reserved" (no "sale" aún)
+    await tx.stockMovement.create({
+      data: {
+        productId: item.productId,
+        variantId: variant.id,
+        quantity: -item.quantity,
+        type: "reserved",
+        note: `Reserva por Orden ${orderId}`,
+      },
+    });
+  }
+}
+
+/**
+ * Libera la reserva de stock (incrementa stock + crea movimiento "released").
+ * Se usa si el pago falla/cancela y la orden no se paga.
+ */
+export async function releaseStockReservation(
+  orderId: string,
+) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { OrderItem: true },
+  });
+
+  if (!order) return;
+
+  return prisma.$transaction(async (tx) => {
+    for (const item of order.OrderItem) {
+      if (item.variantId) {
+        const variant = await tx.productVariant.findUnique({
+          where: { id: item.variantId },
+        });
+
+        if (variant) {
+          // Solo liberar si el movimiento "reserved" existe para esta orden
+          const reservedMovement = await tx.stockMovement.findFirst({
+            where: { productId: item.productId, variantId: item.variantId, type: "reserved", note: { contains: orderId } },
+          });
+
+          if (reservedMovement) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            });
+
+            await tx.stockMovement.create({
+              data: {
+                productId: item.productId,
+                variantId: item.variantId,
+                quantity: item.quantity,
+                type: "released",
+                note: `Liberación de reserva por Orden ${orderId}`,
+              },
+            });
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Crea la orden con su pago asociado Y reserva el stock (T7).
+ * El stock se decrementa AHORA; si el pago falla, se libera con releaseStockReservation.
  */
 async function createOrderTransaction(
   input: CreateOrderInput,
@@ -210,6 +306,9 @@ async function createOrderTransaction(
         },
       },
     });
+
+    // T7: Reservar stock AHORA (al crear la orden, antes del pago)
+    await reserveStock(tx, input.productsToOrder, variants, newOrder.id);
 
     const payment = await tx.payment.create({
       data: {
@@ -325,7 +424,8 @@ export async function updateOrderNotesService(orderId: string, notes: string) {
 // ── Payment Confirmation (shared between webhook and admin) ──
 
 /**
- * Confirma el pago de una orden y decrementa el stock.
+ * Confirma el pago de una orden (T7: stock ya reservado al crear la orden).
+ * Convierte el movimiento "reserved" a "sale" y marca orden como pagada.
  * Usado por: webhook de MP y aprobación manual de admin.
  * Es idempotente: si la orden ya está pagada, no hace nada.
  */
@@ -341,31 +441,45 @@ export async function confirmPaymentAndUpdateStock(
   if (!order) throw new Error("Order not found");
   if (order.isPaid) return order; // idempotencia
 
-  // decremento atómico seguro usando variantes
+  // T7: Stock ya fue decrementado en reserveStock al crear la orden.
+  // Aquí solo convertimos el movimiento "reserved" → "sale" y marcamos pagada.
   for (const item of order.OrderItem) {
     if (item.variantId) {
       const variant = await tx.productVariant.findUnique({
         where: { id: item.variantId },
       });
 
-      if (!variant || variant.stock < item.quantity) {
-        throw new Error(`Stock insuficiente para la variante ${item.variantId}`);
+      if (!variant) {
+        throw new Error(`Variante no encontrada: ${item.variantId}`);
       }
 
-      await tx.productVariant.update({
-        where: { id: item.variantId },
-        data: { stock: { decrement: item.quantity } },
-      });
-
-      await tx.stockMovement.create({
-        data: {
+      // Actualizar el movimiento "reserved" existente a "sale"
+      const reservedMovement = await tx.stockMovement.findFirst({
+        where: {
           productId: item.productId,
           variantId: item.variantId,
-          quantity: -item.quantity,
-          type: "sale",
-          note: `Venta por Orden ${orderId}`,
+          type: "reserved",
+          note: { contains: orderId },
         },
       });
+
+      if (reservedMovement) {
+        await tx.stockMovement.update({
+          where: { id: reservedMovement.id },
+          data: { type: "sale", note: `Venta por Orden ${orderId}` },
+        });
+      } else {
+        // Fallback: si no hay movimiento "reserved" (orden antigua), crear "sale"
+        await tx.stockMovement.create({
+          data: {
+            productId: item.productId,
+            variantId: item.variantId,
+            quantity: -item.quantity,
+            type: "sale",
+            note: `Venta por Orden ${orderId}`,
+          },
+        });
+      }
     }
   }
 
@@ -509,5 +623,97 @@ export async function getOrdersByUserService(
     total,
     totalPages: Math.ceil(total / safeTake),
     currentPage: safePage,
+  };
+}
+
+/**
+ * Verifica el estado del pago en MercadoPago y sincroniza con la BD.
+ * Usado por: página de retorno post-pago y gating del botón de pago.
+ *
+ * @param orderId - ID de la orden
+ * @param userId - ID del usuario (para verificación de propiedad)
+ * @returns Estado del pago actualizado
+ */
+export async function verifyPaymentService(
+  orderId: string,
+  userId: string,
+): Promise<{ ok: true; paymentStatus: string; orderStatus: string; isPaid: boolean } | { ok: false; message: string }> {
+  // Verificar propiedad
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { userId: true, status: true, isPaid: true, payments: { select: { id: true, providerPaymentId: true, status: true, provider: true } } },
+  });
+
+  if (!order) return { ok: false, message: "Orden no encontrada" };
+  if (order.userId !== userId) return { ok: false, message: "No autorizado" };
+
+  const mpPayment = order.payments.find((p) => p.provider === "mercadopago");
+  if (!mpPayment?.providerPaymentId) return { ok: false, message: "No hay pago de MercadoPago asociado" };
+
+  // Llamar a MP para obtener estado real
+  const client = getMpClient();
+  if (!client) return { ok: false, message: "MercadoPago no configurado" };
+
+  const paymentClient = new Payment(client);
+  let mpResponse;
+
+  try {
+    mpResponse = await paymentClient.get({ id: mpPayment.providerPaymentId });
+  } catch {
+    return { ok: false, message: "Error consultando MercadoPago" };
+  }
+
+  const { status: mpStatus, status_detail } = mpResponse;
+
+  // Mapear estado MP a nuestro enum
+  let newPaymentStatus: "CREATED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" = "CREATED";
+
+  switch (mpStatus) {
+    case "approved":
+      newPaymentStatus = status_detail === "accredited" ? "APPROVED" : "PENDING";
+      break;
+    case "pending":
+    case "in_process":
+      newPaymentStatus = "PENDING";
+      break;
+    case "rejected":
+      newPaymentStatus = "REJECTED";
+      break;
+    case "cancelled":
+      newPaymentStatus = "CANCELLED";
+      break;
+    default:
+      newPaymentStatus = "CREATED";
+  }
+
+  // Actualizar si cambió
+  let finalOrderStatus = order.status;
+  let isPaid = order.isPaid;
+
+  if (mpPayment.status !== newPaymentStatus) {
+    await prisma.payment.update({
+      where: { id: mpPayment.id },
+      data: { status: newPaymentStatus },
+    });
+  }
+
+  // Si el pago se aprobó y la orden no está pagada, confirmar
+  if (newPaymentStatus === "APPROVED" && !order.isPaid) {
+    await prisma.$transaction(async (tx) => {
+      await confirmPaymentAndUpdateStock(tx, orderId);
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: "paid", isPaid: true, paidAt: new Date() },
+      });
+    });
+    finalOrderStatus = "paid";
+    isPaid = true;
+  }
+
+  return {
+    ok: true,
+    paymentStatus: newPaymentStatus,
+    orderStatus: finalOrderStatus,
+    isPaid,
   };
 }

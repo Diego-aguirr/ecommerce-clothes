@@ -1,32 +1,49 @@
 import { NextResponse, type NextRequest } from "next/server";
-import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { Payment } from "mercadopago";
 import { getMpClient } from "@/lib/mercadopago";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { webhookSchema } from "@/lib/zod";
 import type { WebhookPayload } from "@/interfaces";
-import { confirmPaymentAndUpdateStock } from "@/services/order.service";
+import { confirmPaymentAndUpdateStock, releaseStockReservation } from "@/services/order.service";
+import { verifyMpSignature } from "@/lib/mercadopago-signature";
+import {
+  amountsMatch,
+  currenciesMatch,
+  decideWebhookOutcome,
+  WebhookDecisionKind,
+} from "@/lib/mercadopago-webhook-decision";
+
+import { Prisma } from "@/generated/prisma-v2/client";
 
 // ---------------------------------------------------------------------------
-// Verify MP signature (HMAC SHA256)
+// IDEMPOTENCY KEY: data.id + x-request-id (MP at-least-once delivery)
 // ---------------------------------------------------------------------------
-function verifySignature(request: NextRequest, body: string): boolean {
-  const signature = request.headers.get("x-signature") ?? "";
-  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "";
-  if (!secret) return false;
+async function checkIdempotency(
+  tx: Prisma.TransactionClient,
+  dataId: string | null,
+  requestId: string | null,
+): Promise<{ isDuplicate: boolean; key: string } | null> {
+  if (!dataId || !requestId) return null;
 
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(body)
-    .digest("hex");
+  const key = `mp:${dataId}:${requestId}`;
 
-  const sigBuf = Buffer.from(signature, "hex");
-  const expBuf = Buffer.from(expected, "hex");
-
-  if (sigBuf.length !== expBuf.length) return false;
-
-  return crypto.timingSafeEqual(sigBuf, expBuf);
+  // Try to claim the idempotency key (atomic upsert with unique constraint)
+  try {
+    await tx.idempotencyKey.create({
+      data: {
+        key,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h TTL
+      },
+    });
+    return { isDuplicate: false, key };
+  } catch (e: unknown) {
+    // P2002 = unique constraint violation = already processed
+    if (e instanceof Error && "code" in e && e.code === "P2002") {
+      return { isDuplicate: true, key };
+    }
+    throw e;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -35,13 +52,40 @@ function verifySignature(request: NextRequest, body: string): boolean {
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
-  // Verificación de firma
-  const isValidSignature = verifySignature(req, rawBody);
+  // Extraer idempotency key components ANTES de cualquier lógica
+  const dataId = req.nextUrl.searchParams.get("data.id");
+  const requestId = req.headers.get("x-request-id");
+
+  // Verificación de firma (manifest HMAC, no el body — ver lib/mercadopago-signature.ts)
+  const isValidSignature = verifyMpSignature({
+    header: req.headers.get("x-signature"),
+    dataId,
+    requestId,
+    secret: process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "",
+  });
 
   if (!isValidSignature) {
     if (process.env.NODE_ENV === "production") {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
+  }
+
+  // IDEMPOTENCY: check + claim key ANTES de la transacción (nivel webhook)
+  // Usamos transacción separada solo para la clave (no bloquea la tx principal)
+  const idempotency = await prisma.$transaction(async (tx) => {
+    return checkIdempotency(tx, dataId, requestId);
+  });
+
+  if (idempotency?.isDuplicate) {
+    // Ya procesado: log duplicado fuera de tx principal y 200
+    await prisma.paymentLog.create({
+      data: {
+        provider: "mercadopago",
+        event: "duplicate",
+        rawData: { key: idempotency.key, dataId, requestId },
+      },
+    });
+    return NextResponse.json({ ok: true, message: "Already processed" }, { status: 200 });
   }
 
   // Validar payload
@@ -73,15 +117,11 @@ export async function POST(req: NextRequest) {
     try {
       mpResponse = await paymentClient.get({ id: payload.data.id });
     } catch {
-      await tx.paymentLog.create({
-        data: {
-          provider: "mercadopago",
-          event: "mp_fetch_error",
-          rawData: payload,
-        },
-      });
-
-      return { ok: true }; // evitar retries infinitos
+      // El log se escribe FUERA de la transacción (ver abajo): adentro el
+      // rollback lo borraría. Devuelvo un resultado discriminado y respondo
+      // non-2xx para que MP reintente (backoff acotado 15min → 96h, no
+      // infinito) en vez de perder el evento con un 200 silencioso.
+      return { kind: WebhookDecisionKind.MP_FETCH_ERROR, webhook: payload };
     }
 
     const {
@@ -119,26 +159,32 @@ export async function POST(req: NextRequest) {
       throw new Error("Invalid provider");
     }
 
-    // antifraude
+    // antifraude: approved pero sin liquidar → non-2xx + log duradero fuera
+    // de la transacción para que MP reintente hasta acreditar.
     if (mpStatus === "approved" && status_detail !== "accredited") {
-      return { ok: true, message: "Not accredited yet" };
+      return {
+        kind: WebhookDecisionKind.NOT_ACCREDITED,
+        webhook: payload,
+        paymentId: payment.id,
+        mpStatus,
+        mpStatusDetail: status_detail,
+      };
     }
 
-    // validación monto
+    // validación monto (tolerante a ruido Float: ver lib/mercadopago-webhook-decision.ts)
     if (
-      Number(transaction_amount) !== Number(payment.amount) ||
-      currency_id !== payment.currency
+      !amountsMatch(transaction_amount, payment.amount) ||
+      !currenciesMatch(currency_id, payment.currency)
     ) {
-      await tx.paymentLog.create({
-        data: {
-          paymentId: payment.id,
-          provider: "mercadopago",
-          event: "amount_mismatch",
-          rawData: { mp: JSON.parse(JSON.stringify(mpResponse)), db: payment },
-        },
-      });
-
-      throw new Error("Amount mismatch");
+      // No tirar adentro de la transacción: el rollback borraría el log y el
+      // throw quedaría sin registrar. Se devuelve un resultado discriminado y
+      // el log se escribe FUERA de la transacción (ver abajo).
+      return {
+        kind: "amount_mismatch" as const,
+        paymentId: payment.id,
+        mp: JSON.parse(JSON.stringify(mpResponse)),
+        db: payment,
+      };
     }
 
     // map status (FIJO OBLIGATORIO: Usar nombres estrictos del enum de Prisma)
@@ -157,6 +203,12 @@ export async function POST(req: NextRequest) {
       case "cancelled":
         newStatus = PaymentStatus.CANCELLED;
         break;
+      case "refunded":
+        newStatus = PaymentStatus.REFUNDED;
+        break;
+      case "charged_back":
+        newStatus = PaymentStatus.CHARGED_BACK;
+        break;
       default:
         newStatus = PaymentStatus.PENDING;
     }
@@ -174,26 +226,96 @@ export async function POST(req: NextRequest) {
     });
 
     if (updated.count === 0) {
-      return { ok: true, message: "Already processed (race safe)" };
+      // Duplicado: respondo 200, pero el log `duplicate` con
+      // providerPaymentId se escribe fuera de la transacción para que un
+      // doble cobro quede visible en la DB (antes: cero trazas).
+      return {
+        kind: WebhookDecisionKind.DUPLICATE,
+        webhook: payload,
+        paymentId: payment.id,
+      };
     }
 
-    // confirmar orden
+    // confirmar orden, liberar reserva, o registrar refund/chargeback según estado
     if (newStatus === PaymentStatus.APPROVED) {
       await confirmPaymentAndUpdateStock(tx, payment.orderId);
+
+      // log completo
+      await tx.paymentLog.create({
+        data: {
+          paymentId: payment.id,
+          provider: "mercadopago",
+          event: payload.action,
+          rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
+        },
+      });
+
+      return { ok: true };
+    } else if (newStatus === PaymentStatus.REJECTED || newStatus === PaymentStatus.CANCELLED) {
+      // T7: Liberar reserva de stock si el pago falla
+      await releaseStockReservation(payment.orderId);
+
+      // log completo
+      await tx.paymentLog.create({
+        data: {
+          paymentId: payment.id,
+          provider: "mercadopago",
+          event: payload.action,
+          rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
+        },
+      });
+
+      return { ok: true };
+    } else if (newStatus === PaymentStatus.REFUNDED) {
+      // T9: Refund - log duradero FUERA de la transacción
+      return {
+        kind: WebhookDecisionKind.REFUNDED,
+        webhook: payload,
+        paymentId: payment.id,
+        mpStatus: mpStatus ?? "refunded",
+        mpStatusDetail: status_detail,
+      };
+    } else if (newStatus === PaymentStatus.CHARGED_BACK) {
+      // T9: Chargeback - log duradero FUERA de la transacción
+      return {
+        kind: WebhookDecisionKind.CHARGED_BACK,
+        webhook: payload,
+        paymentId: payment.id,
+        mpStatus: mpStatus ?? "charged_back",
+        mpStatusDetail: status_detail,
+      };
     }
 
-    // log completo
-    await tx.paymentLog.create({
+    // fallback
+    return { ok: true };
+  });
+
+  // Monto/currency distinto: log duradero FUERA de la transacción + non-2xx
+  // para que MercadoPago reintente (el pago no se procesó).
+  if ("kind" in result && result.kind === "amount_mismatch") {
+    await prisma.paymentLog.create({
       data: {
-        paymentId: payment.id,
+        paymentId: result.paymentId,
         provider: "mercadopago",
-        event: payload.action,
-        rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
+        event: "amount_mismatch",
+        rawData: { mp: result.mp, db: result.db },
       },
     });
 
-    return { ok: true };
-  });
+    return NextResponse.json({ ok: false, error: "Amount mismatch" }, { status: 500 });
+  }
+
+  // Fetch fallido / no acreditado / duplicado: log duradero FUERA de la
+  // transacción (adentro el rollback lo borraría) y respuesta decidida en
+  // lib/mercadopago-webhook-decision.ts (cubierta por tests puros).
+  // El chequeo por valor (y no solo `"kind" in result`) es necesario porque
+  // los retornos `{ ok, message }` quedan con `kind?: undefined` en la unión.
+  if ("kind" in result && result.kind !== undefined) {
+    const decision = decideWebhookOutcome(result);
+    await prisma.paymentLog.create({ data: decision.logPayload });
+
+    return NextResponse.json(decision.response, { status: decision.httpStatus });
+  }
 
   return NextResponse.json(result, { status: 200 });
 }

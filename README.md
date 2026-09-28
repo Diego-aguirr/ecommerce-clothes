@@ -55,11 +55,14 @@ cp .env.templete .env.docker
 
 Editá `.env.docker` y completá todas las variables requeridas. El archivo ya viene con la `DATABASE_URL` apuntando al servicio `db` de Docker, así que no necesitás cambiarla.
 
-> **Requeridas:** `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`.
->
-> **Recomendadas (según feature):** `APP_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME` (fallback "Satoru Store"), `MERCADOPAGO_WEBHOOK_SECRET` (si falta, la verificación de firma del webhook queda **deshabilitada** porque el código cae a `""`), `MERCADOPAGO_PUBLIC_KEY`.
->
-> **Cloudinary:** `CLOUDINARY_URL` **o** bien las tres variables separadas `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` (opcionales comentadas en `.env.templete`).
+> **Requeridas:** `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`, `APP_URL`, `MERCADOPAGO_WEBHOOK_SECRET`.
+> >
+> > `APP_URL` (p.ej. `https://tu-dominio.com`) se usa para construir URLs absolutas en emails y webhooks. **Obligatoria en producción**.
+> > `MERCADOPAGO_WEBHOOK_SECRET` se usa para validar la firma HMAC del webhook de MercadoPago. **Sin ella, la verificación de firma queda deshabilitada y el webhook rechaza todos los eventos en producción**.
+> >
+> > **Recomendadas:** `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME` (fallback "Satoru Store"), `MERCADOPAGO_PUBLIC_KEY`.
+> >
+> > **Cloudinary:** `CLOUDINARY_URL` **o** bien las tres variables separadas `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` (opcionales comentadas en `.env.templete`).
 
 #### Sin Docker
 
@@ -69,9 +72,12 @@ cp .env.templete .env
 
 Editá `.env` y completá todas las variables requeridas, incluyendo `DATABASE_URL` con tu PostgreSQL local.
 
-> **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`.
->
-> **Recomendadas (según feature):** `APP_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME`, `MERCADOPAGO_WEBHOOK_SECRET` (sin ella el webhook no valida firmas), `MERCADOPAGO_PUBLIC_KEY`.
+> **Requeridas:** `DATABASE_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLOUDINARY_URL`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`, `APP_URL`, `MERCADOPAGO_WEBHOOK_SECRET`.
+> >
+> > `APP_URL` (p.ej. `https://tu-dominio.com`) se usa para construir URLs absolutas en emails y webhooks. **Obligatoria en producción**.
+> > `MERCADOPAGO_WEBHOOK_SECRET` se usa para validar la firma HMAC del webhook de MercadoPago. **Sin ella, la verificación de firma queda deshabilitada y el webhook rechaza todos los eventos en producción**.
+> >
+> > **Recomendadas:** `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME` (fallback "Satoru Store"), `MERCADOPAGO_PUBLIC_KEY`.
 
 ### 3. Levantar el entorno completo
 

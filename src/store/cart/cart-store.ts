@@ -84,8 +84,10 @@ export const useCartStore = create<state>()(
           0
         );
 
-        const tax = subTotal * 0.21; // Example 21% IVA
-        const total = subTotal + tax;
+        // IVA-inclusive model: prices already include 21% IVA
+        // tax = total - total/1.21, total = subTotal
+        const total = subTotal;
+        const tax = total - total / 1.21;
         const itemsInCart = cart.reduce(
           (total, item) => total + item.quantity,
           0

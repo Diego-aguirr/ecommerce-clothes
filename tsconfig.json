@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@/generated/prisma/*": [
+        "./src/generated/prisma-v2/*"
       ]
     }
   },
