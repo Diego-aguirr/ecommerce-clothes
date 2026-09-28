@@ -83,6 +83,8 @@ Dashboard completo para gestionar productos, variantes, colores, órdenes, usuar
 - Cambio de estado de entrega (pending/shipped/delivered)
 - Tracking code
 
+> **Nota**: La confirmación de pagos **Cash/Transfer** (acción "Confirmar pago recibido") solo está disponible para **Super Admin** (`requireSuperAdmin`). La acción llama a `approveCashPaymentService` que valida pago `cash`, no pagado, actualiza a `APPROVED`, confirma orden y descuenta stock (transaccional). **Pendiente**: permitir Admin regular + notificaciones.
+
 ### Usuarios
 - Lista de usuarios
 - Cambio de estado (ACTIVE/BLOCKED — `toggleUserBlockService` solo alterna esos dos; `DELETED` no existe en el flujo)

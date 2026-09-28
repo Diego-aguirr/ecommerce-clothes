@@ -232,6 +232,11 @@ Cart → Address → Checkout → Confirm → Payment
 4. Webhook confirms → order paid + stock deducted
 
 #### Cash / Bank Transfer (Offline)
+> ⚠️ **NOTICE: This flow is incomplete / work in progress.**
+> Current implementation: Client selects "Cash/Transfer" → order created with `CREATED` status → client sees bank instructions.
+> **Missing**: Admin confirmation UI (only Super Admin can confirm via `approveCashPaymentService`), client "I paid" notification, auto-expiration, admin email notifications.
+> This is a collaborative model where admin confirms after verifying payment with client. See [Roadmap](#roadmap) for planned improvements.
+
 1. User selects "Cash / Transfer" at checkout
 2. Click "Place Order" → creates order (`CREATED`) + payment (`CREATED`) → shows bank instructions
 2. User transfers or pays cash on pickup
