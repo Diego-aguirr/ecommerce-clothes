@@ -15,8 +15,10 @@
 
 import prisma from "@/lib/prisma";
 import "server-only";
-import { OrderStatus, DeliveryStatus, Size } from "@/generated/prisma/client";
-import type { Prisma } from "@/generated/prisma/client";
+import { getMpClient } from "@/lib/mercadopago";
+import { Payment } from "mercadopago";
+import { OrderStatus, DeliveryStatus, Size } from "@/generated/prisma-v2/client";
+import type { Prisma } from "@/generated/prisma-v2/client";
 import { provinces } from "@/seed/seed-province";
 
 // ── Types ──
@@ -509,5 +511,97 @@ export async function getOrdersByUserService(
     total,
     totalPages: Math.ceil(total / safeTake),
     currentPage: safePage,
+  };
+}
+
+/**
+ * Verifica el estado del pago en MercadoPago y sincroniza con la BD.
+ * Usado por: página de retorno post-pago y gating del botón de pago.
+ *
+ * @param orderId - ID de la orden
+ * @param userId - ID del usuario (para verificación de propiedad)
+ * @returns Estado del pago actualizado
+ */
+export async function verifyPaymentService(
+  orderId: string,
+  userId: string,
+): Promise<{ ok: true; paymentStatus: string; orderStatus: string; isPaid: boolean } | { ok: false; message: string }> {
+  // Verificar propiedad
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { userId: true, status: true, isPaid: true, payments: { select: { id: true, providerPaymentId: true, status: true, provider: true } } },
+  });
+
+  if (!order) return { ok: false, message: "Orden no encontrada" };
+  if (order.userId !== userId) return { ok: false, message: "No autorizado" };
+
+  const mpPayment = order.payments.find((p) => p.provider === "mercadopago");
+  if (!mpPayment?.providerPaymentId) return { ok: false, message: "No hay pago de MercadoPago asociado" };
+
+  // Llamar a MP para obtener estado real
+  const client = getMpClient();
+  if (!client) return { ok: false, message: "MercadoPago no configurado" };
+
+  const paymentClient = new Payment(client);
+  let mpResponse;
+
+  try {
+    mpResponse = await paymentClient.get({ id: mpPayment.providerPaymentId });
+  } catch {
+    return { ok: false, message: "Error consultando MercadoPago" };
+  }
+
+  const { status: mpStatus, status_detail } = mpResponse;
+
+  // Mapear estado MP a nuestro enum
+  let newPaymentStatus: "CREATED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" = "CREATED";
+
+  switch (mpStatus) {
+    case "approved":
+      newPaymentStatus = status_detail === "accredited" ? "APPROVED" : "PENDING";
+      break;
+    case "pending":
+    case "in_process":
+      newPaymentStatus = "PENDING";
+      break;
+    case "rejected":
+      newPaymentStatus = "REJECTED";
+      break;
+    case "cancelled":
+      newPaymentStatus = "CANCELLED";
+      break;
+    default:
+      newPaymentStatus = "CREATED";
+  }
+
+  // Actualizar si cambió
+  let finalOrderStatus = order.status;
+  let isPaid = order.isPaid;
+
+  if (mpPayment.status !== newPaymentStatus) {
+    await prisma.payment.update({
+      where: { id: mpPayment.id },
+      data: { status: newPaymentStatus },
+    });
+  }
+
+  // Si el pago se aprobó y la orden no está pagada, confirmar
+  if (newPaymentStatus === "APPROVED" && !order.isPaid) {
+    await prisma.$transaction(async (tx) => {
+      await confirmPaymentAndUpdateStock(tx, orderId);
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: "paid", isPaid: true, paidAt: new Date() },
+      });
+    });
+    finalOrderStatus = "paid";
+    isPaid = true;
+  }
+
+  return {
+    ok: true,
+    paymentStatus: newPaymentStatus,
+    orderStatus: finalOrderStatus,
+    isPaid,
   };
 }

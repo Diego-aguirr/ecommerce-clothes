@@ -33,6 +33,7 @@ test-results/
 
 # ─── Prisma generated client ───
 /src/generated/prisma
+/src/generated/prisma-v2
 
 # ─── Database data (Docker volumes) ───
 /postgres-data/

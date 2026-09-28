@@ -1,19 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore, useAddressStore } from "@/store";
 import { placeOrder } from "@/actions/order/place-order";
 import { createPreference } from "@/actions/payment/create-preference";
-import { useRouter } from "next/navigation";
+import { verifyPayment } from "@/actions/order/verify-payment";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export const PlaceOrder = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loaded, setLoaded] = useState(true);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [idempotencyToken, setIdempotencyToken] = useState(() => crypto.randomUUID());
   const [paymentMethod, setPaymentMethod] = useState<"mercadopago" | "cash">("mercadopago");
+  const [paymentVerified, setPaymentVerified] = useState<{ status: string; isPaid: boolean } | null>(null);
 
   const address = useAddressStore((state) => state.address);
   const shippingMethod = useAddressStore((state) => state.shippingMethod);
@@ -28,9 +31,31 @@ export const PlaceOrder = () => {
 
   const { subTotal, tax, total, itemsInCart } = getSummaryInformation();
 
+  // Verify payment on return from MercadoPago (external_reference in URL)
+  useEffect(() => {
+    const externalRef = searchParams.get("external_reference");
+    const paymentId = searchParams.get("payment_id");
+    const status = searchParams.get("status");
+
+    if (externalRef && paymentId && status) {
+      // Return from MP - verify payment
+      verifyPayment(externalRef).then((result) => {
+        if (result.ok) {
+          setPaymentVerified({ status: result.paymentStatus, isPaid: result.isPaid });
+        }
+      });
+    }
+  }, [searchParams]);
+
   if (!loaded) {
     return <p className="animate-pulse">Cargando...</p>;
   }
+
+  // Determine if payment button should be gated
+  const isPaymentGated = paymentVerified?.isPaid || 
+    paymentVerified?.status === "APPROVED" || 
+    paymentVerified?.status === "REJECTED" || 
+    paymentVerified?.status === "CANCELLED";
 
   const onPlaceOrder = async () => {
     if (isPlacingOrder) return;
@@ -226,20 +251,51 @@ export const PlaceOrder = () => {
         </div>
       </div>
 
+      {/* Payment status message on return from MP */}
+      {paymentVerified && !isPlacingOrder && (
+        <div className={cn(
+          "mb-4 p-3 rounded-lg text-sm",
+          paymentVerified.isPaid
+            ? "bg-green-50 text-green-700 border border-green-200"
+            : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+        )}>
+          {paymentVerified.isPaid ? (
+            <>
+              <span className="font-medium">✅ Pago confirmado. </span>
+              <span>Tu orden ya fue pagada. </span>
+              <a href={`/orders/${searchParams.get("external_reference")}`} className="underline">
+                Ver detalles
+              </a>
+            </>
+          ) : (
+            <>
+              <span className="font-medium">Estado del pago: {paymentVerified.status}. </span>
+              {paymentVerified.status === "PENDING" && <span>El pago está pendiente de acreditación.</span>}
+              {paymentVerified.status === "REJECTED" && <span>El pago fue rechazado. Podés intentar con otro método.</span>}
+              {paymentVerified.status === "CANCELLED" && <span>El pago fue cancelado.</span>}
+            </>
+          )}
+        </div>
+      )}
+
       <div className="space-y-3">
         <button
           onClick={onPlaceOrder}
-          disabled={isPlacingOrder || productsInCart.length === 0}
+          disabled={isPlacingOrder || productsInCart.length === 0 || isPaymentGated}
           className={cn(
             "w-full bg-foreground text-background font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-sm hover:shadow-md hover:opacity-90",
             {
               "opacity-70 cursor-not-allowed":
-                isPlacingOrder || productsInCart.length === 0,
-              "hover:bg-muted-foreground": !isPlacingOrder && productsInCart.length > 0,
+                isPlacingOrder || productsInCart.length === 0 || isPaymentGated,
+              "hover:bg-muted-foreground": !isPlacingOrder && productsInCart.length > 0 && !isPaymentGated,
             },
           )}
         >
-          {isPlacingOrder ? "Procesando..." : "Finalizar Compra"}
+          {isPlacingOrder
+            ? "Procesando..."
+            : isPaymentGated
+            ? "Pago ya procesado"
+            : "Finalizar Compra"}
         </button>
 
         {errorMessage && (
