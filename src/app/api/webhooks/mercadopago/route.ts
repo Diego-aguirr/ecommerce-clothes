@@ -203,6 +203,12 @@ export async function POST(req: NextRequest) {
       case "cancelled":
         newStatus = PaymentStatus.CANCELLED;
         break;
+      case "refunded":
+        newStatus = PaymentStatus.REFUNDED;
+        break;
+      case "charged_back":
+        newStatus = PaymentStatus.CHARGED_BACK;
+        break;
       default:
         newStatus = PaymentStatus.PENDING;
     }
@@ -230,24 +236,57 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    // confirmar orden o liberar reserva según estado
+    // confirmar orden, liberar reserva, o registrar refund/chargeback según estado
     if (newStatus === PaymentStatus.APPROVED) {
       await confirmPaymentAndUpdateStock(tx, payment.orderId);
+
+      // log completo
+      await tx.paymentLog.create({
+        data: {
+          paymentId: payment.id,
+          provider: "mercadopago",
+          event: payload.action,
+          rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
+        },
+      });
+
+      return { ok: true };
     } else if (newStatus === PaymentStatus.REJECTED || newStatus === PaymentStatus.CANCELLED) {
       // T7: Liberar reserva de stock si el pago falla
       await releaseStockReservation(payment.orderId);
+
+      // log completo
+      await tx.paymentLog.create({
+        data: {
+          paymentId: payment.id,
+          provider: "mercadopago",
+          event: payload.action,
+          rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
+        },
+      });
+
+      return { ok: true };
+    } else if (newStatus === PaymentStatus.REFUNDED) {
+      // T9: Refund - log duradero FUERA de la transacción
+      return {
+        kind: WebhookDecisionKind.REFUNDED,
+        webhook: payload,
+        paymentId: payment.id,
+        mpStatus: mpStatus ?? "refunded",
+        mpStatusDetail: status_detail,
+      };
+    } else if (newStatus === PaymentStatus.CHARGED_BACK) {
+      // T9: Chargeback - log duradero FUERA de la transacción
+      return {
+        kind: WebhookDecisionKind.CHARGED_BACK,
+        webhook: payload,
+        paymentId: payment.id,
+        mpStatus: mpStatus ?? "charged_back",
+        mpStatusDetail: status_detail,
+      };
     }
 
-    // log completo
-    await tx.paymentLog.create({
-      data: {
-        paymentId: payment.id,
-        provider: "mercadopago",
-        event: payload.action,
-        rawData: { webhook: payload, mp: JSON.parse(JSON.stringify(mpResponse)) },
-      },
-    });
-
+    // fallback
     return { ok: true };
   });
 

@@ -69,6 +69,8 @@ export const WebhookDecisionKind = {
   MP_FETCH_ERROR: "mp_fetch_error",
   NOT_ACCREDITED: "not_accredited",
   DUPLICATE: "duplicate",
+  REFUNDED: "refunded",
+  CHARGED_BACK: "charged_back",
 } as const;
 
 export type WebhookDecisionKind =
@@ -96,6 +98,20 @@ export type WebhookDecisionInput =
       kind: typeof WebhookDecisionKind.DUPLICATE;
       webhook: WebhookPayload;
       paymentId: string;
+    }
+  | {
+      kind: typeof WebhookDecisionKind.REFUNDED;
+      webhook: WebhookPayload;
+      paymentId: string;
+      mpStatus: string;
+      mpStatusDetail?: string;
+    }
+  | {
+      kind: typeof WebhookDecisionKind.CHARGED_BACK;
+      webhook: WebhookPayload;
+      paymentId: string;
+      mpStatus: string;
+      mpStatusDetail?: string;
     };
 
 type MpFetchErrorRawData = { webhook: WebhookPayload };
@@ -111,10 +127,24 @@ type DuplicateRawData = {
   providerPaymentId: string;
 };
 
+type RefundedRawData = {
+  webhook: WebhookPayload;
+  mpStatus: string;
+  mpStatusDetail?: string;
+};
+
+type ChargedBackRawData = {
+  webhook: WebhookPayload;
+  mpStatus: string;
+  mpStatusDetail?: string;
+};
+
 export type WebhookLogRawData =
   | MpFetchErrorRawData
   | NotAccreditedRawData
-  | DuplicateRawData;
+  | DuplicateRawData
+  | RefundedRawData
+  | ChargedBackRawData;
 
 /** Data for a durable `paymentLog.create` run outside the transaction. */
 export type WebhookLogPayload = {
@@ -190,6 +220,36 @@ export function decideWebhookOutcome(input: WebhookDecisionInput): WebhookDecisi
           rawData: {
             webhook: input.webhook,
             providerPaymentId: String(input.webhook.data.id),
+          },
+        },
+      };
+    case WebhookDecisionKind.REFUNDED:
+      return {
+        httpStatus: 200,
+        response: { ok: true, message: "Refund recorded" },
+        logPayload: {
+          provider: "mercadopago",
+          event: WebhookDecisionKind.REFUNDED,
+          paymentId: input.paymentId,
+          rawData: {
+            webhook: input.webhook,
+            mpStatus: input.mpStatus,
+            mpStatusDetail: input.mpStatusDetail,
+          },
+        },
+      };
+    case WebhookDecisionKind.CHARGED_BACK:
+      return {
+        httpStatus: 200,
+        response: { ok: true, message: "Chargeback recorded" },
+        logPayload: {
+          provider: "mercadopago",
+          event: WebhookDecisionKind.CHARGED_BACK,
+          paymentId: input.paymentId,
+          rawData: {
+            webhook: input.webhook,
+            mpStatus: input.mpStatus,
+            mpStatusDetail: input.mpStatusDetail,
           },
         },
       };

@@ -50,6 +50,8 @@ enum PaymentStatus {
   APPROVED
   REJECTED
   CANCELLED
+  REFUNDED
+  CHARGED_BACK
 }
 
 enum DeliveryStatus {
