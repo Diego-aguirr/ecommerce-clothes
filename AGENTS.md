@@ -4,13 +4,13 @@
 
 - **Auto-open files**: Every file touched/edited MUST be opened in VS Code automatically with `code <filename>` after the edit. This applies to ALL file operations (read, write, edit). No exceptions.
 
+---
+
 ## How to Use This Guide
 
-Start here for cross-project norms.
+Start here for cross-project norms. Folder-specific guidelines live in: `src/AGENTS.md`, `src/app/admin/AGENTS.md`, `src/app/api/AGENTS.md`.
 
-This repository is a domain-driven ecommerce platform built as a **modular monolith** with a unified services layer.
-
-- Folder-specific guidelines live in: `src/AGENTS.md`, `src/app/admin/AGENTS.md`, `src/app/api/AGENTS.md`.
+---
 
 ## Available Skills
 
@@ -20,35 +20,33 @@ Use these skills for detailed patterns on-demand:
 
 ### Generic Skills (Any Project)
 
-| Skill        | Description                                 | Disponibilidad           |
-| ------------ | ------------------------------------------- | ------------------------ |
-| `typescript` | Const types, flat interfaces, utility types | Local (fuera del repo)   |
-| `react-19`   | No useMemo/useCallback, React Compiler      | Local (fuera del repo)   |
-| `nextjs-15`  | App Router, Server Actions, streaming       | Local (fuera del repo)   |
-| `tailwind-4` | cn() utility, no var() in className         | Local (fuera del repo)   |
-| `zod-4`      | New API (z.email(), z.uuid())               | Local (fuera del repo)   |
-| `zustand-5`  | Persist, selectors, slices                  | Local (fuera del repo)   |
+| Skill | Description | Availability |
+|-------|-------------|--------------|
+| `typescript` | Const types, flat interfaces, utility types | Local (outside repo) |
+| `react-19` | No useMemo/useCallback, React Compiler | Local (outside repo) |
+| `nextjs-15` | App Router, Server Actions, streaming | Local (outside repo) |
+| `tailwind-4` | cn() utility, no var() in className | Local (outside repo) |
+| `zod-4` | New API (z.email(), z.uuid()) | Local (outside repo) |
+| `zustand-5` | Persist, selectors, slices | Local (outside repo) |
 
 ### Auto-invoke Skills
 
 When performing these actions, ALWAYS invoke the corresponding skill FIRST (when available):
 
-| Action                                                                                | Skill              |
-| ------------------------------------------------------------------------------------- | ------------------ |
-| App Router / Server Actions                                                           | `nextjs-15`        |
-| Creating Zod schemas                                                                  | `zod-4`            |
-| Using Zustand stores                                                                  | `zustand-5`        |
-| Working with Tailwind classes                                                         | `tailwind-4`       |
-| Writing React components                                                              | `react-19`         |
-| Writing TypeScript types/interfaces                                                   | `typescript`       |
-
-> Not available as skills (removed): `playwright` (Playwright no es dependencia del proyecto — sin config ni tests), `prisma-7`, `nextauth-5`, `mercadopago` (nunca existieron en `skills/`).
+| Action | Skill |
+|--------|-------|
+| App Router / Server Actions | `nextjs-15` |
+| Creating Zod schemas | `zod-4` |
+| Using Zustand stores | `zustand-5` |
+| Working with Tailwind classes | `tailwind-4` |
+| Writing React components | `react-19` |
+| Writing TypeScript types/interfaces | `typescript` |
 
 ---
 
 ## Project Overview
 
-This repository is a production-grade ecommerce platform built with:
+This repository is a production-grade e-commerce platform built with:
 
 - Next.js 16 App Router
 - React 19
@@ -56,7 +54,7 @@ This repository is a production-grade ecommerce platform built with:
 - Prisma 7 ORM
 - PostgreSQL (Neon)
 - NextAuth v5
-- Tailwind v4
+- Tailwind CSS v4
 - Zustand v5
 - Zod v4
 - MercadoPago (payments)
@@ -73,7 +71,7 @@ Agents must assume modern patterns and MUST NOT generate legacy code.
 
 This project follows the **Modular Monolith** architectural pattern:
 - Single deployable unit (no microservices)
-- Domain-driven modules (auth, products, orders, etc.)
+- Domain-driven modules (auth, products, orders, payments, etc.)
 - Unified services layer for business logic
 - Clear separation of concerns between layers
 - Each module has its own actions, services, and types
@@ -85,22 +83,23 @@ This project follows the **Modular Monolith** architectural pattern:
 │  UI (Server Components)                         │
 │  pages/, components/                            │
 └──────────────────┬──────────────────────────────┘
-                   │ llama
+                   │ calls
 ┌──────────────────▼──────────────────────────────┐
 │  Actions (thin orchestrators)                   │
 │  • Auth (requireSession, requireAdmin)          │
-│  • Validación Zod                               │
-│  • Manejo de errores → { ok, error, data }      │
-│  • 0 queries Prisma directo                     │
+│  • Zod validation                               │
+│  • Error handling → { ok, error, data }         │
+│  • 0 direct Prisma queries                      │
 └──────────────────┬──────────────────────────────┘
-                   │ delega
+                   │ delegates
 ┌──────────────────▼──────────────────────────────┐
 │  Services (business logic)                      │
-│  • Lógica de negocio                            │
-│  • Queries Prisma                               │
-│  • server-only (12/12)                          │
+│  • Business logic                               │
+│  • Prisma queries                               │
+│  • Throw errors (not return { ok: false })      │
+│  • server-only enforced (12/12)                 │
 └──────────────────┬──────────────────────────────┘
-                   │ consulta
+                   │ queries
 ┌──────────────────▼──────────────────────────────┐
 │  Prisma → PostgreSQL (Neon)                     │
 └─────────────────────────────────────────────────┘
@@ -108,18 +107,15 @@ This project follows the **Modular Monolith** architectural pattern:
 
 ### Global Architectural Rule (Highest Priority)
 
-Server Components first.
-Client Components only when strictly necessary.
+**Server Components first.** Client Components only when strictly necessary.
 
 Default assumptions:
-
 - pages → server
 - layouts → server
 - data fetching → server
 - mutations → server actions
 
 Client components allowed only if:
-
 - user interaction required
 - browser APIs required
 - animations required
@@ -144,8 +140,7 @@ When rules conflict:
 
 Project is domain-driven with a unified services layer.
 
-Domains:
-
+**Domains:**
 - auth
 - products
 - cart
@@ -153,92 +148,124 @@ Domains:
 - orders
 - payments
 - admin
-- profile
-- uploads
 - addresses
+- uploads
 - ui
-- data
-- infra
 
 ### Flow Rules
 
-Action layer:
-
+**Action layer:**
 - Auth (requireSession, requireAdmin)
 - Zod validation
 - Error handling → { ok, error, data }
 - Delegate to service
-- 0 Prisma queries direct
+- 0 direct Prisma queries
 
-Service layer:
-
+**Service layer:**
 - Business logic
 - Prisma queries
 - Throw errors (not return { ok: false })
 - server-only enforced
 
-Agents must place code inside correct domain.
-Never create new architectural patterns.
+Agents must place code inside correct domain. Never create new architectural patterns.
+
+---
+
+## Critical Patterns (Implemented)
+
+### Stock Reservation (T7)
+- **Reserve at order creation** (`createOrder`): decrement variant stock + create `StockMovement(type: "reserved")` inside the same transaction.
+- **Confirm payment** (`confirmPaymentAndUpdateStock`): convert `reserved` → `sale` movement, mark order paid.
+- **Release on failure** (`releaseStockReservation`): increment stock + create `released` movement on `REJECTED`/`CANCELLED` webhook status.
+- **Race-safe**: `decrement` + validation inside same transaction; PostgreSQL serializes concurrent transactions.
+- **Idempotent release**: second call finds no `reserved` movement → no-op.
+- **Legacy shim**: orders created before this deploy (no `reserved` movement) fall back to decrement + `sale` movement.
+
+### Idempotency Keys (Webhook)
+- **Key**: `mp:${data.id}:${x-request-id}` (MP `data.id` query param + `x-request-id` header).
+- **Check at webhook entry** (before transaction): `IdempotencyKey` model with unique constraint + 24h TTL.
+- **Duplicate handling**: return 200 + log `duplicate` event with `providerPaymentId` outside transaction.
+
+### Webhook Security
+- **Manifest HMAC**: MP signs `data.id` + `x-request-id` + `ts` (NOT the body). Verified with timing-safe compare.
+- **Fail-closed**: missing secret, missing ts/v1, malformed header, mismatch → 401.
+- **Fetch real state**: call `Payment.get(id)` to MP API; never trust webhook payload.
+- **Amount tolerance**: cent-level comparison (`amountsMatch` ±0.005 + toFixed(2) normalization).
+- **Anti-fraud**: `approved` but not `accredited` → 500 + durable log, MP retries until accredited.
+
+### Payment Methods
+- **MercadoPago**: redirect → webhook → automatic confirm.
+- **Cash/Transfer**: order created `CREATED` → client sees instructions → **Super Admin only** confirms via `approveCashPaymentService` → validates `cash` payment, not already paid, updates payment to `APPROVED`, confirms order + deducts stock (transactional).
+
+### Auth (Fail-Closed)
+- NextAuth v5: Magic Link (Email) + Google OAuth only. No password login.
+- `User.status` (`ACTIVE`/`BLOCKED`/`DELETED`) validated at `signIn` AND on every JWT refresh (mid-session block clears cookie).
+- Services/actions must use `isStatusActive()` from `lib/auth-status.ts`; never assume valid session = active user.
+
+### StockMovement Types
+| Type | Trigger | Quantity | Note |
+|------|---------|----------|------|
+| `reserved` | `createOrder` | `-qty` | `Reserva por Orden {orderId}` |
+| `sale` | `confirmPaymentAndUpdateStock` | (converts reserved→sale) | `Venta por Orden {orderId}` |
+| `released` | `releaseStockReservation` | `+qty` | `Liberación de reserva por Orden {orderId}` |
+
+### PaymentStatus Enum
+`CREATED` | `PENDING` | `APPROVED` | `REJECTED` | `CANCELLED` | `REFUNDED` | `CHARGED_BACK`
 
 ---
 
 ## Coding Standards
 
 ### TypeScript
-
 - Always type returns
-- Never use any
-- Prefer type over interface
+- Never use `any`
+- Prefer `type` over `interface`
 - Use discriminated unions
+- Const assertions: `const X = { A: "a" } as const`
 
 ### Data Access
-
-- All database access must go through Prisma.
-- All Prisma queries live in services/ (never in actions/)
-- Forbidden: raw SQL, duplicated queries, manual joins already modeled
+- All database access through Prisma.
+- All Prisma queries in `services/` (never in `actions/`).
+- Forbidden: raw SQL, duplicated queries, manual joins already modeled.
 
 ### Validation
-
-- All external input must be validated with Zod.
-- Includes: request body, forms, params, API payloads
+- All external input validated with Zod (body, forms, params, API payloads).
 - Never trust user input.
 
 ### State Management
-
 - Global state = Zustand only.
-- Rules: use slices, use selectors, never expose full store, never use Context API for global state
+- Rules: use slices, use selectors, never expose full store, never use Context API for global state.
 
 ### Forms
-
-- Forms must use: react-hook-form + zodResolver
+- Must use: react-hook-form + zodResolver.
 - Never manage form state manually.
 
 ### Styling
-
-- Styling must use Tailwind only.
-- Forbidden: CSS modules, styled-components, emotion, external UI frameworks
+- Tailwind only.
+- Forbidden: CSS modules, styled-components, emotion, external UI frameworks.
+- Single class: `className="bg-slate-800 text-white"`
+- Merge: `cn(BASE, variant && "variant-class")`
+- Dynamic: `style={{ width: "50%" }}`
 
 ### Authentication
-
-- Auth system = NextAuth v5.
-- Agents must: use server session helpers, never decode tokens manually, never store auth state client-side
-- **No password login** — only Magic Link (Email) + Google OAuth. There is no logout action (client-side `signOut` from next-auth/react).
-- **`User.status` rule (fail-closed):** only `ACTIVE` users may access. `BLOCKED`/`DELETED` are rejected in `auth.ts` at `signIn` and re-checked on every JWT refresh (a mid-session block clears the cookie). Services/actions must respect status — use `isStatusActive()` from `lib/auth-status.ts`; never assume a valid session implies an active user.
+- NextAuth v5: Magic Link (Email) + Google OAuth only. No password login.
+- Use server session helpers (`auth()`), never decode tokens manually, never store auth state client-side.
+- No logout action (client-side `signOut` from next-auth/react).
 
 ---
 
 ## File Placement Rules
 
-| Type              | Location                     |
-| ----------------- | ---------------------------- |
-| UI Components     | components/{domain}/         |
-| Server Actions    | actions/{domain}/            |
-| Business Logic    | services/{domain}.service.ts |
-| DB Queries        | services/{domain}.service.ts |
-| Zod Schemas       | lib/validations/ or inline   |
-| Zustand Stores    | store/{domain}/              |
-| Types             | interfaces/ or types/        |
-| Prisma Types      | generated/prisma/ (never import directly in components) |
+| Type | Location |
+|------|----------|
+| UI Components | `components/{domain}/` |
+| Server Actions | `actions/{domain}/` |
+| Business Logic | `services/{domain}.service.ts` |
+| DB Queries | `services/{domain}.service.ts` |
+| Zod Schemas | `lib/validations/` or inline |
+| Zustand Stores | `store/{domain}/` |
+| Types | `interfaces/` or `types/` |
+| Prisma Types | `generated/prisma-v2/` (never import directly in components) |
 
 Never mix responsibilities.
 
@@ -247,7 +274,7 @@ Never mix responsibilities.
 ## Naming Conventions
 
 - files → kebab-case (actions, utils, lib)
-- services → {domain}.service.ts (camelCase exports)
+- services → `{domain}.service.ts` (camelCase exports)
 - components → PascalCase
 - functions → camelCase
 - constants → UPPER_CASE
@@ -258,7 +285,6 @@ Never mix responsibilities.
 ## Performance Rules
 
 Always prefer:
-
 - server fetching
 - streaming
 - partial rendering
@@ -272,12 +298,13 @@ Never optimize prematurely.
 Always assume production environment.
 
 Required:
-
 - validate input
 - sanitize output
-- safe errors
-- no stack traces
+- safe errors (no stack traces, no user enumeration)
 - never expose secrets
+- timing-safe comparisons for secrets
+- idempotency keys on webhooks
+- fail-closed on all auth checks
 
 ---
 
@@ -286,55 +313,52 @@ Required:
 Agents may only use installed dependencies.
 
 If new dependency is required:
-
-- Agent must: justify why, explain size impact, wait approval
+- Justify why, explain size impact, wait for approval.
 
 ---
 
 ## Forbidden Actions
 
 Agents must NOT:
-
 - refactor unrelated files
 - rename folders globally
 - change configs silently
 - alter Prisma schema without instruction
-- introduce new architectures
+- introduce new architectural patterns
 - downgrade libraries
-- put Prisma queries in actions/ (use services/)
-- import Prisma types directly in components (use interfaces/)
+- put Prisma queries in `actions/` (use `services/`)
+- import Prisma types directly in components (use `interfaces/`)
+- add "use client" without justification
+- use `useMemo`/`useCallback` (React Compiler handles it)
 
 ---
 
 ## Expected Agent Behavior
 
 When implementing something:
-
-- Agent must: locate domain, reuse patterns, respect types, validate inputs, return typed data, avoid client code unless required
-- Delegate to services/ for business logic
-- Actions are thin orchestrators only
+- Locate domain, reuse patterns, respect types, validate inputs, return typed data, avoid client code unless required.
+- Delegate to `services/` for business logic.
+- Actions are thin orchestrators only.
 
 ---
 
 ## Definition of Done
 
 Before finishing a task:
-
-- types compile
-- lint passes
+- types compile (`npx tsc --noEmit`)
+- lint passes (`pnpm run lint`)
 - imports valid
 - no unused code
 - no console logs
 - no TODO comments
 - architecture respected
-- services have server-only
+- services have `server-only`
 
 ---
 
 ## Instruction for All Agents
 
 If unsure where code belongs:
-
 1. Check this file
 2. Check folder AGENTS.md
 3. STOP. Analyze project structure.
@@ -342,52 +366,54 @@ If unsure where code belongs:
 
 ---
 
-## PROJECT STRUCTURE
+## Project Structure
 
 ```
 src/
-├── actions/              - [Server Actions (thin orchestrators)]
-│   ├── auth/             - [Auth actions: magic link, register, Google (logout = client-side signOut)]
-│   ├── order/            - [Order actions: place, get, list]
-│   ├── product/          - [Product actions: get, paginate]
-│   ├── category/         - [Category actions: get]
-│   ├── address/          - [Address actions: get, set, delete]
-│   ├── provincies/       - [Province actions: get]
-│   ├── payment/          - [Payment actions: create preference]
-│   └── admin/            - [Admin actions: CRUD for all domains]
-├── app/                  - [Pages and Routes]
-│   ├── (auth)/           - [Auth routes: login, register]
-│   ├── (shop)/           - [Shop routes: products, cart, checkout, orders, payments]
-│   ├── admin/            - [Admin panel: dashboard, products, orders, users, categories, payments, audit]
-│   └── api/              - [API Endpoints: auth, checkout, webhooks]
-├── components/           - [UI Components (React)]
-│   ├── admin/            - [Admin-specific components: dashboard, products, ui]
-│   ├── mercadopago/      - [MercadoPago components: MercadoPagoButton]
-│   ├── product/          - [Product-specific components]
-│   ├── products/         - [Product list components]
-│   ├── provider/         - [Context Providers (client)]
-│   └── ui/               - [Generic components: button, card, footer, sidebar, etc.]
-├── config/               - [Configuration]
-├── generated/            - [Auto-generated code]
-│   └── prisma/           - [Generated by Prisma]
-├── hooks/                - [Custom hooks]
+├── actions/              # Server Actions (thin orchestrators)
+│   ├── auth/             # Magic link, register, Google (logout = client-side signOut)
+│   ├── order/            # Place, get, list
+│   ├── product/          # Get, paginate
+│   ├── category/         # Get categories
+│   ├── address/          # CRUD addresses
+│   ├── provincies/       # Get provinces
+│   ├── payment/          # MP preference, admin approval
+│   └── admin/            # Admin CRUD for all domains
+├── app/                  # Pages & Routes (App Router)
+│   ├── (auth)/           # Login, register
+│   ├── (shop)/           # Products, cart, checkout, orders, payments
+│   ├── admin/            # Admin panel: dashboard, products, orders, users, categories, payments, audit
+│   └── api/              # API Endpoints: auth, checkout, webhooks
+├── components/           # UI Components (React)
+│   ├── admin/            # Admin components: dashboard, products, ui
+│   ├── mercadopago/      # MercadoPagoButton
+│   ├── product/          # Product-specific
+│   ├── products/         # Product listings
+│   ├── provider/         # Context Providers (client)
+│   └── ui/               # Generic: button, card, footer, sidebar, etc.
+├── config/               # Configuration
+├── generated/prisma-v2/  # Auto-generated by Prisma (output path)
+├── hooks/                # Custom hooks
 │   └── useProductVariant.ts
-├── interfaces/           - [Type contracts and data interfaces]
-├── lib/                  - [Shared utilities and Prisma client]
-│   ├── admin/            - [Admin utilities: auth-utils, audit-logger]
-│   ├── schemas/          - [Zod schemas]
-│   ├── storage/          - [Storage utilities]
-│   ├── validations/      - [Validation schemas]
-│   ├── prisma.ts         - [Prisma client singleton]
-│   ├── auth-status.ts    - [Fail-closed User.status gate]
-│   ├── mailer.ts         - [Resend email client]
-│   ├── mercadopago.ts    - [MercadoPago client]
-│   ├── errors.ts         - [Unified error handler]
-│   ├── html-escape.ts    - [XSS escaping for emails]
-│   ├── url.ts            - [isLocalUrl — open redirect guard]
-│   ├── magic-link-email.ts | image-utils.ts | utils.ts | zod.ts
-├── seed/                 - [Seed scripts for database]
-├── services/             - [Business logic layer (server-only · 12 services)]
+├── interfaces/           # Type contracts and data interfaces
+├── lib/                  # Shared utilities & Prisma client
+│   ├── admin/            # auth-utils (requireAdmin), audit-logger
+│   ├── schemas/          # Zod schemas
+│   ├── storage/          # Storage utilities
+│   ├── validations/      # Validation schemas
+│   ├── prisma.ts         # Prisma singleton (src/generated/prisma-v2)
+│   ├── auth-status.ts    # Fail-closed User.status gate
+│   ├── mailer.ts         # Resend email client
+│   ├── mercadopago.ts    # MercadoPago client
+│   ├── errors.ts         # Unified error handler
+│   ├── html-escape.ts    # XSS escaping for emails
+│   ├── url.ts            # isLocalUrl (open redirect guard)
+│   ├── magic-link-email.ts
+│   ├── image-utils.ts
+│   ├── utils.ts
+│   └── zod.ts
+├── seed/                 # Seed scripts
+├── services/             # Business logic (server-only · 12 services)
 │   ├── address.service.ts
 │   ├── admin.service.ts
 │   ├── auth.service.ts
@@ -400,24 +426,35 @@ src/
 │   ├── upload.service.ts
 │   ├── user.service.ts
 │   └── variant.service.ts
-├── store/                - [Client-side state (Zustand)]
-│   ├── address/          - [Address state]
-│   ├── cart/             - [Cart state]
-│   └── ui/               - [UI state]
-├── types/                - [Global type definitions]
-└── utils/                - [General utilities]
+├── store/                # Client state (Zustand)
+│   ├── address/          # useAddressStore
+│   ├── cart/             # useCartStore
+│   └── ui/               # useUIStore
+├── types/                # Global type definitions
+└── utils/                # General utilities
 ```
 
 ---
 
-## COMMANDS
+## Commands
 
 ```bash
 pnpm install && pnpm run dev      # Start dev server
 pnpm run build                     # Production build
 npx tsc --noEmit                   # TypeScript check
-pnpm run lint                      # ESLint (no auto-fix script exists)
-pnpm run test                      # Vitest (watch mode)
+pnpm run lint                      # ESLint (no auto-fix script)
+pnpm run test                      # Vitest (watch)
 pnpm run test:run                  # Vitest (single run)
-# pnpm run test:coverage           # ⚠️ FALLA: @vitest/coverage-v8 NO está instalado (instalar dep antes de usar)
+# pnpm run test:coverage           # ⚠️ FAILS: @vitest/coverage-v8 not installed
 ```
+
+---
+
+## Seeds
+
+| Command | Description | Safety |
+|---------|-------------|--------|
+| `pnpm seed` (`prisma/seed.ts`) | DESTRUCTIVE: wipes users, orders, payments, catalog, provinces, categories; rewrites with Cloudinary images + test users | Blocks in production/Neon |
+| `pnpm seed:users` (`prisma/seed-users.ts`) | Idempotent upsert: super admin + test users + blocked user | Local only, blocks prod/Neon |
+| `pnpm seed:prod` (`prisma/seed-prod.ts`) | Provinces + categories only (base data) | Idempotent, safe for prod |
+| `npx tsx prisma/seed-dev.ts` | Local catalog (8 products) with `public/products/` images + test users. Runs on every dev container boot. **DESTRUCTIVE on every restart** | Local only, blocks prod/Neon |
