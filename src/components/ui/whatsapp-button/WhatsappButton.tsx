@@ -25,12 +25,12 @@ export const WhatsappButton = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed z-40 bottom-24 md:bottom-8 right-4 md:right-8 flex flex-col items-end gap-3">
+    <div className="fixed z-40 bottom-[calc(24px+env(safe-area-inset-bottom))] md:bottom-[calc(8px+env(safe-area-inset-bottom))] right-[calc(4px+env(safe-area-inset-right))] md:right-[calc(8px+env(safe-area-inset-right))] flex flex-col items-end gap-3">
       {/* Burbuja de chat animada */}
       <div
         className={`
           relative bg-card text-foreground p-4 rounded-2xl rounded-br-md shadow-lg 
-          max-w-[280px] transition-all duration-500 ease-out transform
+          max-w-[90vw] sm:max-w-[280px] transition-all duration-500 ease-out transform
           ${showBubble 
             ? 'opacity-100 translate-y-0 scale-100' 
             : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
