@@ -53,7 +53,7 @@ Server Components
 | 01 | Auth | services/auth.service.ts, actions/auth/ | ✅ Funcional |
 | 02 | Products | services/product.service.ts, services/variant.service.ts, services/color.service.ts | ✅ Funcional |
 | 03 | Orders | services/order.service.ts, actions/order/ | ✅ Funcional |
-| 04 | Payments | services/payment.service.ts, api/webhooks/mercadopago/ | ⚠️ Revisar |
+| 04 | Payments | services/payment.service.ts, api/webhooks/mercadopago/ | ✅ Funcional |
 | 05 | Cart & Checkout | store/cart/, actions/payment/create-preference.ts, api/checkout/ | ✅ Funcional |
 | 06 | Admin | actions/admin/, components/admin/ | ✅ Funcional |
 | 07 | Addresses | services/address.service.ts, services/province.service.ts | ✅ Funcional |
