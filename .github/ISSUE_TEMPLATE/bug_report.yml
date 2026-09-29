@@ -1,0 +1,37 @@
+---
+name: Bug Report
+about: Reportar un bug reproducible
+title: "[BUG] "
+labels: ["bug"]
+assignees: ""
+---
+
+## Descripción del Bug
+Descripción clara y concisa del problema.
+
+## Pasos para Reproducir
+1. Ir a '...'
+2. Clic en '...'
+3. Scroll a '...'
+4. Ver error
+
+## Comportamiento Esperado
+Qué debería pasar.
+
+## Comportamiento Actual
+Qué pasa en su lugar (con capturas de pantalla si aplica).
+
+## Entorno
+- OS: [ej. Ubuntu 22.04, macOS 14, Windows 11]
+- Node: [ej. 20.20.2]
+- pnpm: [ej. 10.26.2]
+- Navegador: [ej. Chrome 128, Firefox 129]
+- Docker: [sí/no, versión si aplica]
+
+## Logs / Errores
+```
+Pegá logs relevantes aquí
+```
+
+## Contexto Adicional
+Cualquier otra info útil (config, variables de entorno, pasos previos, etc.)

@@ -1,0 +1,24 @@
+---
+name: Feature Request
+about: Proponer una nueva funcionalidad
+title: "[FEAT] "
+labels: ["enhancement"]
+assignees: ""
+---
+
+## Problema a Resolver
+Descripción clara del problema que esta feature resolvería. ¿Por qué es necesario?
+
+## Solución Propuesta
+Descripción de la funcionalidad que tenés en mente.
+
+## Alternativas Consideradas
+Otras soluciones que evaluaste y por qué no sirven.
+
+## Alcance Estimado
+- Dominios afectados: [auth, orders, payments, webhook, checkout, cart, admin, products, db, ui, docs]
+- ¿Rompe compatibilidad? [sí/no]
+- ¿Requiere migración DB? [sí/no]
+
+## Contexto Adicional
+Mockups, referencias, issues relacionados, etc.

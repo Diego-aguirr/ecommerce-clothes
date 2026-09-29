@@ -1,0 +1,60 @@
+version: 2
+updates:
+  - package-ecosystem: "pnpm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "pnpm"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "vitest*"
+          - "typescript*"
+          - "prettier*"
+        update-types: ["minor", "patch"]
+      nextjs:
+        patterns:
+          - "next*"
+          - "react*"
+          - "react-dom*"
+        update-types: ["minor", "patch"]
+      prisma:
+        patterns:
+          - "prisma*"
+          - "@prisma/*"
+        update-types: ["minor", "patch"]
+      tailwind:
+        patterns:
+          - "tailwind*"
+          - "postcss*"
+          - "autoprefixer*"
+        update-types: ["minor", "patch"]
+      auth:
+        patterns:
+          - "next-auth*"
+          - "@auth/*"
+        update-types: ["minor", "patch"]
+      payments:
+        patterns:
+          - "mercadopago*"
+        update-types: ["minor", "patch"]
+      zod:
+        patterns:
+          - "zod*"
+          - "@hookform/resolvers*"
+        update-types: ["minor", "patch"]
+      zustand:
+        patterns:
+          - "zustand*"
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
